@@ -28,7 +28,6 @@ body{
 a{color:var(--primary);text-decoration:none}
 button{font-family:inherit}
 
-/* Auth */
 #auth-screen{
   display:flex;align-items:center;justify-content:center;min-height:100vh;
   padding:20px;background:linear-gradient(135deg,#667eea,#764ba2);
@@ -77,7 +76,6 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--primary)
 .auth-message.success{display:block;background:rgba(16,185,129,.1);color:var(--success)}
 .auth-message.info{display:block;background:rgba(99,102,241,.1);color:var(--primary)}
 
-/* App */
 #app-screen{display:flex;min-height:100vh}
 .sidebar{width:240px;background:var(--bg-elev);border-right:1px solid var(--border);
   display:flex;flex-direction:column;transition:transform var(--transition)}
@@ -181,13 +179,11 @@ tbody tr:last-child td{border-bottom:none}
 </head>
 <body>
 
-<!-- Экран загрузки -->
 <div id="loader-screen" class="loader">
   <div class="spinner"></div>
   <div id="loader-text" style="color:var(--text-muted);font-size:13px;">Загрузка…</div>
 </div>
 
-<!-- Экран авторизации -->
 <div id="auth-screen" style="display:none">
   <div class="auth-card">
     <div class="auth-logo">
@@ -241,7 +237,6 @@ tbody tr:last-child td{border-bottom:none}
   </div>
 </div>
 
-<!-- Экран приложения -->
 <div id="app-screen" style="display:none">
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-header"><h2>📚 ЭЖ</h2></div>
@@ -293,13 +288,37 @@ const secondaryApp  = firebase.initializeApp(firebaseConfig, 'Secondary');
 const secondaryAuth = secondaryApp.auth();
 
 /* ============================================================
-   КОНСТАНТЫ
+   ★ ЗАХАРДКОЖЕННЫЙ АДМИН (без Firebase Auth)
+   Чтобы изменить логин/пароль — правьте эти строки.
 ============================================================ */
-const ADMIN_EMAIL       = 'admin@admin.local';
-const ADMIN_PASSWORD    = 'admin123';
-const ADMIN_PASSWORD_UI = 'admin';
-const ADMIN_LOGIN       = 'admin';
-const BOOTSTRAP_KEY     = 'ej_bootstrap_v2';
+const HARDCODED_ADMIN = {
+  login:    'admin',
+  password: 'admin',
+  profile: {
+    role: 'super_admin',
+    login: 'admin',
+    name: 'Главный администратор',
+    email: 'admin@local'
+  }
+};
+
+/* ============================================================
+   СЕССИЯ (хранится в localStorage)
+============================================================ */
+const SESSION_KEY = 'ej_session_v1';
+
+function getSession() {
+  try {
+    const raw = localStorage.getItem(SESSION_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch (e) { return null; }
+}
+function setSession(user, profile) {
+  localStorage.setItem(SESSION_KEY, JSON.stringify({ user, profile }));
+}
+function clearSession() {
+  localStorage.removeItem(SESSION_KEY);
+}
 
 /* ============================================================
    УТИЛИТЫ
@@ -392,66 +411,7 @@ function translateError(err) {
 }
 
 /* ============================================================
-   АВТОСОЗДАНИЕ АДМИНИСТРАТОРА
-============================================================ */
-async function bootstrapAdmin() {
-  const loaderText = $('#loader-text');
-
-  loaderText.textContent = 'Проверка администратора…';
-  try {
-    const cred = await auth.signInWithEmailAndPassword(ADMIN_EMAIL, ADMIN_PASSWORD);
-    const uid  = cred.user.uid;
-
-    const snap = await db.ref('users/' + uid).once('value');
-    if (!snap.exists()) {
-      await db.ref('users/' + uid).set({
-        role: 'super_admin',
-        login: ADMIN_LOGIN,
-        email: ADMIN_EMAIL,
-        name: 'Главный администратор',
-        createdAt: Date.now()
-      });
-    }
-    await auth.signOut();
-    localStorage.setItem(BOOTSTRAP_KEY, 'done');
-    console.log('[bootstrap] admin уже существует, вход успешен');
-    return;
-  } catch (e) {
-    console.log('[bootstrap] вход не удался:', e.code);
-  }
-
-  loaderText.textContent = 'Создание администратора…';
-  try {
-    const cred = await auth.createUserWithEmailAndPassword(ADMIN_EMAIL, ADMIN_PASSWORD);
-    const uid  = cred.user.uid;
-    await db.ref('users/' + uid).set({
-      role: 'super_admin',
-      login: ADMIN_LOGIN,
-      email: ADMIN_EMAIL,
-      name: 'Главный администратор',
-      createdAt: Date.now()
-    });
-    await auth.signOut();
-    localStorage.setItem(BOOTSTRAP_KEY, 'done');
-    console.log('[bootstrap] админ успешно создан');
-  } catch (e) {
-    console.warn('[bootstrap] не удалось создать:', e.code, e.message);
-
-    if (e.code === 'auth/email-already-in-use') {
-      localStorage.setItem(BOOTSTRAP_KEY, 'done');
-      toast('Админ уже существует. Войдите как admin/admin', 'warning');
-    } else if (e.code === 'auth/weak-password') {
-      toast('Пароль админа слишком короткий — Firebase требует ≥6 символов', 'error');
-    } else if (e.code === 'auth/operation-not-allowed') {
-      toast('В Firebase Console включите Email/Password в Authentication → Sign-in method', 'error');
-    } else if (e.code === 'auth/network-request-failed') {
-      toast('Нет соединения с Firebase. Проверьте интернет.', 'error');
-    }
-  }
-}
-
-/* ============================================================
-   UI: тема
+   ТЕМА
 ============================================================ */
 function initTheme() {
   const t = localStorage.getItem('theme') || 'light';
@@ -470,7 +430,7 @@ function initTheme() {
 initTheme();
 
 /* ============================================================
-   АВТОРИЗАЦИЯ: вкладки, вход, регистрация, сброс
+   АВТОРИЗАЦИЯ: вкладки
 ============================================================ */
 function showAuthMsg(text, type = 'error') {
   const el2 = $('#auth-message');
@@ -488,34 +448,46 @@ $$('.auth-tab').forEach(tab => {
   };
 });
 
-/* --- ВХОД --- */
+/* ============================================================
+   ВХОД
+============================================================ */
 $('#login-form').addEventListener('submit', async (e) => {
   e.preventDefault();
   const loginInput = $('#login-input').value.trim();
-  let   password   = $('#login-password').value;
+  const password   = $('#login-password').value;
   if (!loginInput || !password) return;
 
+  /* 1) Проверяем захардкоженного админа */
+  if (loginInput === HARDCODED_ADMIN.login && password === HARDCODED_ADMIN.password) {
+    const user = {
+      uid: 'admin-local',   // фиктивный UID, чтобы код не падал
+      email: HARDCODED_ADMIN.profile.email
+    };
+    const profile = { ...HARDCODED_ADMIN.profile, createdAt: Date.now() };
+    setSession(user, profile);
+    startApp(user, profile);
+    return;
+  }
+
+  /* 2) Иначе — обычный вход через Firebase (учителя, создатели) */
   try {
     let email = loginInput;
     if (!loginInput.includes('@')) {
       const snap = await db.ref('users').orderByChild('login').equalTo(loginInput).once('value');
       if (!snap.exists()) return showAuthMsg('Пользователь с таким логином не найден');
-      const user = Object.values(snap.val())[0];
-      email = user.email;
+      const u = Object.values(snap.val())[0];
+      email = u.email;
     }
-
-    // Подмена пароля для админа: пользователь вводит "admin", в Firebase идёт "admin123"
-    if ((loginInput === ADMIN_LOGIN || email === ADMIN_EMAIL) && password === ADMIN_PASSWORD_UI) {
-      password = ADMIN_PASSWORD;
-    }
-
-    await auth.signInWithEmailAndPassword(email, password);
+    const cred = await auth.signInWithEmailAndPassword(email, password);
+    // Дальше сработает onAuthStateChanged — он подхватит сессию
   } catch (err) {
     showAuthMsg(translateError(err));
   }
 });
 
-/* --- РЕГИСТРАЦИЯ --- */
+/* ============================================================
+   РЕГИСТРАЦИЯ ПО КОДУ
+============================================================ */
 $('#register-form').addEventListener('submit', async (e) => {
   e.preventDefault();
   const code     = $('#invite-code').value.trim().toUpperCase();
@@ -540,18 +512,14 @@ $('#register-form').addEventListener('submit', async (e) => {
 
     await db.ref('users/' + uid).set({
       role: invite.role || 'teacher',
-      login,
-      name,
-      email,
+      login, name, email,
       schoolId: invite.schoolId || null,
       cityId: invite.cityId || null,
       createdAt: Date.now()
     });
 
     await db.ref('invites/' + code).update({
-      used: true,
-      usedBy: uid,
-      usedAt: Date.now()
+      used: true, usedBy: uid, usedAt: Date.now()
     });
 
     showAuthMsg('Регистрация успешна! Входим…', 'success');
@@ -619,14 +587,6 @@ const MENU = {
     { id: 'students',  label: '👨‍🎓 Ученики' },
     { id: 'worktypes', label: '🏷️ Типы работ' },
     { id: 'profile',   label: '⚙️ Профиль' }
-  ],
-  student: [
-    { id: 'dashboard', label: '📊 Мои оценки' },
-    { id: 'profile',   label: '⚙️ Профиль' }
-  ],
-  parent: [
-    { id: 'dashboard', label: '📊 Оценки ребёнка' },
-    { id: 'profile',   label: '⚙️ Профиль' }
   ]
 };
 
@@ -643,8 +603,6 @@ function buildMenu() {
   });
 }
 
-let currentView = 'dashboard';
-
 function navigate(view, params = {}) {
   location.hash = '#' + view + (params.id ? '/' + params.id : '');
   router();
@@ -653,9 +611,8 @@ function navigate(view, params = {}) {
 async function router() {
   const hash = location.hash.slice(1) || 'dashboard';
   const [view, id] = hash.split('/');
-  currentView = view;
 
-  if (!App.profile) return; // защита: если профиль ещё не загружен
+  if (!App.profile) return;
 
   const items = MENU[App.profile.role] || [];
   const allowed = items.map(i => i.id);
@@ -759,11 +716,6 @@ async function renderDashboard() {
       { label: 'Моих классов',     value: Object.keys(myClasses()).length },
       { label: 'Моих учеников',    value: countStudentsInMyClasses() },
       { label: 'Оценок выставлено', value: countMyGrades() }
-    ];
-  } else {
-    stats = [
-      { label: 'Моих оценок',  value: countMyGradesAsStudent() },
-      { label: 'Средний балл', value: avgForStudent(App.user.uid) || '—' }
     ];
   }
 
@@ -1285,9 +1237,7 @@ function addSchoolDialog() {
     .filter(([id]) => App.profile.role !== 'city_creator' || id === App.profile.cityId)
     .map(([id, c]) => `<option value="${id}">${c.name}</option>`).join('');
 
-  if (!cityOpts) {
-    return toast('Сначала создайте город', 'warning');
-  }
+  if (!cityOpts) return toast('Сначала создайте город', 'warning');
 
   showModal('Новая школа', `
     <div class="form-group"><label>Название</label>
@@ -1310,6 +1260,10 @@ function addSchoolDialog() {
 
 function createCityCreatorDialog(cityId) {
   showModal('Создатель города', `
+    <p style="font-size:12px;color:var(--text-muted);margin-bottom:12px;">
+      Внимание: создание пользователя требует включённого Email/Password в Firebase и
+      повторный вход не понадобится.
+    </p>
     <div class="form-group"><label>ФИО</label><input id="cc-name"></div>
     <div class="form-group"><label>Логин</label><input id="cc-login"></div>
     <div class="form-group"><label>Email</label><input id="cc-email" type="email"></div>
@@ -1373,8 +1327,8 @@ function createInvite() {
   const expiresAt = Date.now() + 7 * 24 * 60 * 60 * 1000;
   db.ref('invites/' + code).set({
     role: 'teacher',
-    schoolId: App.profile.schoolId,
-    cityId: App.profile.cityId,
+    schoolId: App.profile.schoolId || null,
+    cityId: App.profile.cityId || null,
     createdBy: App.user.uid,
     used: false,
     createdAt: Date.now(),
@@ -1404,7 +1358,7 @@ function addClassDialog() {
       await db.ref('classes/' + id).set({
         name, year, subjects,
         teacherId: App.user.uid,
-        schoolId: App.profile.schoolId,
+        schoolId: App.profile.schoolId || null,
         createdAt: Date.now()
       });
       closeModal(); toast('Класс создан', 'success');
@@ -1556,7 +1510,7 @@ function addWorkTypeDialog() {
       if (!name || weight < 1) return;
       const id = db.ref('workTypes').push().key;
       await db.ref('workTypes/' + id).set({
-        name, weight, schoolId: App.profile.schoolId, createdBy: App.user.uid
+        name, weight, schoolId: App.profile.schoolId || null, createdBy: App.user.uid
       });
       closeModal(); toast('Тип добавлен', 'success');
       await loadAll(); renderWorkTypes();
@@ -1603,9 +1557,6 @@ function countStudentsInMyClasses() {
 function countMyGrades() {
   return Object.values(App.cache.grades).filter(g => g.teacherId === App.user.uid).length;
 }
-function countMyGradesAsStudent() {
-  return Object.values(App.cache.grades).filter(g => g.studentId === App.user.uid).length;
-}
 
 /* ============================================================
    ЭКСПОРТ
@@ -1647,6 +1598,30 @@ function showApp() {
 }
 
 /* ============================================================
+   СТАРТ ПРИЛОЖЕНИЯ ПОСЛЕ ВХОДА
+============================================================ */
+async function startApp(user, profile) {
+  App.user = user;
+  App.profile = profile;
+  showLoader('Загрузка данных…');
+
+  $('#user-name').textContent = profile.name || profile.login || '';
+  $('#user-role').textContent = profile.role || '';
+
+  try {
+    await loadAll();
+    buildMenu();
+    showApp();
+    if (!location.hash) location.hash = '#dashboard';
+    router();
+  } catch (err) {
+    console.error(err);
+    toast('Ошибка загрузки данных: ' + err.message, 'error');
+    showApp();
+  }
+}
+
+/* ============================================================
    КНОПКА ВЫХОДА
 ============================================================ */
 $('#logout-btn').onclick = async () => {
@@ -1654,98 +1629,58 @@ $('#logout-btn').onclick = async () => {
   btn.disabled = true;
   btn.textContent = 'Выход…';
 
-  // Сбрасываем локальное состояние — чтобы никакие async-задачи
-  // не «вернули» пользователя обратно в приложение
-  authToken++;
+  clearSession();
   App.user = null;
   App.profile = null;
 
-  try {
-    await auth.signOut();
-    // Принудительная перезагрузка: гарантирует чистое состояние
-    location.reload();
-  } catch (err) {
-    console.error('Logout error:', err);
-    toast('Ошибка выхода: ' + (err.message || err.code), 'error');
-    btn.disabled = false;
-    btn.textContent = 'Выйти';
-  }
+  // Пытаемся выйти из Firebase (если был вход через Auth)
+  try { await auth.signOut(); } catch (e) {}
+
+  // Перезагружаем — чистое состояние
+  location.reload();
 };
 
 $('#menu-toggle').onclick = () => $('#sidebar').classList.toggle('open');
 
 /* ============================================================
-   ЗАЩИТА ОТ ГОНКИ + ОТСЛЕЖИВАНИЕ АВТОРИЗАЦИИ
+   ВОССТАНОВЛЕНИЕ СЕССИИ ПРИ ЗАГРУЗКЕ
 ============================================================ */
-let authToken = 0;
+(async () => {
+  showLoader('Загрузка…');
 
-auth.onAuthStateChanged(async (user) => {
-  const myToken = ++authToken; // «своя» версия запроса
-
-  // Пользователь вышел — показываем форму входа
-  if (!user) {
-    App.user = null;
-    App.profile = null;
-    showAuth();
+  // 1) Проверяем локальную сессию (захардкоженный админ или прошлый вход)
+  const session = getSession();
+  if (session && session.user && session.profile) {
+    await startApp(session.user, session.profile);
     return;
   }
 
-  App.user = user;
-  showLoader('Загрузка профиля…');
-
-  try {
-    const snap = await db.ref('users/' + user.uid).once('value');
-    if (myToken !== authToken) return; // отменено (logout/повторный вход)
-
-    if (!snap.exists()) {
-      await db.ref('users/' + user.uid).set({
-        role: 'super_admin',
-        login: user.email.split('@')[0],
-        email: user.email,
-        name: user.email,
-        createdAt: Date.now()
-      });
-      const snap2 = await db.ref('users/' + user.uid).once('value');
-      if (myToken !== authToken) return;
-      App.profile = snap2.val();
-    } else {
-      App.profile = snap.val();
+  // 2) Проверяем Firebase Auth (для учителей и создателей)
+  //    onAuthStateChanged сработает один раз при загрузке
+  auth.onAuthStateChanged(async (fbUser) => {
+    if (!fbUser) {
+      showAuth();
+      return;
     }
-
-    $('#user-name').textContent = App.profile.name || App.profile.login || '';
-    $('#user-role').textContent = App.profile.role || '';
-
-    await loadAll();
-    if (myToken !== authToken) return; // отменено во время загрузки
-
-    buildMenu();
-    showApp();
-    if (!location.hash) location.hash = '#dashboard';
-    router();
-  } catch (err) {
-    if (myToken !== authToken) return;
-    console.error(err);
-    toast('Ошибка загрузки профиля: ' + err.message, 'error');
-    showAuth();
-  }
-});
-
-/* ============================================================
-   ЗАПУСК
-============================================================ */
-(async () => {
-  showLoader('Инициализация…');
-  try {
-    await bootstrapAdmin();
-  } catch (e) {
-    console.warn('bootstrap err', e);
-  }
-  showLoader('Проверка сессии…');
-  setTimeout(() => {
-    if (!App.user && $('#loader-screen').style.display !== 'none') {
+    // Есть пользователь в Firebase — подгружаем профиль
+    showLoader('Загрузка профиля…');
+    try {
+      const snap = await db.ref('users/' + fbUser.uid).once('value');
+      if (!snap.exists()) {
+        toast('Профиль пользователя не найден в базе', 'error');
+        await auth.signOut();
+        showAuth();
+        return;
+      }
+      const profile = snap.val();
+      setSession({ uid: fbUser.uid, email: fbUser.email }, profile);
+      await startApp({ uid: fbUser.uid, email: fbUser.email }, profile);
+    } catch (err) {
+      console.error(err);
+      toast('Ошибка загрузки профиля: ' + err.message, 'error');
       showAuth();
     }
-  }, 3000);
+  });
 })();
 </script>
 </body>
