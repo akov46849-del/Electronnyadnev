@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Электронный журнал</title>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
+<style>
+:root{--bg:#f4f7fb;--card:#fff;--text:#172033;--muted:#718096;--border:#e6eaf0;--primary:#5b5cf0;--danger:#ef4444;--ok:#22c55e;--warn:#f59e0b;--side:#111827}
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:var(--bg);color:var(--text)}body.dark{--bg:#0b1120;--card:#111827;--text:#f1f5f9;--muted:#94a3b8;--border:#263247;--side:#050a14}
+.hidden{display:none!important}button,input,select,textarea{font:inherit}button{cursor:pointer}
+.auth{min-height:100vh;display:grid;place-items:center;padding:20px;background:radial-gradient(circle at 20% 20%,#5b5cf033,transparent 30%),var(--bg)}
+.authbox{width:min(430px,100%);background:var(--card);padding:32px;border:1px solid var(--border);border-radius:22px;box-shadow:0 15px 45px #0001}
+.logo{width:58px;height:58px;border-radius:17px;display:grid;place-items:center;background:linear-gradient(135deg,#5b5cf0,#8b5cf6);color:#fff;font-size:27px;font-weight:800}
+h1{margin:12px 0 7px}.muted{color:var(--muted)}.field{margin:14px 0}.field label{display:block;font-size:13px;font-weight:bold;margin-bottom:6px}.field input,.field select,.field textarea{width:100%;padding:12px;border:1px solid var(--border);border-radius:10px;background:var(--bg);color:var(--text)}
+.primary{background:linear-gradient(135deg,#5b5cf0,#7778ff);color:white;border:0;border-radius:10px;padding:12px 16px;font-weight:bold}.secondary{background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:10px;padding:11px 15px}.danger{background:#fee2e2;color:#b91c1c;border:0;border-radius:10px;padding:10px}
+.auth .primary{width:100%}.link{background:none;color:var(--primary);border:0;font-weight:bold}.msg{margin-top:12px;padding:10px;border-radius:10px;background:#fee2e2;color:#b91c1c;font-size:14px}
+.layout{min-height:100vh}.side{position:fixed;left:0;top:0;bottom:0;width:250px;background:var(--side);color:#fff;padding:18px 13px;overflow:auto}.brand{display:flex;gap:10px;align-items:center;padding:8px 9px 22px;font-weight:bold;font-size:18px}.bi{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(135deg,#6366f1,#8b5cf6)}
+.nav button{display:block;width:100%;padding:11px;border:0;border-radius:10px;text-align:left;background:none;color:#dbe3f0;margin:3px 0}.nav button:hover,.nav button.active{background:#ffffff16;color:#fff}
+.main{margin-left:250px}.top{height:68px;display:flex;align-items:center;justify-content:space-between;padding:0 26px;background:var(--card);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:5}.user{display:flex;align-items:center;gap:10px}.avatar{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:#6366f1;color:#fff;font-weight:bold}
+.content{padding:25px;max-width:1500px;margin:auto}.title{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:20px}.title h2{margin:0}.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px}.card,.tablebox{background:var(--card);border:1px solid var(--border);border-radius:17px;box-shadow:0 10px 30px #00000008}.card{padding:20px}.value{font-size:29px;font-weight:bold;margin-top:8px}.tablebox{overflow:auto}.toolbar{display:flex;gap:10px;flex-wrap:wrap;padding:15px;border-bottom:1px solid var(--border)}.toolbar input,.toolbar select{padding:10px;border:1px solid var(--border);border-radius:9px;background:var(--bg);color:var(--text)}
+table{width:100%;border-collapse:collapse;min-width:650px}th,td{padding:12px 14px;border-bottom:1px solid var(--border);text-align:left}th{font-size:13px;color:var(--muted);background:#00000004}tr:last-child td{border-bottom:0}.empty{text-align:center;color:var(--muted);padding:35px}
+.grade{display:inline-grid;place-items:center;min-width:34px;height:30px;border-radius:8px;font-weight:bold}.g5{background:#bbf7d0;color:#166534}.g4{background:#dcfce7;color:#166534}.g3{background:#fef08a;color:#854d0e}.g2{background:#fecaca;color:#991b1b}
+.modal{position:fixed;inset:0;background:#0008;display:grid;place-items:center;padding:20px;z-index:50}.modalbox{width:min(520px,100%);max-height:90vh;overflow:auto;background:var(--card);border-radius:18px;padding:24px}.modalhead{display:flex;justify-content:space-between;align-items:center}.close{background:none;font-size:25px;color:var(--muted)}
+.toast{position:fixed;right:20px;bottom:20px;background:#111827;color:white;padding:13px 17px;border-radius:11px;z-index:100;box-shadow:0 10px 30px #0003}
+.mobile{display:none}.section{display:none}.section.active{display:block}
+.badge{display:inline-block;padding:5px 8px;border-radius:99px;background:#5b5cf01a;color:#5b5cf0;font-size:12px;font-weight:bold}
+@media(max-width:900px){.cards{grid-template-columns:repeat(2,1fr)}.side{width:220px}.main{margin-left:220px}}
+@media(max-width:650px){.side{transform:translateX(-100%);transition:.2s;width:250px}.side.open{transform:translateX(0)}.main{margin-left:0}.mobile{display:block}.top{padding:0 15px}.content{padding:15px}.cards{grid-template-columns:1fr 1fr}.title h2{font-size:22px}}
+</style>
+</head>
+<body>
+<div id="auth" class="auth">
+  <div class="authbox">
+    <div class="logo">Ж</div>
+    <h1>Электронный журнал</h1>
+    <p class="muted">Вход в систему</p>
+    <form id="loginForm">
+      <div class="field"><label>Логин или Email</label><input id="login" required autocomplete="username"></div>
+      <div class="field"><label>Пароль</label><input id="password" type="password" required autocomplete="current-password"></div>
+      <button class="primary">Войти</button>
+    </form>
+    <div style="text-align:center;margin-top:14px">
+      <button class="link" onclick="showRegister()">Регистрация по коду</button>
+      · <button class="link" onclick="resetPassword()">Сбросить пароль</button>
+    </div>
+    <div id="authMsg"></div>
+  </div>
+</div>
+
+<div id="register" class="auth hidden">
+  <div class="authbox">
+    <div class="logo">+</div><h1>Регистрация</h1>
+    <p class="muted">Введите код приглашения школы</p>
+    <form id="registerForm">
+      <div class="field"><label>Код приглашения</label><input id="invite" required></div>
+      <div class="field"><label>ФИО</label><input id="regName" required></div>
+      <div class="field"><label>Логин</label><input id="regLogin" required></div>
+      <div class="field"><label>Email</label><input id="regEmail" type="email" required></div>
+      <div class="field"><label>Пароль</label><input id="regPassword" type="password" minlength="6" required></div>
+      <button class="primary">Создать аккаунт</button>
+    </form>
+    <div class="auth-switch"><button class="link" onclick="showLogin()">Вернуться ко входу</button></div>
+    <div id="regMsg"></div>
+  </div>
+</div>
+
+<div id="app" class="layout hidden">
+  <aside id="side" class="side">
+    <div class="brand"><div class="bi">Ж</div> Электронный журнал</div>
+    <div id="nav" class="nav"></div>
+  </aside>
+  <main class="main">
+    <header class="top">
+      <button class="secondary mobile" onclick="toggleSide()">☰</button>
+      <div id="topTitle">Главная</div>
+      <div class="user"><div id="topName"></div><div id="avatar" class="avatar">?</div><button class="secondary" onclick="toggleTheme()">☀/🌙</button><button class="secondary" onclick="logout()">Выйти</button></div>
+    </header>
+    <div class="content">
+      <div id="sections"></div>
+    </div>
+  </main>
+</div>
+
+<div id="modal" class="modal hidden"><div class="modalbox"><div class="modalhead"><h2 id="modalTitle"></h2><button class="close" onclick="closeModal()">×</button></div><div id="modalBody"></div></div></div>
+<div id="toast" class="toast hidden"></div>
+
+<script>
+const firebaseConfig={
+ apiKey:"AIzaSyBSb532Ppi7xXdfXTDfXT6P_ut_0saio", /* замените только если Firebase Console показывает другой ключ */
+ authDomain:"zing-30a21.firebaseapp.com",
+ databaseURL:"https://zing-30a21-default-rtdb.europe-west1.firebasedatabase.app",
+ projectId:"zing-30a21",
+ storageBucket:"zing-30a21.firebasestorage.app",
+ messagingSenderId:"179467663659",
+ appId:"1:179467663659:web:be71167fd0ffd412416d6e"
+};
+
+/* Вставьте исходный apiKey из задания в firebaseConfig.apiKey, если он отличается. */
+firebase.initializeApp(firebaseConfig);
+const auth=firebase.auth(), db=firebase.database();
+let currentUser=null,currentProfile=null,data={};
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
+const now=()=>Date.now();
+
+function toast(t){$("toast").textContent=t;$("toast").classList.remove("hidden");setTimeout(()=>$("toast").classList.add("hidden"),2600)}
+function msg(id,t){$(id).innerHTML='<div class="msg">'+esc(t)+'</div>'}
+function showLogin(){$("register").classList.add("hidden");$("auth").classList.remove("hidden")}
+function showRegister(){$("auth").classList.add("hidden");$("register").classList.remove("hidden")}
+function toggleTheme(){document.body.classList.toggle("dark");localStorage.theme=document.body.classList.contains("dark")?"dark":"light"}
+function toggleSide(){$("side").classList.toggle("open")}
+function closeModal(){$("modal").classList.add("hidden")}
+function openModal(title,body){$("modalTitle").textContent=title;$("modalBody").innerHTML=body;$("modal").classList.remove("hidden")}
+
+function roleName(r){return({superAdmin:"Создатель",cityCreator:"Создатель города",schoolCreator:"Создатель школы",teacher:"Учитель",student:"Ученик",parent:"Родитель"})[r]||r}
+
+function loginEmail(login){
+ if(login.includes("@")) return Promise.resolve(login);
+ return db.ref("usernames/"+login.toLowerCase()).once("value").then(s=>{
+   const v=s.val(); if(!v) throw new Error("Пользователь не найден");
+   return v.email;
+ });
+}
+
+$("loginForm").onsubmit=async e=>{
+ e.preventDefault(); $("authMsg").innerHTML="";
+ try{
+   const email=await loginEmail($("login").value.trim());
+   await auth.signInWithEmailAndPassword(email,$("password").value);
+ }catch(x){msg("authMsg",friendly(x))}
+};
+
+$("registerForm").onsubmit=async e=>{
+ e.preventDefault();$("regMsg").innerHTML="";
+ const code=$("invite").value.trim().toUpperCase();
+ try{
+   const snap=await db.ref("invites/"+code).once("value"),inv=snap.val();
+   if(!inv)throw new Error("Приглашение не найдено");
+   if(inv.used)throw new Error("Приглашение уже использовано");
+   if(inv.expiresAt&&inv.expiresAt<now())throw new Error("Срок действия приглашения истёк");
+   if(inv.role!=="teacher")throw new Error("Этот код не предназначен для учителя");
+   const email=$("regEmail").value.trim(),login=$("regLogin").value.trim().toLowerCase();
+   const exists=await db.ref("usernames/"+login).once("value");
+   if(exists.exists())throw new Error("Такой логин уже занят");
+   const cred=await auth.createUserWithEmailAndPassword(email,$("regPassword").value);
+   const uid=cred.user.uid;
+   const profile={uid,role:"teacher",login,schoolId:inv.schoolId,cityId:inv.cityId||null,name:$("regName").value.trim(),email,createdAt:now(),active:true};
+   const updates={};
+   updates["users/"+uid]=profile;
+   updates["usernames/"+login]={uid,email};
+   updates["invites/"+code+"/used"]=true;
+   updates["invites/"+code+"/usedBy"]=uid;
+   updates["invites/"+code+"/usedAt"]=now();
+   await db.ref().update(updates);
+   toast("Аккаунт создан"); await loadApp(uid);
+ }catch(x){msg("regMsg",friendly(x))}
+};
+
+async function resetPassword(){
+ const login=prompt("Введите email для восстановления пароля:");
+ if(!login)return;
+ try{const email=await loginEmail(login.trim());await auth.sendPasswordResetEmail(email);toast("Письмо для сброса отправлено")}
+ catch(x){alert(friendly(x))}
+}
+
+function friendly(e){
+ const c=e.code||"",m={ "auth/invalid-credential":"Неверный логин или пароль","auth/email-already-in-use":"Email уже используется","auth/weak-password":"Пароль слишком простой","auth/invalid-email":"Некорректный email","auth/too-many-requests":"Слишком много попыток. Попробуйте позже"};
+ return m[c]||e.message||"Произошла ошибка";
+}
+
+auth.onAuthStateChanged(async u=>{
+ if(!u){currentUser=null;currentProfile=null;$("app").classList.add("hidden");$("auth").classList.remove("hidden");return}
+ try{await loadApp(u.uid)}catch(e){await auth.signOut();msg("authMsg","Профиль пользователя не найден")}
+});
+
+async function loadApp(uid){
+ currentUser=auth.currentUser;
+ const s=await db.ref("users/"+uid).once("value");currentProfile=s.val();
+ if(!currentProfile)throw Error("no profile");
+ if(currentProfile.active===false)throw Error("account disabled");
+ $("auth").classList.add("hidden");$("register").classList.add("hidden");$("app").classList.remove("hidden");
+ $("topName").textContent=currentProfile.name||currentProfile.login;
+ $("avatar").textContent=(currentProfile.name||currentProfile.login||"?")[0].toUpperCase();
+ buildNav();renderDashboard();
+}
+
+function navItem(id,text,fn){return `<button data-nav="${id}" onclick="${fn}">${text}</button>`}
+function buildNav(){
+ let r=currentProfile.role,n="";
+ n+=navItem("dashboard","🏠 Главная","renderDashboard()");
+ if(r==="superAdmin"){n+=navItem("cities","🏙 Города","renderCities()");n+=navItem("schools","🏫 Школы","renderSchools()");n+=navItem("users","👥 Пользователи","renderUsers()")}
+ if(r==="cityCreator"){n+=navItem("schools","🏫 Мои школы","renderSchools()")}
+ if(r==="schoolCreator"){n+=navItem("teachers","👨‍🏫 Учителя","renderTeachers()");n+=navItem("invites","🔑 Приглашения","renderInvites()")}
+ if(["teacher","schoolCreator","cityCreator","superAdmin"].includes(r)){n+=navItem("classes","📚 Классы","renderClasses()")}
+ if(r==="teacher"){n+=navItem("students","👨‍🎓 Ученики","renderStudents()");n+=navItem("journal","📝 Журнал","renderJournal()");n+=navItem("types","⚙ Типы работ","renderTypes()");n+=navItem("stats","📊 Статистика","renderStats()")}
+ n+=navItem("settings","⚙ Настройки","renderSettings()");
+ $("nav").innerHTML=n;
+}
+
+function setPage(title,id,html){
+ $("topTitle").textContent=title;
+ $("sections").innerHTML=`<section id="${id}" class="section active">${html}</section>`;
+ document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.nav===id));
+}
+
+async function getAll(path){return (await db.ref(path).once("value")).val()||{}}
+function own(obj){
+ return Object.entries(obj).filter(([id,x])=>{
+  if(currentProfile.role==="superAdmin")return true;
+  if(currentProfile.role==="cityCreator")return x.cityId===currentProfile.cityId;
+  if(currentProfile.role==="schoolCreator")return x.schoolId===currentProfile.schoolId;
+  if(currentProfile.role==="teacher")return x.teacherId===currentUser.uid||x.schoolId===currentProfile.schoolId;
+  return false;
+ });
+}
+
+async function renderDashboard(){
+ const [classes,students,grades,schools]=await Promise.all([getAll("classes"),getAll("students"),getAll("grades"),getAll("schools")]);
+ const c=own(classes).length,s=own(students).length,g=own(grades).length,sc=own(schools).length;
+ setPage("Главная","dashboard",`
+ <div class="title"><div><h2>Добро пожаловать, ${esc(currentProfile.name||currentProfile.login)}!</h2><span class="muted">${roleName(currentProfile.role)}</span></div></div>
+ <div class="cards">
+  <div class="card"><span class="stat-label">Классы</span><div class="value">${c}</div></div>
+  <div class="card"><span class="stat-label">Ученики</span><div class="value">${s}</div></div>
+  <div class="card"><span class="stat-label">Оценки</span><div class="value">${g}</div></div>
+  <div class="card"><span class="stat-label">Школы</span><div class="value">${sc}</div></div>
+ </div>
+ <div class="card"><h3>Быстрые действия</h3>
+ ${currentProfile.role==="teacher"?'<button class="primary" onclick="openGradeModal()">+ Поставить оценку</button>':''}
+ ${currentProfile.role==="schoolCreator"?'<button class="primary" onclick="createInvite()">+ Создать приглашение</button>':''}
+ </div>`);
+}
+
+async function renderCities(){
+ const cities=await getAll("cities");
+ let rows=own(cities).map(([id,x])=>`<tr><td>${esc(x.name)}</td><td>${esc(x.creatorId||"—")}</td><td>${id}</td></tr>`).join("");
+ setPage("Города","cities",`<div class="title"><h2>Города</h2><button class="primary" onclick="createCity()">+ Создать город</button></div><div class="tablebox"><table><tr><th>Название</th><th>Создатель</th><th>ID</th></tr>${rows||'<tr><td colspan="3" class="empty">Нет городов</td></tr>'}</table></div>`);
+}
+async function createCity(){
+ openModal("Создать город",`<div class="field"><label>Название</label><input id="cityName"></div><button class="primary" onclick="saveCity()">Создать</button>`);
+}
+async function saveCity(){
+ const name=$("cityName").value.trim();if(!name)return;
+ const id=db.ref("cities").push().key;
+ await db.ref("cities/"+id).set({name,creatorId:currentUser.uid,createdAt:now(),active:true});
+ closeModal();toast("Город создан");renderCities();
+}
+
+async function renderSchools(){
+ const schools=await getAll("schools");
+ let rows=own(schools).map(([id,x])=>`<tr><td>${esc(x.name)}</td><td>${esc(x.cityId||"—")}</td><td>${id}</td></tr>`).join("");
+ setPage("Школы","schools",`<div class="title"><h2>Школы</h2>${currentProfile.role!=="cityCreator"?"":"<button class='primary' onclick='createSchool()'>+ Создать школу</button>"}</div><div class="tablebox"><table><tr><th>Школа</th><th>Город</th><th>ID</th></tr>${rows||'<tr><td colspan="3" class="empty">Нет школ</td></tr>'}</table></div>`);
+}
+async function createSchool(){
+ openModal("Создать школу",`<div class="field"><label>Название школы</label><input id="schoolName"></div><button class="primary" onclick="saveSchool()">Создать</button>`);
+}
+async function saveSchool(){
+ const name=$("schoolName").value.trim();if(!name)return;
+ const id=db.ref("schools").push().key;
+ await db.ref("schools/"+id).set({name,cityId:currentProfile.cityId,creatorId:currentUser.uid,createdAt:now(),active:true});
+ closeModal();toast("Школа создана");renderSchools();
+}
+
+async function renderUsers(){
+ const users=await getAll("users"),rows=Object.values(users).map(x=>`<tr><td>${esc(x.name)}</td><td>${esc(x.login)}</td><td><span class="badge">${esc(roleName(x.role))}</span></td><td>${esc(x.schoolId||"—")}</td></tr>`).join("");
+ setPage("Пользователи","users",`<div class="title"><h2>Пользователи</h2></div><div class="tablebox"><table><tr><th>Имя</th><th>Логин</th><th>Роль</th><th>Школа</th></tr>${rows||'<tr><td colspan="4" class="empty">Нет пользователей</td></tr>'}</table></div>`);
+}
+
+async function renderTeachers(){
+ const users=await getAll("users"),rows=Object.values(users).filter(x=>x.role==="teacher"&&x.schoolId===currentProfile.schoolId).map(x=>`<tr><td>${esc(x.name)}</td><td>${esc(x.login)}</td><td>${esc(x.email)}</td><td>${x.active===false?"Отключён":"Активен"}</td></tr>`).join("");
+ setPage("Учителя","teachers",`<div class="title"><h2>Учителя</h2><button class="primary" onclick="createInvite()">+ Пригласить учителя</button></div><div class="tablebox"><table><tr><th>ФИО</th><th>Логин</th><th>Email</th><th>Статус</th></tr>${rows||'<tr><td colspan="4" class="empty">Учителей пока нет</td></tr>'}</table></div>`);
+}
+
+function createInvite(){
+ const code=crypto.getRandomValues(new Uint32Array(2)).reduce((a,b)=>a+b.toString(36).toUpperCase(),"").slice(0,8);
+ const id=db.ref("invites").push().key;
+ db.ref("invites/"+code).set({role:"teacher",schoolId:currentProfile.schoolId,cityId:currentProfile.cityId||null,createdBy:currentUser.uid,used:false,expiresAt:now()+7*86400000});
+ openModal("Приглашение создано",`<p>Код приглашения:</p><h1 style="letter-spacing:4px">${code}</h1><p class="muted">Действует 7 дней и может быть использован один раз.</p><button class="primary" onclick="navigator.clipboard?.writeText('${code}');toast('Код скопирован')">Копировать код</button>`);
+}
+
+async function renderInvites(){
+ const inv=await getAll("invites");
+ const rows=Object.entries(inv).filter(([id,x])=>x.schoolId===currentProfile.schoolId).map(([id,x])=>`<tr><td><b>${id}</b></td><td>${x.used?"Использован":"Активен"}</td><td>${x.expiresAt?new Date(x.expiresAt).toLocaleDateString("ru-RU"):"—"}</td></tr>`).join("");
+ setPage("Приглашения","invites",`<div class="title"><h2>Приглашения</h2><button class="primary" onclick="createInvite()">+ Создать</button></div><div class="tablebox"><table><tr><th>Код</th><th>Статус</th><th>Истекает</th></tr>${rows||'<tr><td colspan="3" class="empty">Нет приглашений</td></tr>'}</table></div>`);
+}
+
+async function renderClasses(){
+ const classes=await getAll("classes");
+ const rows=own(classes).filter(([id,x])=>currentProfile.role!=="teacher"||x.teacherId===currentUser.uid).map(([id,x])=>`<tr><td><b>${esc(x.name)}</b></td><td>${esc(x.year||"")}</td><td>${(x.subjects||[]).map(esc).join(", ")}</td><td><button class="secondary" onclick="classStudents('${id}')">Ученики</button></td></tr>`).join("");
+ setPage("Классы","classes",`<div class="title"><h2>Мои классы</h2>${currentProfile.role==="teacher"?'<button class="primary" onclick="createClass()">+ Создать класс</button>':''}</div><div class="tablebox"><table><tr><th>Класс</th><th>Год</th><th>Предметы</th><th></th></tr>${rows||'<tr><td colspan="4" class="empty">Классов пока нет</td></tr>'}</table></div>`);
+}
+function createClass(){
+ openModal("Новый класс",`<div class="field"><label>Название</label><input id="className" placeholder="7А"></div><div class="field"><label>Учебный год</label><input id="classYear" value="${new Date().getFullYear()}"></div><div class="field"><label>Предметы через запятую</label><input id="subjects" placeholder="Математика, Русский язык"></div><button class="primary" onclick="saveClass()">Создать</button>`);
+}
+async function saveClass(){
+ const id=db.ref("classes").push().key,subs=$("subjects").value.split(",").map(x=>x.trim()).filter(Boolean);
+ await db.ref("classes/"+id).set({name:$("className").value.trim(),year:$("classYear").value.trim(),subjects:subs,schoolId:currentProfile.schoolId,teacherId:currentUser.uid,createdAt:now(),active:true});
+ closeModal();toast("Класс создан");renderClasses();
+}
+
+async function renderStudents(){
+ const students=await getAll("students"),classes=await getAll("classes");
+ const rows=own(students).filter(([id,x])=>Object.values(classes).some(c=>c.schoolId===currentProfile.schoolId&&c.teacherId===currentUser.uid&&c.name&&Object.keys(classes).find(k=>classes[k]===c)===x.classId)).map(([id,x])=>`<tr><td>${esc(x.name)}</td><td>${esc(classes[x.classId]?.name||x.classId)}</td></tr>`).join("");
+ setPage("Ученики","students",`<div class="title"><h2>Ученики</h2><button class="primary" onclick="addStudent()">+ Добавить</button></div><div class="tablebox"><table><tr><th>ФИО</th><th>Класс</th></tr>${rows||'<tr><td colspan="2" class="empty">Ученики пока не добавлены</td></tr>'}</table></div>`);
+}
+async function addStudent(){
+ const classes=await getAll("classes"),list=Object.entries(classes).filter(([id,x])=>x.teacherId===currentUser.uid).map(([id,x])=>`<option value="${id}">${esc(x.name)}</option>`).join("");
+ openModal("Добавить ученика",`<div class="field"><label>ФИО</label><input id="studentName"></div><div class="field"><label>Класс</label><select id="studentClass">${list}</select></div><button class="primary" onclick="saveStudent()">Добавить</button>`);
+}
+async function saveStudent(){
+ const id=db.ref("students").push().key;
+ await db.ref("students/"+id).set({name:$("studentName").value.trim(),classId:$("studentClass").value,schoolId:currentProfile.schoolId,createdAt:now()});
+ closeModal();toast("Ученик добавлен");renderStudents();
+}
+async function classStudents(cid){location.hash="";const students=await getAll("students"),rows=Object.entries(students).filter(([id,x])=>x.classId===cid).map(([id,x])=>`<tr><td>${esc(x.name)}</td></tr>`).join("");setPage("Ученики класса","classStudents",`<div class="title"><h2>Ученики</h2><button class="secondary" onclick="renderClasses()">← Назад</button></div><div class="tablebox"><table><tr><th>ФИО</th></tr>${rows||'<tr><td class="empty">Нет учеников</td></tr>'}</table></div>`)}
+
+async function renderTypes(){
+ const types=await getAll("workTypes");
+ let rows=Object.entries(types).filter(([id,x])=>!x.schoolId||x.schoolId===currentProfile.schoolId).map(([id,x])=>`<tr><td>${esc(x.name)}</td><td>${x.weight}</td></tr>`).join("");
+ setPage("Типы работ","types",`<div class="title"><h2>Типы работ</h2><button class="primary" onclick="addType()">+ Добавить</button></div><div class="tablebox"><table><tr><th>Тип</th><th>Вес</th></tr>${rows||'<tr><td colspan="2" class="empty">Нет типов</td></tr>'}</table></div>`);
+}
+function addType(){openModal("Тип работы",`<div class="field"><label>Название</label><input id="typeName"></div><div class="field"><label>Вес</label><input id="typeWeight" type="number" min="1" value="1"></div><button class="primary" onclick="saveType()">Сохранить</button>`)}
+async function saveType(){const id=db.ref("workTypes").push().key;await db.ref("workTypes/"+id).set({name:$("typeName").value.trim(),weight:Number($("typeWeight").value),schoolId:currentProfile.schoolId,createdBy:currentUser.uid});closeModal();toast("Тип создан");renderTypes()}
+
+async function renderJournal(){
+ const [grades,students,classes]=await Promise.all([getAll("grades"),getAll("students"),getAll("classes")]);
+ const allowed=Object.fromEntries(Object.entries(students).filter(([id,x])=>x.schoolId===currentProfile.schoolId));
+ const rows=Object.entries(grades).filter(([id,g])=>allowed[g.studentId]&&(currentProfile.role!=="teacher"||g.teacherId===currentUser.uid)).sort((a,b)=>(b[1].date||"").localeCompare(a[1].date||"")).map(([id,g])=>{
+  const st=allowed[g.studentId];return `<tr><td>${esc(st?.name)}</td><td>${esc(classes[g.classId]?.name||"")}</td><td>${esc(g.subject)}</td><td>${esc(g.date)}</td><td>${esc(g.typeName||g.typeId||"")}</td><td><span class="grade g${g.value}">${g.value}</span></td><td>${g.weight}</td></tr>`
+ }).join("");
+ setPage("Журнал","journal",`<div class="title"><h2>Журнал</h2><div><button class="primary" onclick="openGradeModal()">+ Оценка</button> <button class="secondary" onclick="exportCSV()">CSV</button></div></div><div class="tablebox"><div class="toolbar"><input id="journalSearch" placeholder="Поиск ученика..." oninput="filterTable(this,'journalTable')"></div><table id="journalTable"><tr><th>Ученик</th><th>Класс</th><th>Предмет</th><th>Дата</th><th>Работа</th><th>Оценка</th><th>Вес</th></tr>${rows||'<tr><td colspan="7" class="empty">Оценок пока нет</td></tr>'}</table></div>`);
+}
+function filterTable(inp,id){const q=inp.value.toLowerCase();document.querySelectorAll("#"+id+" tr").forEach((r,i)=>{if(i)r.style.display=r.textContent.toLowerCase().includes(q)?"":"none"})}
+
+async function openGradeModal(){
+ const [students,classes,types]=await Promise.all([getAll("students"),getAll("classes"),getAll("workTypes")]);
+ const st=Object.entries(students).filter(([id,x])=>x.schoolId===currentProfile.schoolId&&Object.values(classes).some(c=>c.teacherId===currentUser.uid&&Object.keys(classes).find(k=>classes[k]===c)===x.classId));
+ const opt=st.map(([id,x])=>`<option value="${id}" data-class="${x.classId}">${esc(x.name)}</option>`).join("");
+ const t=Object.entries(types).filter(([id,x])=>!x.schoolId||x.schoolId===currentProfile.schoolId).map(([id,x])=>`<option value="${id}" data-weight="${x.weight}">${esc(x.name)} (вес ${x.weight})</option>`).join("");
+ openModal("Добавить оценку",`<div class="field"><label>Ученик</label><select id="gradeStudent">${opt}</select></div><div class="field"><label>Предмет</label><input id="gradeSubject" placeholder="Математика"></div><div class="field"><label>Дата</label><input id="gradeDate" type="date" value="${new Date().toISOString().slice(0,10)}"></div><div class="field"><label>Тип работы</label><select id="gradeType" onchange="document.getElementById('gradeWeight').value=this.options[this.selectedIndex]?.dataset.weight||1">${t}</select></div><div class="field"><label>Вес</label><input id="gradeWeight" type="number" min="1" value="1"></div><div class="field"><label>Оценка</label><select id="gradeValue"><option>5</option><option>4</option><option>3</option><option>2</option></select></div><button class="primary" onclick="saveGrade()">Сохранить</button>`);
+}
+async function saveGrade(){
+ const students=await getAll("students"),types=await getAll("workTypes"),sid=$("gradeStudent").value,st=students[sid];
+ const type=types[$("gradeType").value]||{};
+ const id=db.ref("grades").push().key;
+ const grade={studentId:sid,classId:st.classId,subject:$("gradeSubject").value.trim(),teacherId:currentUser.uid,schoolId:currentProfile.schoolId,date:$("gradeDate").value,typeId:$("gradeType").value,typeName:type.name||"",weight:Number($("gradeWeight").value),value:Number($("gradeValue").value),createdAt:now(),updatedAt:now()};
+ await db.ref("grades/"+id).set(grade);
+ await db.ref("gradeHistory/"+db.ref("gradeHistory").push().key).set({gradeId:id,action:"create",userId:currentUser.uid,newValue:grade.value,newWeight:grade.weight,timestamp:now()});
+ closeModal();toast("Оценка сохранена");renderJournal();
+}
+
+async function renderStats(){
+ const [grades,students]=await Promise.all([getAll("grades"),getAll("students")]);
+ const groups={};
+ Object.values(grades).filter(g=>g.teacherId===currentUser.uid).forEach(g=>{const k=g.studentId;if(!groups[k])groups[k]={sum:0,w:0};groups[k].sum+=g.value*g.weight;groups[k].w+=g.weight});
+ const rows=Object.entries(groups).map(([sid,x])=>`<tr><td>${esc(students[sid]?.name||sid)}</td><td>${x.w?(x.sum/x.w).toFixed(2):"—"}</td><td>${x.w}</td></tr>`).join("");
+ setPage("Статистика","stats",`<div class="title"><h2>Средневзвешенный балл</h2></div><div class="tablebox"><table><tr><th>Ученик</th><th>Средний</th><th>Сумма весов</th></tr>${rows||'<tr><td colspan="3" class="empty">Нет данных</td></tr>'}</table></div>`);
+}
+
+async function exportCSV(){
+ const grades=await getAll("grades"),students=await getAll("students");
+ const rows=[["Ученик","Предмет","Дата","Тип работы","Вес","Оценка"]];
+ Object.values(grades).filter(g=>g.teacherId===currentUser.uid).forEach(g=>rows.push([students[g.studentId]?.name||"",g.subject,g.date,g.typeName||g.typeId,g.weight,g.value]));
+ const csv="\uFEFF"+rows.map(r=>r.map(x=>`"${String(x).replaceAll('"','""')}"`).join(";")).join("\n");
+ const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv;charset=utf-8"}));a.download="journal.csv";a.click();URL.revokeObjectURL(a.href);
+}
+
+function renderSettings(){setPage("Настройки","settings",`<div class="title"><h2>Настройки</h2></div><div class="card"><h3>Профиль</h3><p><b>Имя:</b> ${esc(currentProfile.name)}</p><p><b>Логин:</b> ${esc(currentProfile.login)}</p><p><b>Роль:</b> ${esc(roleName(currentProfile.role))}</p><button class="secondary" onclick="toggleTheme()">Переключить тему</button></div>`)}
+async function logout(){await auth.signOut()}
+function toggleSide(){ $("side").classList.toggle("open") }
+
+if(localStorage.theme==="dark")document.body.classList.add("dark");
+</script>
+</body>
+</html>
