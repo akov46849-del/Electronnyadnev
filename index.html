@@ -296,10 +296,11 @@ const secondaryAuth = secondaryApp.auth();
 /* ============================================================
    КОНСТАНТЫ
 ============================================================ */
-const ADMIN_EMAIL    = 'admin@admin.local';
-const ADMIN_PASSWORD = 'admin';
-const ADMIN_LOGIN    = 'admin';
-const BOOTSTRAP_KEY  = 'ej_bootstrap_v1';
+const ADMIN_EMAIL       = 'admin@admin.local';
+const ADMIN_PASSWORD    = 'admin123';         // реальный пароль в Firebase (≥6 символов)
+const ADMIN_PASSWORD_UI = 'admin';            // что вводит пользователь
+const ADMIN_LOGIN       = 'admin';
+const BOOTSTRAP_KEY     = 'ej_bootstrap_v2';  // версия ключа
 
 /* ============================================================
    УТИЛИТЫ
@@ -385,7 +386,8 @@ function translateError(err) {
     'auth/email-already-in-use': 'Email уже используется',
     'auth/weak-password':        'Слишком простой пароль (мин. 6 символов)',
     'auth/too-many-requests':    'Слишком много попыток. Попробуйте позже.',
-    'auth/network-request-failed': 'Проблема с сетью'
+    'auth/network-request-failed': 'Проблема с сетью',
+    'auth/operation-not-allowed':  'Email/Password не включён в Firebase Console'
   };
   return map[err.code] || err.message || 'Неизвестная ошибка';
 }
@@ -396,26 +398,13 @@ function translateError(err) {
 async function bootstrapAdmin() {
   const loaderText = $('#loader-text');
 
-  // Если уже помечено как созданное — просто проверим вход
-  const alreadyDone = localStorage.getItem(BOOTSTRAP_KEY) === 'done';
-  if (alreadyDone) {
-    loaderText.textContent = 'Проверка входа…';
-    // Попробуем тихо войти, чтобы убедиться, что админ существует
-    try {
-      await auth.signInWithEmailAndPassword(ADMIN_EMAIL, ADMIN_PASSWORD);
-      await auth.signOut(); // всё равно покажем форму входа
-      return;
-    } catch (e) {
-      // Если не получилось — пробуем пересоздать
-    }
-  }
-
-  // Пытаемся войти
-  loaderText.textContent = 'Инициализация администратора…';
+  // 1) Пробуем войти под админом
+  loaderText.textContent = 'Проверка администратора…';
   try {
-    await auth.signInWithEmailAndPassword(ADMIN_EMAIL, ADMIN_PASSWORD);
+    const cred = await auth.signInWithEmailAndPassword(ADMIN_EMAIL, ADMIN_PASSWORD);
+    const uid  = cred.user.uid;
+
     // Запись users могла быть удалена — восстановим
-    const uid = auth.currentUser.uid;
     const snap = await db.ref('users/' + uid).once('value');
     if (!snap.exists()) {
       await db.ref('users/' + uid).set({
@@ -428,12 +417,13 @@ async function bootstrapAdmin() {
     }
     await auth.signOut();
     localStorage.setItem(BOOTSTRAP_KEY, 'done');
+    console.log('[bootstrap] admin уже существует, вход успешен');
     return;
   } catch (e) {
-    // Не удалось войти — возможно, пользователя нет
+    console.log('[bootstrap] вход не удался:', e.code);
   }
 
-  // Пробуем создать
+  // 2) Создаём админа
   loaderText.textContent = 'Создание администратора…';
   try {
     const cred = await auth.createUserWithEmailAndPassword(ADMIN_EMAIL, ADMIN_PASSWORD);
@@ -447,12 +437,19 @@ async function bootstrapAdmin() {
     });
     await auth.signOut();
     localStorage.setItem(BOOTSTRAP_KEY, 'done');
+    console.log('[bootstrap] админ успешно создан');
   } catch (e) {
-    // Например, email занят, но пароль другой, или сеть
-    console.warn('Bootstrap warn:', e);
+    console.warn('[bootstrap] не удалось создать:', e.code, e.message);
+
     if (e.code === 'auth/email-already-in-use') {
-      // Админ уже есть, но пароль другой. Просто пометим.
       localStorage.setItem(BOOTSTRAP_KEY, 'done');
+      toast('Админ уже существует. Войдите как admin/admin', 'warning');
+    } else if (e.code === 'auth/weak-password') {
+      toast('Пароль админа слишком короткий — Firebase требует ≥6 символов', 'error');
+    } else if (e.code === 'auth/operation-not-allowed') {
+      toast('В Firebase Console включите Email/Password в Authentication → Sign-in method', 'error');
+    } else if (e.code === 'auth/network-request-failed') {
+      toast('Нет соединения с Firebase. Проверьте интернет.', 'error');
     }
   }
 }
@@ -495,10 +492,11 @@ $$('.auth-tab').forEach(tab => {
   };
 });
 
+/* --- ВХОД --- */
 $('#login-form').addEventListener('submit', async (e) => {
   e.preventDefault();
   const loginInput = $('#login-input').value.trim();
-  const password   = $('#login-password').value;
+  let   password   = $('#login-password').value;
   if (!loginInput || !password) return;
 
   try {
@@ -509,12 +507,19 @@ $('#login-form').addEventListener('submit', async (e) => {
       const user = Object.values(snap.val())[0];
       email = user.email;
     }
+
+    // ⬇ Подмена пароля для админа: пользователь вводит "admin", в Firebase идёт "admin123"
+    if ((loginInput === ADMIN_LOGIN || email === ADMIN_EMAIL) && password === ADMIN_PASSWORD_UI) {
+      password = ADMIN_PASSWORD;
+    }
+
     await auth.signInWithEmailAndPassword(email, password);
   } catch (err) {
     showAuthMsg(translateError(err));
   }
 });
 
+/* --- РЕГИСТРАЦИЯ --- */
 $('#register-form').addEventListener('submit', async (e) => {
   e.preventDefault();
   const code     = $('#invite-code').value.trim().toUpperCase();
@@ -533,7 +538,6 @@ $('#register-form').addEventListener('submit', async (e) => {
     const loginCheck = await db.ref('users').orderByChild('login').equalTo(login).once('value');
     if (loginCheck.exists()) return showAuthMsg('Такой логин уже занят');
 
-    // Создаём через вторичный auth, чтобы не разлогинивать (на случай, если кто-то вошёл)
     const cred = await secondaryAuth.createUserWithEmailAndPassword(email, password);
     const uid = cred.user.uid;
     await secondaryAuth.signOut();
@@ -1661,7 +1665,6 @@ auth.onAuthStateChanged(async (user) => {
   try {
     const snap = await db.ref('users/' + user.uid).once('value');
     if (!snap.exists()) {
-      // Создаём запись, если её нет (напр., admin при первом входе)
       await db.ref('users/' + user.uid).set({
         role: 'super_admin',
         login: user.email.split('@')[0],
@@ -1701,8 +1704,6 @@ auth.onAuthStateChanged(async (user) => {
     console.warn('bootstrap err', e);
   }
   showLoader('Проверка сессии…');
-  // onAuthStateChanged сам переключит экран
-  // Если через 3 секунды ничего — покажем форму входа
   setTimeout(() => {
     if (!App.user && $('#loader-screen').style.display !== 'none') {
       showAuth();
