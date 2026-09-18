@@ -6,29 +6,22 @@
 <title>Класс Жур — электронный журнал</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'><rect width='120' height='120' rx='28' fill='%230EA5E9'/><path d='M25 40 Q60 30 60 40 Q60 30 95 40 L95 82 Q60 72 60 82 Q60 72 25 82 Z' fill='%23FFFFFF'/><line x1='60' y1='40' x2='60' y2='82' stroke='%230EA5E9' stroke-width='2'/><path d='M42 60 L56 74 L84 46' stroke='%23FACC15' stroke-width='6' stroke-linecap='round' stroke-linejoin='round' fill='none'/></svg>">
 <style>
-/* ============================================================
-   ПАЛИТРА "НЕБО" — бренд «Класс Жур»
-============================================================ */
 :root{
-  /* Основные */
   --bg:#F8FAFC;
   --bg-elev:#FFFFFF;
   --text:#0F172A;
   --text-muted:#64748B;
   --border:#E2E8F0;
 
-  /* Бренд */
-  --primary:#0EA5E9;         /* ярко-голубой */
+  --primary:#0EA5E9;
   --primary-hover:#0284C7;
-  --accent:#A855F7;          /* розово-фиолетовый */
-  --brand-yellow:#FACC15;    /* тёплый жёлтый */
+  --accent:#A855F7;
+  --brand-yellow:#FACC15;
 
-  /* Семантика */
   --danger:#EF4444;
   --success:#10B981;
   --warning:#F59E0B;
 
-  /* Тени и радиусы */
   --shadow:0 1px 3px rgba(15,23,42,.08),0 1px 2px rgba(15,23,42,.04);
   --shadow-lg:0 10px 25px rgba(14,165,233,.18);
   --radius:12px;
@@ -62,15 +55,10 @@ a{color:var(--primary);text-decoration:none}
 button{font-family:inherit}
 
 /* ============================================================
-   БРЕНД — общие стили логотипа
+   БРЕНД
 ============================================================ */
-.brand{
-  display:flex;align-items:center;gap:12px;
-}
-.brand-logo{
-  flex-shrink:0;
-  filter:drop-shadow(0 4px 10px rgba(14,165,233,.25));
-}
+.brand{display:flex;align-items:center;gap:12px}
+.brand-logo{flex-shrink:0;filter:drop-shadow(0 4px 10px rgba(14,165,233,.25))}
 .brand-text{line-height:1.1}
 .brand-name{
   font-size:16px;font-weight:800;letter-spacing:-.02em;
@@ -82,6 +70,13 @@ button{font-family:inherit}
   font-size:10px;color:var(--text-muted);text-transform:uppercase;
   letter-spacing:.08em;font-weight:600;margin-top:2px;
 }
+
+/* ============================================================
+   ИКОНКИ (общие правила)
+============================================================ */
+.btn svg{flex-shrink:0}
+.nav-item svg{flex-shrink:0}
+.nav-item span{flex:1}
 
 /* ============================================================
    AUTH
@@ -108,35 +103,30 @@ button{font-family:inherit}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 
 .auth-logo{text-align:center;margin-bottom:28px}
-.auth-logo .brand-logo{margin:0 auto 14px}
+.auth-logo .brand-logo{margin:0 auto 14px;display:block}
 .auth-logo h1{
   font-size:26px;margin-bottom:6px;letter-spacing:-.03em;
   background:linear-gradient(135deg,var(--primary),var(--accent));
   -webkit-background-clip:text;background-clip:text;
   -webkit-text-fill-color:transparent;color:transparent;
 }
-.auth-subtitle{
-  color:var(--text-muted);font-size:13px;font-weight:500;
-}
+.auth-subtitle{color:var(--text-muted);font-size:13px;font-weight:500}
 .auth-slogan{
-  display:inline-block;margin-top:10px;padding:4px 12px;
+  display:inline-flex;align-items:center;gap:6px;
+  margin-top:12px;padding:5px 14px;
   background:linear-gradient(135deg,rgba(14,165,233,.12),rgba(168,85,247,.12));
   color:var(--primary);font-size:11px;font-weight:700;
   border-radius:20px;letter-spacing:.02em;
 }
+.auth-slogan svg{color:var(--brand-yellow)}
 
-.auth-tabs{
-  display:flex;background:var(--bg);border-radius:var(--radius);
-  padding:4px;margin-bottom:20px;
-}
+.auth-tabs{display:flex;background:var(--bg);border-radius:var(--radius);padding:4px;margin-bottom:20px}
 .auth-tab{
   flex:1;padding:9px;border:none;background:transparent;
   color:var(--text-muted);font-weight:600;border-radius:9px;
   cursor:pointer;transition:var(--transition);font-size:13px;
 }
-.auth-tab.active{
-  background:var(--bg-elev);color:var(--text);box-shadow:var(--shadow);
-}
+.auth-tab.active{background:var(--bg-elev);color:var(--text);box-shadow:var(--shadow)}
 .auth-form{display:none}
 .auth-form.active{display:block;animation:fadeIn .3s ease}
 
@@ -163,7 +153,7 @@ input:focus,select:focus,textarea:focus{
    BUTTONS
 ============================================================ */
 .btn{
-  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  display:inline-flex;align-items:center;justify-content:center;gap:7px;
   padding:10px 18px;border:1px solid transparent;border-radius:10px;
   font-size:14px;font-weight:600;cursor:pointer;
   transition:var(--transition);white-space:nowrap;
@@ -184,13 +174,10 @@ input:focus,select:focus,textarea:focus{
 }
 .btn-ghost:hover{background:var(--bg);border-color:var(--primary);color:var(--primary)}
 .btn-block{width:100%}
-.btn-sm{padding:7px 12px;font-size:12px;border-radius:8px}
+.btn-sm{padding:7px 12px;font-size:12px;border-radius:8px;gap:5px}
 .btn:disabled{opacity:.5;cursor:not-allowed}
 
-.auth-link{
-  display:block;text-align:center;margin-top:16px;
-  font-size:13px;color:var(--text-muted);font-weight:500;
-}
+.auth-link{display:block;text-align:center;margin-top:16px;font-size:13px;color:var(--text-muted);font-weight:500}
 .auth-link:hover{color:var(--primary)}
 .auth-message{margin-top:16px;padding:11px 14px;border-radius:10px;font-size:13px;display:none}
 .auth-message.error{display:block;background:rgba(239,68,68,.1);color:var(--danger)}
@@ -205,12 +192,10 @@ input:focus,select:focus,textarea:focus{
   width:250px;background:var(--bg-elev);border-right:1px solid var(--border);
   display:flex;flex-direction:column;transition:transform var(--transition);
 }
-.sidebar-header{
-  padding:22px 20px;border-bottom:1px solid var(--border);
-}
+.sidebar-header{padding:22px 20px;border-bottom:1px solid var(--border)}
 .sidebar-nav{flex:1;padding:12px;overflow-y:auto}
 .nav-item{
-  display:flex;align-items:center;gap:10px;padding:11px 13px;
+  display:flex;align-items:center;gap:11px;padding:11px 13px;
   border-radius:10px;color:var(--text-muted);cursor:pointer;
   font-size:14px;font-weight:500;margin-bottom:2px;
   transition:var(--transition);position:relative;
@@ -343,7 +328,11 @@ tbody tr:last-child td{border-bottom:none}
   max-width:500px;width:100%;max-height:90vh;overflow-y:auto;
   box-shadow:var(--shadow-lg);animation:slideUp .25s ease;
 }
-.modal-title{font-size:18px;margin-bottom:18px;font-weight:800;letter-spacing:-.01em}
+.modal-title{
+  font-size:18px;margin-bottom:18px;font-weight:800;letter-spacing:-.01em;
+  display:flex;align-items:center;gap:10px;
+}
+.modal-title svg{color:var(--primary);flex-shrink:0}
 .modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:22px}
 
 /* ============================================================
@@ -358,10 +347,16 @@ tbody tr:last-child td{border-bottom:none}
   border-radius:12px;box-shadow:var(--shadow-lg);font-size:13px;
   animation:slideIn .3s ease;pointer-events:auto;max-width:340px;
   border-left:4px solid var(--primary);font-weight:500;
+  display:flex;align-items:flex-start;gap:10px;
 }
+.toast svg{flex-shrink:0;margin-top:1px}
 .toast.success{border-left-color:var(--success)}
+.toast.success svg{color:var(--success)}
 .toast.error{border-left-color:var(--danger)}
+.toast.error svg{color:var(--danger)}
 .toast.warning{border-left-color:var(--warning)}
+.toast.warning svg{color:var(--warning)}
+.toast.info svg{color:var(--primary)}
 @keyframes slideIn{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:translateX(0)}}
 
 /* ============================================================
@@ -391,15 +386,13 @@ tbody tr:last-child td{border-bottom:none}
 }
 @keyframes spin{to{transform:rotate(360deg)}}
 
-.hint{font-size:12px;color:var(--text-muted);margin-top:6px;line-height:1.5}
-
-/* ============================================================
-   ДОП. АНИМАЦИИ
-============================================================ */
-@keyframes pulse{
-  0%,100%{transform:scale(1)}
-  50%{transform:scale(1.05)}
+.hint{
+  font-size:12px;color:var(--text-muted);margin-top:6px;line-height:1.5;
+  display:flex;align-items:center;gap:6px;
 }
+.hint svg{flex-shrink:0}
+
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
 .brand-logo{animation:pulse 3s ease-in-out infinite}
 </style>
 </head>
@@ -430,7 +423,12 @@ tbody tr:last-child td{border-bottom:none}
       </svg>
       <h1>Класс Жур</h1>
       <p class="auth-subtitle">Электронный журнал для школ</p>
-      <span class="auth-slogan">✨ Оценки — под контролем</span>
+      <span class="auth-slogan">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+          <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4-6.2-4.6-6.2 4.6 2.4-7.4L2 9.4h7.6z"/>
+        </svg>
+        Оценки — под контролем
+      </span>
     </div>
 
     <div class="auth-tabs">
@@ -498,13 +496,19 @@ tbody tr:last-child td{border-bottom:none}
     </div>
     <nav class="sidebar-nav" id="sidebar-nav"></nav>
     <div class="sidebar-footer">
-      <button id="theme-toggle" class="btn btn-ghost" title="Сменить тему">🌙</button>
-      <button id="logout-btn" class="btn btn-ghost">Выйти</button>
+      <button id="theme-toggle" class="btn btn-ghost" title="Сменить тему"></button>
+      <button id="logout-btn" class="btn btn-ghost"></button>
     </div>
   </aside>
   <main class="main">
     <header class="topbar">
-      <button id="menu-toggle" class="btn btn-ghost only-mobile">☰</button>
+      <button id="menu-toggle" class="btn btn-ghost only-mobile">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="3" y1="6" x2="21" y2="6"/>
+          <line x1="3" y1="12" x2="21" y2="12"/>
+          <line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+      </button>
       <h1 id="page-title">Дашборд</h1>
       <div class="user-info">
         <span id="user-name"></span>
@@ -542,6 +546,46 @@ const db   = firebase.database();
 
 const secondaryApp  = firebase.initializeApp(firebaseConfig, 'Secondary');
 const secondaryAuth = secondaryApp.auth();
+
+/* ============================================================
+   ★ НАБОР SVG-ИКОНОК (Feather-style, stroke:currentColor)
+============================================================ */
+const ICON_PATHS = {
+  dashboard: '<line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>',
+  city: '<path d="M3 21h18"/><path d="M5 21V7l8-4v18"/><path d="M19 21V11l-6-4"/><path d="M9 9v.01M9 12v.01M9 15v.01M9 18v.01"/>',
+  school: '<path d="M14 22v-4a2 2 0 1 0-4 0v4"/><path d="M18 10l4 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-8l4-2"/><path d="M18 5v17"/><path d="M6 5v17"/><rect x="4" y="2" width="16" height="4" rx="1"/>',
+  users: '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+  tag: '<path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/>',
+  settings: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>',
+  cap: '<path d="M22 10l-10-5L2 10l10 5 10-5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/><path d="M22 10v6"/>',
+  book: '<path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>',
+  student: '<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+  mail: '<path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>',
+  user: '<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+  sun: '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>',
+  moon: '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>',
+  menu: '<line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>',
+  logout: '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>',
+  plus: '<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>',
+  trash: '<polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/>',
+  key: '<circle cx="7.5" cy="15.5" r="5.5"/><path d="M21 2l-10 10"/><path d="M15.5 7.5l3 3L22 7l-3-3"/>',
+  download: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>',
+  arrowLeft: '<line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>',
+  pencil: '<path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/>',
+  check: '<polyline points="20 6 9 17 4 12"/>',
+  clock: '<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>',
+  circle: '<circle cx="12" cy="12" r="6" fill="currentColor" stroke="none"/>',
+  info: '<circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>',
+  checkCircle: '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>',
+  alertCircle: '<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>',
+  xCircle: '<circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>',
+  userPlus: '<path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/>'
+};
+
+function ic(name, size = 18) {
+  const path = ICON_PATHS[name] || '';
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${path}</svg>`;
+}
 
 /* ============================================================
    ЗАХАРДКОЖЕННЫЙ АДМИН
@@ -592,8 +636,19 @@ const el = (tag, props = {}, ...children) => {
   return n;
 };
 
+const TOAST_ICONS = {
+  success: 'checkCircle',
+  error:   'xCircle',
+  warning: 'alertCircle',
+  info:    'info'
+};
+
 function toast(msg, type = 'info') {
-  const t = el('div', { class: `toast ${type}`, html: msg });
+  const iconName = TOAST_ICONS[type] || 'info';
+  const t = el('div', {
+    class: `toast ${type}`,
+    html: `${ic(iconName, 18)}<div>${msg}</div>`
+  });
   $('#toast-root').appendChild(t);
   setTimeout(() => t.remove(), 4000);
 }
@@ -624,10 +679,14 @@ function closeModal() { $('#modal-root').innerHTML = ''; }
 
 function confirmDialog(title, message) {
   return new Promise(res => {
-    showModal(title, `<p>${message}</p>`, [
-      { label: 'Отмена', onClick: () => { closeModal(); res(false); } },
-      { label: 'Подтвердить', class: 'btn-danger', onClick: () => { closeModal(); res(true); } }
-    ]);
+    showModal(
+      `${ic('alertCircle', 20)} ${title}`,
+      `<p>${message}</p>`,
+      [
+        { label: 'Отмена', onClick: () => { closeModal(); res(false); } },
+        { label: 'Подтвердить', class: 'btn-danger', onClick: () => { closeModal(); res(true); } }
+      ]
+    );
   });
 }
 
@@ -673,16 +732,19 @@ function initTheme() {
   document.documentElement.dataset.theme = t;
   const btn = $('#theme-toggle');
   if (btn) {
-    btn.textContent = t === 'dark' ? '☀️' : '🌙';
+    btn.innerHTML = t === 'dark' ? ic('sun', 16) : ic('moon', 16);
     btn.onclick = () => {
       const cur = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
       document.documentElement.dataset.theme = cur;
       localStorage.setItem('theme', cur);
-      btn.textContent = cur === 'dark' ? '☀️' : '🌙';
+      btn.innerHTML = cur === 'dark' ? ic('sun', 16) : ic('moon', 16);
     };
   }
 }
 initTheme();
+
+/* Кнопка выхода — с иконкой */
+$('#logout-btn').innerHTML = ic('logout', 16) + ' Выйти';
 
 /* ============================================================
    АВТОРИЗАЦИЯ
@@ -799,37 +861,37 @@ const App = {
 };
 
 /* ============================================================
-   МЕНЮ
+   МЕНЮ (с иконками)
 ============================================================ */
 const MENU = {
   super_admin: [
-    { id: 'dashboard', label: '📊 Дашборд' },
-    { id: 'cities',    label: '🏙️ Города' },
-    { id: 'schools',   label: '🏫 Школы' },
-    { id: 'users',     label: '👥 Пользователи' },
-    { id: 'worktypes', label: '🏷️ Типы работ' },
-    { id: 'profile',   label: '⚙️ Профиль' }
+    { id: 'dashboard', icon: 'dashboard', label: 'Дашборд' },
+    { id: 'cities',    icon: 'city',      label: 'Города' },
+    { id: 'schools',   icon: 'school',    label: 'Школы' },
+    { id: 'users',     icon: 'users',     label: 'Пользователи' },
+    { id: 'worktypes', icon: 'tag',       label: 'Типы работ' },
+    { id: 'profile',   icon: 'user',      label: 'Профиль' }
   ],
   city_creator: [
-    { id: 'dashboard', label: '📊 Дашборд' },
-    { id: 'schools',   label: '🏫 Школы города' },
-    { id: 'users',     label: '👥 Пользователи' },
-    { id: 'profile',   label: '⚙️ Профиль' }
+    { id: 'dashboard', icon: 'dashboard', label: 'Дашборд' },
+    { id: 'schools',   icon: 'school',    label: 'Школы города' },
+    { id: 'users',     icon: 'users',     label: 'Пользователи' },
+    { id: 'profile',   icon: 'user',      label: 'Профиль' }
   ],
   school_creator: [
-    { id: 'dashboard', label: '📊 Дашборд' },
-    { id: 'invites',   label: '✉️ Приглашения' },
-    { id: 'users',     label: '👥 Учителя' },
-    { id: 'worktypes', label: '🏷️ Типы работ' },
-    { id: 'profile',   label: '⚙️ Профиль' }
+    { id: 'dashboard', icon: 'dashboard', label: 'Дашборд' },
+    { id: 'invites',   icon: 'mail',      label: 'Приглашения' },
+    { id: 'users',     icon: 'users',     label: 'Учителя' },
+    { id: 'worktypes', icon: 'tag',       label: 'Типы работ' },
+    { id: 'profile',   icon: 'user',      label: 'Профиль' }
   ],
   teacher: [
-    { id: 'dashboard', label: '📊 Дашборд' },
-    { id: 'classes',   label: '🎓 Классы' },
-    { id: 'journal',   label: '📖 Журнал' },
-    { id: 'students',  label: '👨‍🎓 Ученики' },
-    { id: 'worktypes', label: '🏷️ Типы работ' },
-    { id: 'profile',   label: '⚙️ Профиль' }
+    { id: 'dashboard', icon: 'dashboard', label: 'Дашборд' },
+    { id: 'classes',   icon: 'cap',       label: 'Классы' },
+    { id: 'journal',   icon: 'book',      label: 'Журнал' },
+    { id: 'students',  icon: 'student',   label: 'Ученики' },
+    { id: 'worktypes', icon: 'tag',       label: 'Типы работ' },
+    { id: 'profile',   icon: 'user',      label: 'Профиль' }
   ]
 };
 
@@ -840,8 +902,9 @@ function buildMenu() {
   items.forEach(it => {
     const a = el('div', {
       class: 'nav-item' + (location.hash === '#' + it.id ? ' active' : ''),
+      html: ic(it.icon, 18) + `<span>${it.label}</span>`,
       onclick: () => navigate(it.id)
-    }, it.label);
+    });
     nav.appendChild(a);
   });
 }
@@ -1013,7 +1076,11 @@ async function renderCities() {
   const card = el('div', { class: 'card' });
   card.appendChild(el('div', { class: 'card-header' },
     el('div', { class: 'card-title' }, 'Список городов'),
-    el('button', { class: 'btn btn-primary', onclick: addCityDialog }, '+ Добавить город')
+    el('button', {
+      class: 'btn btn-primary',
+      html: ic('plus', 16) + ' Добавить город',
+      onclick: addCityDialog
+    })
   ));
   const cities = Object.entries(App.cache.cities);
   if (!cities.length) {
@@ -1026,12 +1093,15 @@ async function renderCities() {
       const tr = el('tr');
       tr.innerHTML = `<td>${city.name}</td><td>${fmt.date(city.createdAt)}</td>`;
       const actions = el('td');
+      actions.style.cssText = 'display:flex;gap:6px;';
       actions.appendChild(el('button', {
         class: 'btn btn-sm btn-ghost',
+        html: ic('userPlus', 14) + ' Создателя',
         onclick: () => createCityCreatorDialog(id)
-      }, '➕ Создателя города'));
+      }));
       actions.appendChild(el('button', {
         class: 'btn btn-sm btn-ghost',
+        html: ic('trash', 14),
         onclick: async () => {
           if (await confirmDialog('Удалить город?', `Город "${city.name}" будет удалён.`)) {
             await db.ref('cities/' + id).remove();
@@ -1039,7 +1109,7 @@ async function renderCities() {
             await loadAll(); renderCities();
           }
         }
-      }, '🗑️'));
+      }));
       tr.appendChild(actions);
       tb.appendChild(tr);
     });
@@ -1057,7 +1127,13 @@ async function renderSchools() {
   const canCreate = ['super_admin','city_creator'].includes(App.profile.role);
   card.appendChild(el('div', { class: 'card-header' },
     el('div', { class: 'card-title' }, 'Список школ'),
-    canCreate ? el('button', { class: 'btn btn-primary', onclick: addSchoolDialog }, '+ Добавить школу') : el('span')
+    canCreate
+      ? el('button', {
+          class: 'btn btn-primary',
+          html: ic('plus', 16) + ' Добавить школу',
+          onclick: addSchoolDialog
+        })
+      : el('span')
   ));
   const schools = Object.entries(mySchools());
   if (!schools.length) {
@@ -1074,12 +1150,15 @@ async function renderSchools() {
         <td>${city?.name || '—'}</td>
         <td>${fmt.date(s.createdAt)}</td>`;
       const actions = el('td');
+      actions.style.cssText = 'display:flex;gap:6px;';
       actions.appendChild(el('button', {
         class: 'btn btn-sm btn-ghost',
+        html: ic('userPlus', 14) + ' Создателя',
         onclick: () => createSchoolCreatorDialog(id, s.cityId)
-      }, '➕ Создателя школы'));
+      }));
       actions.appendChild(el('button', {
         class: 'btn btn-sm btn-ghost',
+        html: ic('trash', 14),
         onclick: async () => {
           if (await confirmDialog('Удалить школу?', `Школа "${s.name}" будет удалена.`)) {
             await db.ref('schools/' + id).remove();
@@ -1087,7 +1166,7 @@ async function renderSchools() {
             await loadAll(); renderSchools();
           }
         }
-      }, '🗑️'));
+      }));
       tr.appendChild(actions);
       tb.appendChild(tr);
     });
@@ -1126,8 +1205,9 @@ async function renderUsers() {
       const actions = el('td');
       actions.appendChild(el('button', {
         class: 'btn btn-sm btn-ghost',
+        html: ic('key', 14) + ' Пароль',
         onclick: () => resetPasswordDialog(u.email)
-      }, '🔑 Пароль'));
+      }));
       tr.appendChild(actions);
       tb.appendChild(tr);
     });
@@ -1144,7 +1224,11 @@ async function renderInvites() {
   const card = el('div', { class: 'card' });
   card.appendChild(el('div', { class: 'card-header' },
     el('div', { class: 'card-title' }, 'Коды приглашения для учителей'),
-    el('button', { class: 'btn btn-primary', onclick: createInvite }, '+ Создать код')
+    el('button', {
+      class: 'btn btn-primary',
+      html: ic('plus', 16) + ' Создать код',
+      onclick: createInvite
+    })
   ));
   const invites = Object.entries(App.cache.invites)
     .filter(([,i]) => i.createdBy === App.user.uid)
@@ -1156,7 +1240,14 @@ async function renderInvites() {
     t.innerHTML = `<thead><tr><th>Код</th><th>Статус</th><th>Создан</th><th>Истекает</th></tr></thead>`;
     const tb = el('tbody');
     invites.forEach(([code, inv]) => {
-      const status = inv.used ? '✅ Использован' : (inv.expiresAt < Date.now() ? '⌛ Истёк' : '🟢 Активен');
+      let status;
+      if (inv.used) {
+        status = `<span style="display:inline-flex;align-items:center;gap:6px;color:var(--success);font-weight:600;">${ic('check', 14)} Использован</span>`;
+      } else if (inv.expiresAt < Date.now()) {
+        status = `<span style="display:inline-flex;align-items:center;gap:6px;color:var(--text-muted);font-weight:600;">${ic('clock', 14)} Истёк</span>`;
+      } else {
+        status = `<span style="display:inline-flex;align-items:center;gap:6px;color:var(--primary);font-weight:600;">${ic('circle', 14)} Активен</span>`;
+      }
       const tr = el('tr');
       tr.innerHTML = `
         <td><span class="invite-code ${inv.used?'used':''}">${code}</span></td>
@@ -1178,7 +1269,11 @@ async function renderClasses() {
   const card = el('div', { class: 'card' });
   card.appendChild(el('div', { class: 'card-header' },
     el('div', { class: 'card-title' }, 'Классы'),
-    el('button', { class: 'btn btn-primary', onclick: addClassDialog }, '+ Создать класс')
+    el('button', {
+      class: 'btn btn-primary',
+      html: ic('plus', 16) + ' Создать класс',
+      onclick: addClassDialog
+    })
   ));
   const classes = Object.entries(myClasses());
   if (!classes.length) {
@@ -1191,16 +1286,24 @@ async function renderClasses() {
       ccard.innerHTML = `
         <div class="stat-label">${cl.year || '—'} год</div>
         <div class="stat-value" style="font-size:20px;">${cl.name}</div>
-        <p style="color:var(--text-muted);font-size:12px;margin-top:6px;">
-          👨‍🎓 ${studentCount} учеников • 📚 ${(cl.subjects||[]).length} предметов
-        </p>`;
-      const actions = el('div', { style: 'margin-top:12px;display:flex;gap:6px' });
+        <div style="display:flex;gap:14px;margin-top:10px;font-size:12px;color:var(--text-muted);">
+          <span style="display:inline-flex;align-items:center;gap:4px;">
+            ${ic('student', 14)} ${studentCount} учеников
+          </span>
+          <span style="display:inline-flex;align-items:center;gap:4px;">
+            ${ic('book', 14)} ${(cl.subjects||[]).length} предметов
+          </span>
+        </div>`;
+      const actions = el('div', { style: 'margin-top:14px;display:flex;gap:6px;' });
       actions.appendChild(el('button', {
         class: 'btn btn-sm btn-primary',
+        html: ic('arrowLeft', 14) + ' Открыть',
+        style: 'flex:1;',
         onclick: () => navigate('class', { id })
-      }, 'Открыть'));
+      }));
       actions.appendChild(el('button', {
         class: 'btn btn-sm btn-ghost',
+        html: ic('trash', 14),
         onclick: async () => {
           if (await confirmDialog('Удалить класс?', `Класс "${cl.name}" и его ученики будут удалены.`)) {
             const updates = { ['classes/' + id]: null };
@@ -1215,7 +1318,7 @@ async function renderClasses() {
             await loadAll(); renderClasses();
           }
         }
-      }, '🗑️'));
+      }));
       ccard.appendChild(actions);
       grid.appendChild(ccard);
     });
@@ -1236,20 +1339,25 @@ async function renderClassDetail(classId) {
     <div class="card-header">
       <div class="card-title">${cl.name} • ${cl.year || ''} год</div>
     </div>
-    <p style="font-size:13px;color:var(--text-muted);">
-      📚 Предметы: ${(cl.subjects||[]).join(', ') || '—'}
-    </p>
+    <div style="font-size:13px;color:var(--text-muted);display:flex;gap:10px;align-items:flex-start;">
+      <span style="flex-shrink:0;margin-top:2px;">${ic('book', 16)}</span>
+      <span><b>Предметы:</b> ${(cl.subjects||[]).join(', ') || '—'}</span>
+    </div>
   `;
   c.appendChild(info);
 
   const card = el('div', { class: 'card' });
   card.appendChild(el('div', { class: 'card-header' },
     el('div', { class: 'card-title' }, 'Ученики класса'),
-    el('button', { class: 'btn btn-primary btn-sm', onclick: () => addStudentDialog(classId) }, '+ Добавить учеников')
+    el('button', {
+      class: 'btn btn-primary btn-sm',
+      html: ic('userPlus', 14) + ' Добавить учеников',
+      onclick: () => addStudentDialog(classId)
+    })
   ));
   const students = Object.entries(App.cache.students).filter(([,s]) => s.classId === classId);
   if (!students.length) {
-    card.appendChild(el('div', { class: 'empty' }, 'Учеников пока нет — нажмите «+ Добавить учеников»'));
+    card.appendChild(el('div', { class: 'empty' }, 'Учеников пока нет — нажмите «Добавить учеников»'));
   } else {
     const t = el('table');
     t.innerHTML = `<thead><tr><th>#</th><th>ФИО</th><th>Средний</th><th></th></tr></thead>`;
@@ -1266,8 +1374,9 @@ async function renderClassDetail(classId) {
         const a = el('td');
         a.appendChild(el('button', {
           class: 'btn btn-sm btn-ghost',
+          html: ic('trash', 14),
           onclick: () => deleteStudent(sid, s.name)
-        }, '🗑️'));
+        }));
         tr.appendChild(a);
         tb.appendChild(tr);
       });
@@ -1276,7 +1385,11 @@ async function renderClassDetail(classId) {
   }
   c.appendChild(card);
 
-  const back = el('button', { class: 'btn btn-ghost', onclick: () => navigate('classes') }, '← Назад к классам');
+  const back = el('button', {
+    class: 'btn btn-ghost',
+    html: ic('arrowLeft', 16) + ' Назад к классам',
+    onclick: () => navigate('classes')
+  });
   c.appendChild(back);
 }
 
@@ -1300,7 +1413,7 @@ async function renderJournal() {
   const subjectSel = el('select');
   subjectSel.innerHTML = '<option value="">— Все предметы —</option>';
 
-  const searchInput = el('input', { placeholder: '🔍 Поиск ученика', type: 'text' });
+  const searchInput = el('input', { placeholder: 'Поиск ученика...', type: 'text' });
 
   const updateSubjects = () => {
     const cid = classSel.value;
@@ -1316,7 +1429,11 @@ async function renderJournal() {
   toolbar.append(classSel, subjectSel, searchInput);
   card.appendChild(el('div', { class: 'card-header' },
     el('div', { class: 'card-title' }, 'Оценки'),
-    el('button', { class: 'btn btn-primary btn-sm', onclick: () => addGradeDialog(classSel.value) }, '+ Выставить оценку')
+    el('button', {
+      class: 'btn btn-primary btn-sm',
+      html: ic('plus', 14) + ' Выставить оценку',
+      onclick: () => addGradeDialog(classSel.value)
+    })
   ));
   card.appendChild(toolbar);
 
@@ -1380,8 +1497,9 @@ async function renderJournal() {
     const exp = el('button', {
       class: 'btn btn-sm btn-ghost',
       style: 'margin-top:12px;',
+      html: ic('download', 14) + ' Экспорт CSV',
       onclick: () => exportCSV(byStudent)
-    }, '📥 Экспорт CSV');
+    });
     tableWrap.appendChild(exp);
   }
   drawGrades();
@@ -1399,8 +1517,12 @@ async function renderStudents() {
   card.appendChild(el('div', { class: 'card-header' },
     el('div', { class: 'card-title' }, 'Все мои ученики'),
     hasClasses
-      ? el('button', { class: 'btn btn-primary btn-sm', onclick: addStudentsDialog }, '+ Добавить учеников')
-      : el('span', { class: 'hint' }, 'Сначала создайте класс в разделе «🎓 Классы»')
+      ? el('button', {
+          class: 'btn btn-primary btn-sm',
+          html: ic('userPlus', 14) + ' Добавить учеников',
+          onclick: addStudentsDialog
+        })
+      : el('span', { class: 'hint' }, 'Сначала создайте класс в разделе «Классы»')
   ));
 
   const myClassIds = Object.keys(classes);
@@ -1410,7 +1532,7 @@ async function renderStudents() {
 
   if (!students.length) {
     card.appendChild(el('div', { class: 'empty' },
-      hasClasses ? 'Учеников пока нет — нажмите «+ Добавить учеников»' : 'Учеников пока нет'));
+      hasClasses ? 'Учеников пока нет — нажмите «Добавить учеников»' : 'Учеников пока нет'));
   } else {
     const t = el('table');
     t.innerHTML = `<thead><tr><th>#</th><th>ФИО</th><th>Класс</th><th>Средний</th></tr></thead>`;
@@ -1439,7 +1561,11 @@ async function renderWorkTypes() {
   const card = el('div', { class: 'card' });
   card.appendChild(el('div', { class: 'card-header' },
     el('div', { class: 'card-title' }, 'Типы работ и веса'),
-    el('button', { class: 'btn btn-primary', onclick: addWorkTypeDialog }, '+ Добавить тип')
+    el('button', {
+      class: 'btn btn-primary',
+      html: ic('plus', 16) + ' Добавить тип',
+      onclick: addWorkTypeDialog
+    })
   ));
   const items = Object.entries(App.cache.workTypes);
   if (!items.length) {
@@ -1454,13 +1580,14 @@ async function renderWorkTypes() {
       const a = el('td');
       a.appendChild(el('button', {
         class: 'btn btn-sm btn-ghost',
+        html: ic('trash', 14),
         onclick: async () => {
           if (await confirmDialog('Удалить тип?', `Тип "${w.name}" будет удалён.`)) {
             await db.ref('workTypes/' + id).remove();
             await loadAll(); renderWorkTypes();
           }
         }
-      }, '🗑️'));
+      }));
       tr.appendChild(a);
       tb.appendChild(tr);
     });
@@ -1478,12 +1605,30 @@ async function renderProfile() {
   const card = el('div', { class: 'card' });
   card.innerHTML = `
     <div class="card-header"><div class="card-title">Мой профиль</div></div>
-    <p style="margin-bottom:8px"><b>ФИО:</b> ${p.name || '—'}</p>
-    <p style="margin-bottom:8px"><b>Логин:</b> ${p.login || '—'}</p>
-    <p style="margin-bottom:8px"><b>Email:</b> ${p.email || '—'}</p>
-    <p style="margin-bottom:8px"><b>Роль:</b> <span class="badge">${p.role}</span></p>
-    <p style="margin-bottom:8px"><b>Школа:</b> ${App.cache.schools[p.schoolId]?.name || '—'}</p>
-    <p><b>Город:</b> ${App.cache.cities[p.cityId]?.name || '—'}</p>
+    <p style="margin-bottom:8px;display:flex;align-items:center;gap:8px;">
+      <span style="color:var(--text-muted);">${ic('user', 16)}</span>
+      <b>ФИО:</b> ${p.name || '—'}
+    </p>
+    <p style="margin-bottom:8px;display:flex;align-items:center;gap:8px;">
+      <span style="color:var(--text-muted);">${ic('key', 16)}</span>
+      <b>Логин:</b> ${p.login || '—'}
+    </p>
+    <p style="margin-bottom:8px;display:flex;align-items:center;gap:8px;">
+      <span style="color:var(--text-muted);">${ic('mail', 16)}</span>
+      <b>Email:</b> ${p.email || '—'}
+    </p>
+    <p style="margin-bottom:8px;display:flex;align-items:center;gap:8px;">
+      <span style="color:var(--text-muted);">${ic('tag', 16)}</span>
+      <b>Роль:</b> <span class="badge">${p.role}</span>
+    </p>
+    <p style="margin-bottom:8px;display:flex;align-items:center;gap:8px;">
+      <span style="color:var(--text-muted);">${ic('school', 16)}</span>
+      <b>Школа:</b> ${App.cache.schools[p.schoolId]?.name || '—'}
+    </p>
+    <p style="display:flex;align-items:center;gap:8px;">
+      <span style="color:var(--text-muted);">${ic('city', 16)}</span>
+      <b>Город:</b> ${App.cache.cities[p.cityId]?.name || '—'}
+    </p>
   `;
   c.appendChild(card);
 }
@@ -1492,7 +1637,7 @@ async function renderProfile() {
    ДИАЛОГИ
 ============================================================ */
 function addCityDialog() {
-  showModal('Новый город', `
+  showModal(`${ic('city', 20)} Новый город`, `
     <div class="form-group"><label>Название города</label>
       <input id="m-city-name" placeholder="Москва"></div>
   `, [
@@ -1516,7 +1661,7 @@ function addSchoolDialog() {
 
   if (!cityOpts) return toast('Сначала создайте город', 'warning');
 
-  showModal('Новая школа', `
+  showModal(`${ic('school', 20)} Новая школа`, `
     <div class="form-group"><label>Название</label>
       <input id="m-school-name" placeholder="Школа №1"></div>
     <div class="form-group"><label>Город</label>
@@ -1536,7 +1681,7 @@ function addSchoolDialog() {
 }
 
 function createCityCreatorDialog(cityId) {
-  showModal('Создатель города', `
+  showModal(`${ic('userPlus', 20)} Создатель города`, `
     <div class="form-group"><label>ФИО</label><input id="cc-name"></div>
     <div class="form-group"><label>Логин</label><input id="cc-login"></div>
     <div class="form-group"><label>Email</label><input id="cc-email" type="email"></div>
@@ -1549,7 +1694,7 @@ function createCityCreatorDialog(cityId) {
       const email = document.getElementById('cc-email').value.trim();
       const pass  = document.getElementById('cc-pass').value;
       if (!name || !login || !email || pass.length < 6)
-        return toast('Заполните все поля (пароль ≥6)', 'error');
+        return toast('Заполните все поля (пароль от 6 символов)', 'error');
       try {
         const cred = await secondaryAuth.createUserWithEmailAndPassword(email, pass);
         const uid  = cred.user.uid;
@@ -1566,7 +1711,7 @@ function createCityCreatorDialog(cityId) {
 }
 
 function createSchoolCreatorDialog(schoolId, cityId) {
-  showModal('Создатель школы', `
+  showModal(`${ic('userPlus', 20)} Создатель школы`, `
     <div class="form-group"><label>ФИО</label><input id="sc-name"></div>
     <div class="form-group"><label>Логин</label><input id="sc-login"></div>
     <div class="form-group"><label>Email</label><input id="sc-email" type="email"></div>
@@ -1579,7 +1724,7 @@ function createSchoolCreatorDialog(schoolId, cityId) {
       const email = document.getElementById('sc-email').value.trim();
       const pass  = document.getElementById('sc-pass').value;
       if (!name || !login || !email || pass.length < 6)
-        return toast('Заполните все поля (пароль ≥6)', 'error');
+        return toast('Заполните все поля (пароль от 6 символов)', 'error');
       try {
         const cred = await secondaryAuth.createUserWithEmailAndPassword(email, pass);
         const uid  = cred.user.uid;
@@ -1613,14 +1758,14 @@ function createInvite() {
 }
 
 function addClassDialog() {
-  showModal('Новый класс', `
+  showModal(`${ic('cap', 20)} Новый класс`, `
     <div class="form-group"><label>Название класса</label><input id="m-cl-name" placeholder="1А"></div>
     <div class="form-group"><label>Год</label>
       <input id="m-cl-year" type="number" value="${new Date().getFullYear()}"></div>
     <div class="form-group">
       <label>Предметы (через запятую)</label>
       <input id="m-cl-subjects" placeholder="Русский язык, Математика, Окружающий мир">
-      <div class="hint">Пример для 1 класса: Русский язык, Литературное чтение, Математика, Окружающий мир, Технология, Изобразительное искусство, Музыка, Физическая культура</div>
+      <div class="hint">${ic('info', 14)} Пример для 1 класса: Русский язык, Литературное чтение, Математика, Окружающий мир, Технология, Изобразительное искусство, Музыка, Физическая культура</div>
     </div>
   `, [
     { label: 'Отмена' },
@@ -1645,13 +1790,13 @@ function addClassDialog() {
 }
 
 function addStudentDialog(classId) {
-  showModal('Новые ученики', `
+  showModal(`${ic('userPlus', 20)} Новые ученики`, `
     <div class="form-group">
       <label>ФИО учеников</label>
       <textarea id="m-st-names"
         placeholder="Иванов Иван Иванович, Петров Пётр Петрович, Сидорова Анна Сергеевна"></textarea>
       <div class="hint">
-        Вводите несколько учеников <b>через запятую</b> или <b>каждый с новой строки</b>.
+        ${ic('info', 14)} Вводите несколько учеников <b>через запятую</b> или <b>каждый с новой строки</b>.
       </div>
     </div>
   `, [
@@ -1693,7 +1838,7 @@ function addStudentsDialog() {
     .sort((a,b) => a[1].name.localeCompare(b[1].name))
     .map(([id, c]) => `<option value="${id}">${c.name}</option>`).join('');
 
-  showModal('Добавить учеников', `
+  showModal(`${ic('userPlus', 20)} Добавить учеников`, `
     <div class="form-group">
       <label>Класс</label>
       <select id="m-as-class">${classOpts}</select>
@@ -1703,7 +1848,7 @@ function addStudentsDialog() {
       <textarea id="m-as-names"
         placeholder="Иванов Иван Иванович, Петров Пётр Петрович, Сидорова Анна Сергеевна"></textarea>
       <div class="hint">
-        Несколько ФИО — <b>через запятую</b> или <b>каждый с новой строки</b>.
+        ${ic('info', 14)} Несколько ФИО — <b>через запятую</b> или <b>каждый с новой строки</b>.
       </div>
     </div>
   `, [
@@ -1760,7 +1905,7 @@ function addGradeDialog(classId) {
   const wtOpts = workTypes.map(([id, w]) =>
     `<option value="${id}" data-weight="${w.weight}">${w.name} (вес ${w.weight})</option>`).join('');
 
-  showModal('Выставить оценку', `
+  showModal(`${ic('pencil', 20)} Выставить оценку`, `
     <div class="form-group"><label>Класс</label><select id="m-g-class">${classOpts}</select></div>
     <div class="form-group"><label>Ученик</label><select id="m-g-student"></select></div>
     <div class="form-group"><label>Предмет</label><select id="m-g-subject"></select></div>
@@ -1817,7 +1962,7 @@ function editGradeDialog(gid) {
   const g = App.cache.grades[gid];
   if (!g) return;
   const wt = App.cache.workTypes[g.typeId];
-  showModal('Изменить оценку', `
+  showModal(`${ic('pencil', 20)} Изменить оценку`, `
     <p style="margin-bottom:6px"><b>Ученик:</b> ${App.cache.students[g.studentId]?.name || '—'}</p>
     <p style="margin-bottom:6px"><b>Предмет:</b> ${g.subject}</p>
     <p style="margin-bottom:6px"><b>Тип:</b> ${wt?.name || '—'} (вес ${g.weight})</p>
@@ -1852,7 +1997,7 @@ function editGradeDialog(gid) {
 }
 
 function addWorkTypeDialog() {
-  showModal('Новый тип работы', `
+  showModal(`${ic('tag', 20)} Новый тип работы`, `
     <div class="form-group"><label>Название</label>
       <input id="m-wt-name" placeholder="Контрольная работа"></div>
     <div class="form-group"><label>Вес (1–10)</label>
@@ -1875,7 +2020,8 @@ function addWorkTypeDialog() {
 
 function resetPasswordDialog(email) {
   if (!email) return toast('У пользователя нет email', 'error');
-  showModal('Сброс пароля', `<p>Отправить письмо для сброса пароля на <b>${email}</b>?</p>`, [
+  showModal(`${ic('key', 20)} Сброс пароля`,
+    `<p>Отправить письмо для сброса пароля на <b>${email}</b>?</p>`, [
     { label: 'Отмена' },
     { label: 'Отправить', class: 'btn-primary', onClick: async () => {
       try {
@@ -1982,7 +2128,7 @@ async function startApp(user, profile) {
 $('#logout-btn').onclick = async () => {
   const btn = $('#logout-btn');
   btn.disabled = true;
-  btn.textContent = 'Выход…';
+  btn.innerHTML = ic('logout', 16) + ' Выход…';
 
   clearSession();
   App.user = null;
