@@ -177,7 +177,7 @@ tbody tr:last-child td{border-bottom:none}
   border-radius:50%;animation:spin 0.8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-.hint{font-size:12px;color:var(--text-muted);margin-top:4px;line-height:1.4}
+.hint{font-size:12px;color:var(--text-muted);margin-top:6px;line-height:1.5}
 </style>
 </head>
 <body>
@@ -291,7 +291,7 @@ const secondaryApp  = firebase.initializeApp(firebaseConfig, 'Secondary');
 const secondaryAuth = secondaryApp.auth();
 
 /* ============================================================
-   ★ ЗАХАРДКОЖЕННЫЙ АДМИН (без Firebase Auth)
+   ЗАХАРДКОЖЕННЫЙ АДМИН
 ============================================================ */
 const HARDCODED_ADMIN = {
   login:    'admin',
@@ -459,7 +459,6 @@ $('#login-form').addEventListener('submit', async (e) => {
   const password   = $('#login-password').value;
   if (!loginInput || !password) return;
 
-  /* 1) Проверяем захардкоженного админа */
   if (loginInput === HARDCODED_ADMIN.login && password === HARDCODED_ADMIN.password) {
     const user = { uid: 'admin-local', email: HARDCODED_ADMIN.profile.email };
     const profile = { ...HARDCODED_ADMIN.profile, createdAt: Date.now() };
@@ -468,7 +467,6 @@ $('#login-form').addEventListener('submit', async (e) => {
     return;
   }
 
-  /* 2) Иначе — обычный вход через Firebase */
   try {
     let email = loginInput;
     if (!loginInput.includes('@')) {
@@ -542,7 +540,7 @@ $('#forgot-password').onclick = async (e) => {
 };
 
 /* ============================================================
-   СОСТОЯНИЕ ПРИЛОЖЕНИЯ
+   СОСТОЯНИЕ
 ============================================================ */
 const App = {
   user: null,
@@ -606,6 +604,7 @@ function navigate(view, params = {}) {
   router();
 }
 
+/* ★ ИСПРАВЛЕНО: разрешаем скрытые виды (class), которых нет в меню */
 async function router() {
   const hash = location.hash.slice(1) || 'dashboard';
   const [view, id] = hash.split('/');
@@ -614,6 +613,11 @@ async function router() {
 
   const items = MENU[App.profile.role] || [];
   const allowed = items.map(i => i.id);
+
+  // Скрытые виды (не показываются в меню, но доступны по прямой ссылке)
+  const HIDDEN_VIEWS = ['class'];
+  HIDDEN_VIEWS.forEach(v => { if (!allowed.includes(v)) allowed.push(v); });
+
   if (!allowed.includes(view)) return navigate('dashboard');
 
   $$('.nav-item').forEach(n => n.classList.remove('active'));
@@ -982,6 +986,18 @@ async function renderClassDetail(classId) {
   const c = $('#content');
   c.innerHTML = '';
 
+  // Инфо-карточка класса
+  const info = el('div', { class: 'card' });
+  info.innerHTML = `
+    <div class="card-header">
+      <div class="card-title">${cl.name} • ${cl.year || ''} год</div>
+    </div>
+    <p style="font-size:13px;color:var(--text-muted);">
+      📚 Предметы: ${(cl.subjects||[]).join(', ') || '—'}
+    </p>
+  `;
+  c.appendChild(info);
+
   const card = el('div', { class: 'card' });
   card.appendChild(el('div', { class: 'card-header' },
     el('div', { class: 'card-title' }, 'Ученики класса'),
@@ -989,7 +1005,7 @@ async function renderClassDetail(classId) {
   ));
   const students = Object.entries(App.cache.students).filter(([,s]) => s.classId === classId);
   if (!students.length) {
-    card.appendChild(el('div', { class: 'empty' }, 'Нет учеников'));
+    card.appendChild(el('div', { class: 'empty' }, 'Учеников пока нет — нажмите «+ Добавить учеников»'));
   } else {
     const t = el('table');
     t.innerHTML = `<thead><tr><th>#</th><th>ФИО</th><th>Средний</th><th></th></tr></thead>`;
@@ -1131,24 +1147,36 @@ async function renderStudents() {
   $('#page-title').textContent = 'Ученики';
   const c = $('#content');
   c.innerHTML = '';
+
+  const classes = myClasses();
+  const hasClasses = Object.keys(classes).length > 0;
+
   const card = el('div', { class: 'card' });
   card.appendChild(el('div', { class: 'card-header' },
-    el('div', { class: 'card-title' }, 'Все мои ученики')));
-  const myClassIds = Object.keys(myClasses());
+    el('div', { class: 'card-title' }, 'Все мои ученики'),
+    hasClasses
+      ? el('button', { class: 'btn btn-primary btn-sm', onclick: addStudentsDialog }, '+ Добавить учеников')
+      : el('span', { class: 'hint' }, 'Сначала создайте класс в разделе «🎓 Классы»')
+  ));
+
+  const myClassIds = Object.keys(classes);
   const students = Object.entries(App.cache.students)
     .filter(([,s]) => myClassIds.includes(s.classId))
     .sort((a,b) => a[1].name.localeCompare(b[1].name));
+
   if (!students.length) {
-    card.appendChild(el('div', { class: 'empty' }, 'Учеников пока нет'));
+    card.appendChild(el('div', { class: 'empty' },
+      hasClasses ? 'Учеников пока нет — нажмите «+ Добавить учеников»' : 'Учеников пока нет'));
   } else {
     const t = el('table');
-    t.innerHTML = `<thead><tr><th>ФИО</th><th>Класс</th><th>Средний</th></tr></thead>`;
+    t.innerHTML = `<thead><tr><th>#</th><th>ФИО</th><th>Класс</th><th>Средний</th></tr></thead>`;
     const tb = el('tbody');
-    students.forEach(([sid, s]) => {
+    students.forEach(([sid, s], idx) => {
       const cl = App.cache.classes[s.classId];
       const avg = avgForStudent(sid, s.classId);
       const tr = el('tr');
       tr.innerHTML = `
+        <td>${idx + 1}</td>
         <td>${s.name}</td>
         <td>${cl?.name || '—'}</td>
         <td><span class="grade ${avgClass(avg)}">${avg || '—'}</span></td>`;
@@ -1348,7 +1376,7 @@ function addClassDialog() {
     <div class="form-group">
       <label>Предметы (через запятую)</label>
       <input id="m-cl-subjects" placeholder="Русский язык, Математика, Окружающий мир">
-      <div class="hint">Перечислите предметы через запятую. Например для 1 класса:</div>
+      <div class="hint">Перечислите предметы через запятую. Пример для 1 класса: Русский язык, Литературное чтение, Математика, Окружающий мир, Технология, Изобразительное искусство, Музыка, Физическая культура</div>
     </div>
   `, [
     { label: 'Отмена' },
@@ -1372,11 +1400,6 @@ function addClassDialog() {
   ]);
 }
 
-/* ============================================================
-   ★ МАССОВОЕ ДОБАВЛЕНИЕ УЧЕНИКОВ
-   Вводите ФИО через запятую или каждое с новой строки.
-   Например: "Иванов Иван, Петров Пётр, Сидорова Анна"
-============================================================ */
 function addStudentDialog(classId) {
   showModal('Новые ученики', `
     <div class="form-group">
@@ -1385,26 +1408,16 @@ function addStudentDialog(classId) {
         placeholder="Иванов Иван Иванович, Петров Пётр Петрович, Сидорова Анна Сергеевна"></textarea>
       <div class="hint">
         Вводите несколько учеников <b>через запятую</b> или <b>каждый с новой строки</b>.<br>
-        Например:<br>
-        Иванов Иван, Петров Пётр, Сидорова Анна<br>
-        или<br>
-        Иванов Иван<br>Петров Пётр<br>Сидорова Анна
+        Например: Иванов Иван, Петров Пётр, Сидорова Анна
       </div>
     </div>
   `, [
     { label: 'Отмена' },
     { label: 'Добавить', class: 'btn-primary', onClick: async () => {
       const raw = document.getElementById('m-st-names').value;
-
-      // Разбиваем по запятым ИЛИ переводам строк, чистим пробелы, убираем пустые
-      const names = raw
-        .split(/[,\n]+/)
-        .map(s => s.trim())
-        .filter(Boolean);
-
+      const names = raw.split(/[,\n]+/).map(s => s.trim()).filter(Boolean);
       if (!names.length) return toast('Введите хотя бы одно ФИО', 'error');
 
-      // Формируем один bulk-апдейт
       const updates = {};
       const now = Date.now();
       names.forEach((name, idx) => {
@@ -1424,8 +1437,62 @@ function addStudentDialog(classId) {
     }}
   ]);
 
-  // Автофокус на поле
   setTimeout(() => document.getElementById('m-st-names')?.focus(), 100);
+}
+
+function addStudentsDialog() {
+  const classes = myClasses();
+  if (!Object.keys(classes).length) {
+    return toast('Сначала создайте класс', 'warning');
+  }
+
+  const classOpts = Object.entries(classes)
+    .sort((a,b) => a[1].name.localeCompare(b[1].name))
+    .map(([id, c]) => `<option value="${id}">${c.name}</option>`).join('');
+
+  showModal('Добавить учеников', `
+    <div class="form-group">
+      <label>Класс</label>
+      <select id="m-as-class">${classOpts}</select>
+    </div>
+    <div class="form-group">
+      <label>ФИО учеников</label>
+      <textarea id="m-as-names"
+        placeholder="Иванов Иван Иванович, Петров Пётр Петрович, Сидорова Анна Сергеевна"></textarea>
+      <div class="hint">
+        Несколько ФИО — <b>через запятую</b> или <b>каждый с новой строки</b>.
+      </div>
+    </div>
+  `, [
+    { label: 'Отмена' },
+    { label: 'Добавить', class: 'btn-primary', onClick: async () => {
+      const classId = document.getElementById('m-as-class').value;
+      const raw = document.getElementById('m-as-names').value;
+      const names = raw.split(/[,\n]+/).map(s => s.trim()).filter(Boolean);
+      if (!names.length) return toast('Введите хотя бы одно ФИО', 'error');
+      if (!classId) return toast('Выберите класс', 'error');
+
+      const updates = {};
+      const now = Date.now();
+      names.forEach((name, idx) => {
+        const id = db.ref('students').push().key;
+        updates['students/' + id] = { name, classId, createdAt: now + idx };
+      });
+
+      try {
+        await db.ref().update(updates);
+        closeModal();
+        toast(`Добавлено учеников: <b>${names.length}</b> в класс ` +
+          `<b>${App.cache.classes[classId]?.name || ''}</b>`, 'success');
+        await loadAll();
+        renderStudents();
+      } catch (err) {
+        toast('Ошибка: ' + err.message, 'error');
+      }
+    }}
+  ]);
+
+  setTimeout(() => document.getElementById('m-as-names')?.focus(), 100);
 }
 
 async function deleteStudent(sid, name) {
@@ -1643,7 +1710,7 @@ function showApp() {
 }
 
 /* ============================================================
-   СТАРТ ПРИЛОЖЕНИЯ
+   СТАРТ
 ============================================================ */
 async function startApp(user, profile) {
   App.user = user;
