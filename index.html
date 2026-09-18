@@ -2,377 +2,1713 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Электронный журнал</title>
-<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
 <style>
-:root{--bg:#f4f7fb;--card:#fff;--text:#172033;--muted:#718096;--border:#e6eaf0;--primary:#5b5cf0;--danger:#ef4444;--ok:#22c55e;--warn:#f59e0b;--side:#111827}
-*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:var(--bg);color:var(--text)}body.dark{--bg:#0b1120;--card:#111827;--text:#f1f5f9;--muted:#94a3b8;--border:#263247;--side:#050a14}
-.hidden{display:none!important}button,input,select,textarea{font:inherit}button{cursor:pointer}
-.auth{min-height:100vh;display:grid;place-items:center;padding:20px;background:radial-gradient(circle at 20% 20%,#5b5cf033,transparent 30%),var(--bg)}
-.authbox{width:min(430px,100%);background:var(--card);padding:32px;border:1px solid var(--border);border-radius:22px;box-shadow:0 15px 45px #0001}
-.logo{width:58px;height:58px;border-radius:17px;display:grid;place-items:center;background:linear-gradient(135deg,#5b5cf0,#8b5cf6);color:#fff;font-size:27px;font-weight:800}
-h1{margin:12px 0 7px}.muted{color:var(--muted)}.field{margin:14px 0}.field label{display:block;font-size:13px;font-weight:bold;margin-bottom:6px}.field input,.field select,.field textarea{width:100%;padding:12px;border:1px solid var(--border);border-radius:10px;background:var(--bg);color:var(--text)}
-.primary{background:linear-gradient(135deg,#5b5cf0,#7778ff);color:white;border:0;border-radius:10px;padding:12px 16px;font-weight:bold}.secondary{background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:10px;padding:11px 15px}.danger{background:#fee2e2;color:#b91c1c;border:0;border-radius:10px;padding:10px}
-.auth .primary{width:100%}.link{background:none;color:var(--primary);border:0;font-weight:bold}.msg{margin-top:12px;padding:10px;border-radius:10px;background:#fee2e2;color:#b91c1c;font-size:14px}
-.layout{min-height:100vh}.side{position:fixed;left:0;top:0;bottom:0;width:250px;background:var(--side);color:#fff;padding:18px 13px;overflow:auto}.brand{display:flex;gap:10px;align-items:center;padding:8px 9px 22px;font-weight:bold;font-size:18px}.bi{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(135deg,#6366f1,#8b5cf6)}
-.nav button{display:block;width:100%;padding:11px;border:0;border-radius:10px;text-align:left;background:none;color:#dbe3f0;margin:3px 0}.nav button:hover,.nav button.active{background:#ffffff16;color:#fff}
-.main{margin-left:250px}.top{height:68px;display:flex;align-items:center;justify-content:space-between;padding:0 26px;background:var(--card);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:5}.user{display:flex;align-items:center;gap:10px}.avatar{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:#6366f1;color:#fff;font-weight:bold}
-.content{padding:25px;max-width:1500px;margin:auto}.title{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:20px}.title h2{margin:0}.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px}.card,.tablebox{background:var(--card);border:1px solid var(--border);border-radius:17px;box-shadow:0 10px 30px #00000008}.card{padding:20px}.value{font-size:29px;font-weight:bold;margin-top:8px}.tablebox{overflow:auto}.toolbar{display:flex;gap:10px;flex-wrap:wrap;padding:15px;border-bottom:1px solid var(--border)}.toolbar input,.toolbar select{padding:10px;border:1px solid var(--border);border-radius:9px;background:var(--bg);color:var(--text)}
-table{width:100%;border-collapse:collapse;min-width:650px}th,td{padding:12px 14px;border-bottom:1px solid var(--border);text-align:left}th{font-size:13px;color:var(--muted);background:#00000004}tr:last-child td{border-bottom:0}.empty{text-align:center;color:var(--muted);padding:35px}
-.grade{display:inline-grid;place-items:center;min-width:34px;height:30px;border-radius:8px;font-weight:bold}.g5{background:#bbf7d0;color:#166534}.g4{background:#dcfce7;color:#166534}.g3{background:#fef08a;color:#854d0e}.g2{background:#fecaca;color:#991b1b}
-.modal{position:fixed;inset:0;background:#0008;display:grid;place-items:center;padding:20px;z-index:50}.modalbox{width:min(520px,100%);max-height:90vh;overflow:auto;background:var(--card);border-radius:18px;padding:24px}.modalhead{display:flex;justify-content:space-between;align-items:center}.close{background:none;font-size:25px;color:var(--muted)}
-.toast{position:fixed;right:20px;bottom:20px;background:#111827;color:white;padding:13px 17px;border-radius:11px;z-index:100;box-shadow:0 10px 30px #0003}
-.mobile{display:none}.section{display:none}.section.active{display:block}
-.badge{display:inline-block;padding:5px 8px;border-radius:99px;background:#5b5cf01a;color:#5b5cf0;font-size:12px;font-weight:bold}
-@media(max-width:900px){.cards{grid-template-columns:repeat(2,1fr)}.side{width:220px}.main{margin-left:220px}}
-@media(max-width:650px){.side{transform:translateX(-100%);transition:.2s;width:250px}.side.open{transform:translateX(0)}.main{margin-left:0}.mobile{display:block}.top{padding:0 15px}.content{padding:15px}.cards{grid-template-columns:1fr 1fr}.title h2{font-size:22px}}
+:root{
+  --bg:#f5f7fa; --bg-elev:#fff; --text:#1a202c; --text-muted:#64748b;
+  --border:#e2e8f0; --primary:#4f46e5; --primary-hover:#4338ca;
+  --danger:#ef4444; --success:#10b981; --warning:#f59e0b;
+  --shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.04);
+  --shadow-lg:0 10px 25px rgba(0,0,0,.1);
+  --radius:10px; --transition:.2s ease;
+}
+[data-theme="dark"]{
+  --bg:#0f172a; --bg-elev:#1e293b; --text:#e2e8f0; --text-muted:#94a3b8;
+  --border:#334155; --primary:#6366f1; --primary-hover:#818cf8;
+  --shadow:0 1px 3px rgba(0,0,0,.4); --shadow-lg:0 10px 25px rgba(0,0,0,.5);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  background:var(--bg);color:var(--text);font-size:14px;
+  transition:background var(--transition),color var(--transition);
+}
+a{color:var(--primary);text-decoration:none}
+button{font-family:inherit}
+
+/* Auth */
+#auth-screen{
+  display:flex;align-items:center;justify-content:center;min-height:100vh;
+  padding:20px;background:linear-gradient(135deg,#667eea,#764ba2);
+}
+.auth-card{
+  background:var(--bg-elev);border-radius:16px;padding:32px;max-width:420px;
+  width:100%;box-shadow:var(--shadow-lg);animation:slideUp .4s ease;
+}
+@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.auth-logo{text-align:center;margin-bottom:24px}
+.auth-logo h1{font-size:22px;margin-bottom:6px}
+.auth-subtitle{color:var(--text-muted);font-size:13px}
+.auth-tabs{display:flex;background:var(--bg);border-radius:var(--radius);padding:4px;margin-bottom:20px}
+.auth-tab{flex:1;padding:9px;border:none;background:transparent;color:var(--text-muted);
+  font-weight:500;border-radius:8px;cursor:pointer;transition:var(--transition)}
+.auth-tab.active{background:var(--bg-elev);color:var(--text);box-shadow:var(--shadow)}
+.auth-form{display:none}
+.auth-form.active{display:block;animation:fadeIn .3s ease}
+
+.form-group{margin-bottom:14px}
+.form-group label{display:block;font-size:12px;font-weight:600;color:var(--text-muted);
+  margin-bottom:6px;text-transform:uppercase;letter-spacing:.03em}
+input,select,textarea{
+  width:100%;padding:10px 12px;border:1px solid var(--border);background:var(--bg);
+  color:var(--text);border-radius:8px;font-size:14px;font-family:inherit;transition:var(--transition);
+}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--primary);
+  box-shadow:0 0 0 3px rgba(99,102,241,.15)}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  padding:9px 16px;border:1px solid transparent;border-radius:8px;font-size:14px;
+  font-weight:500;cursor:pointer;transition:var(--transition);white-space:nowrap}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-primary:hover{background:var(--primary-hover)}
+.btn-danger{background:var(--danger);color:#fff}
+.btn-ghost{background:transparent;color:var(--text);border:1px solid var(--border)}
+.btn-ghost:hover{background:var(--bg)}
+.btn-block{width:100%}
+.btn-sm{padding:6px 10px;font-size:12px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+
+.auth-link{display:block;text-align:center;margin-top:14px;font-size:13px;color:var(--text-muted)}
+.auth-message{margin-top:16px;padding:10px;border-radius:8px;font-size:13px;display:none}
+.auth-message.error{display:block;background:rgba(239,68,68,.1);color:var(--danger)}
+.auth-message.success{display:block;background:rgba(16,185,129,.1);color:var(--success)}
+.auth-message.info{display:block;background:rgba(99,102,241,.1);color:var(--primary)}
+
+/* App */
+#app-screen{display:flex;min-height:100vh}
+.sidebar{width:240px;background:var(--bg-elev);border-right:1px solid var(--border);
+  display:flex;flex-direction:column;transition:transform var(--transition)}
+.sidebar-header{padding:20px;border-bottom:1px solid var(--border)}
+.sidebar-header h2{font-size:18px}
+.sidebar-nav{flex:1;padding:12px;overflow-y:auto}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;
+  color:var(--text-muted);cursor:pointer;font-size:14px;margin-bottom:2px;transition:var(--transition)}
+.nav-item:hover{background:var(--bg);color:var(--text)}
+.nav-item.active{background:var(--primary);color:#fff}
+.sidebar-footer{padding:12px;border-top:1px solid var(--border);display:flex;gap:8px}
+.sidebar-footer .btn{flex:1}
+
+.main{flex:1;display:flex;flex-direction:column;min-width:0}
+.topbar{display:flex;align-items:center;gap:16px;padding:16px 24px;
+  background:var(--bg-elev);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:10}
+.topbar h1{font-size:20px;flex:1}
+.user-info{display:flex;align-items:center;gap:10px;font-size:13px}
+.badge{padding:4px 10px;background:var(--primary);color:#fff;border-radius:20px;
+  font-size:11px;font-weight:600;text-transform:uppercase}
+.content{padding:24px;flex:1}
+.only-mobile{display:none}
+@media (max-width:768px){
+  .only-mobile{display:inline-flex}
+  .sidebar{position:fixed;z-index:100;height:100%;transform:translateX(-100%)}
+  .sidebar.open{transform:translateX(0);box-shadow:var(--shadow-lg)}
+  .content{padding:16px}
+}
+
+.card{background:var(--bg-elev);border-radius:var(--radius);padding:20px;
+  box-shadow:var(--shadow);margin-bottom:16px}
+.card-header{display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:16px;gap:12px;flex-wrap:wrap}
+.card-title{font-size:16px;font-weight:600}
+
+.grid{display:grid;gap:16px}
+.grid-2{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.grid-3{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+.grid-4{grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}
+
+.stat-card{background:var(--bg-elev);border-radius:var(--radius);padding:18px;
+  box-shadow:var(--shadow);transition:var(--transition)}
+.stat-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg)}
+.stat-label{font-size:12px;color:var(--text-muted);text-transform:uppercase;
+  letter-spacing:.04em;margin-bottom:8px}
+.stat-value{font-size:26px;font-weight:700}
+
+table{width:100%;border-collapse:collapse;font-size:13px;background:var(--bg-elev);
+  border-radius:var(--radius);overflow:hidden}
+th,td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--border)}
+th{background:var(--bg);font-weight:600;font-size:12px;text-transform:uppercase;
+  color:var(--text-muted);letter-spacing:.03em}
+tbody tr{transition:var(--transition)}
+tbody tr:hover{background:var(--bg)}
+tbody tr:last-child td{border-bottom:none}
+
+.empty{padding:40px;text-align:center;color:var(--text-muted)}
+.empty-icon{font-size:40px;display:block;margin-bottom:8px;opacity:.5}
+
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+.toolbar input,.toolbar select{width:auto;min-width:160px}
+
+.grade{display:inline-flex;align-items:center;justify-content:center;min-width:30px;
+  height:30px;padding:0 8px;border-radius:8px;font-weight:700;color:#fff;
+  cursor:pointer;transition:var(--transition)}
+.grade:hover{transform:scale(1.08)}
+.grade-5{background:#10b981}
+.grade-4{background:#84cc16}
+.grade-3{background:#f59e0b}
+.grade-2{background:#ef4444}
+.grade-avg{background:var(--primary)}
+
+.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;
+  align-items:center;justify-content:center;z-index:200;padding:20px;animation:fadeIn .2s ease}
+.modal{background:var(--bg-elev);border-radius:14px;padding:24px;max-width:500px;width:100%;
+  max-height:90vh;overflow-y:auto;box-shadow:var(--shadow-lg);animation:slideUp .25s ease}
+.modal-title{font-size:18px;margin-bottom:16px;font-weight:600}
+.modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:20px}
+
+.toast-root{position:fixed;top:20px;right:20px;z-index:300;display:flex;
+  flex-direction:column;gap:10px;pointer-events:none}
+.toast{background:var(--bg-elev);color:var(--text);padding:12px 18px;border-radius:10px;
+  box-shadow:var(--shadow-lg);border-left:4px solid var(--primary);font-size:13px;
+  animation:slideIn .3s ease;pointer-events:auto;max-width:340px}
+.toast.success{border-left-color:var(--success)}
+.toast.error{border-left-color:var(--danger)}
+.toast.warning{border-left-color:var(--warning)}
+@keyframes slideIn{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:translateX(0)}}
+
+.invite-code{display:inline-flex;align-items:center;gap:8px;font-family:"Courier New",monospace;
+  background:var(--bg);padding:8px 14px;border-radius:8px;font-weight:700;
+  font-size:16px;letter-spacing:.1em}
+.invite-code.used{opacity:.5;text-decoration:line-through}
+
+.loader{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:14px;z-index:999}
+.spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--primary);
+  border-radius:50%;animation:spin 0.8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
-<div id="auth" class="auth">
-  <div class="authbox">
-    <div class="logo">Ж</div>
-    <h1>Электронный журнал</h1>
-    <p class="muted">Вход в систему</p>
-    <form id="loginForm">
-      <div class="field"><label>Логин или Email</label><input id="login" required autocomplete="username"></div>
-      <div class="field"><label>Пароль</label><input id="password" type="password" required autocomplete="current-password"></div>
-      <button class="primary">Войти</button>
-    </form>
-    <div style="text-align:center;margin-top:14px">
-      <button class="link" onclick="showRegister()">Регистрация по коду</button>
-      · <button class="link" onclick="resetPassword()">Сбросить пароль</button>
+
+<!-- Экран загрузки -->
+<div id="loader-screen" class="loader">
+  <div class="spinner"></div>
+  <div id="loader-text" style="color:var(--text-muted);font-size:13px;">Загрузка…</div>
+</div>
+
+<!-- Экран авторизации -->
+<div id="auth-screen" style="display:none">
+  <div class="auth-card">
+    <div class="auth-logo">
+      <h1>📚 Электронный журнал</h1>
+      <p class="auth-subtitle">Войдите или зарегистрируйтесь</p>
     </div>
-    <div id="authMsg"></div>
-  </div>
-</div>
 
-<div id="register" class="auth hidden">
-  <div class="authbox">
-    <div class="logo">+</div><h1>Регистрация</h1>
-    <p class="muted">Введите код приглашения школы</p>
-    <form id="registerForm">
-      <div class="field"><label>Код приглашения</label><input id="invite" required></div>
-      <div class="field"><label>ФИО</label><input id="regName" required></div>
-      <div class="field"><label>Логин</label><input id="regLogin" required></div>
-      <div class="field"><label>Email</label><input id="regEmail" type="email" required></div>
-      <div class="field"><label>Пароль</label><input id="regPassword" type="password" minlength="6" required></div>
-      <button class="primary">Создать аккаунт</button>
+    <div class="auth-tabs">
+      <button class="auth-tab active" data-tab="login">Вход</button>
+      <button class="auth-tab" data-tab="register">Регистрация</button>
+    </div>
+
+    <form id="login-form" class="auth-form active">
+      <div class="form-group">
+        <label>Логин или Email</label>
+        <input type="text" id="login-input" required placeholder="admin">
+      </div>
+      <div class="form-group">
+        <label>Пароль</label>
+        <input type="password" id="login-password" required placeholder="••••••">
+      </div>
+      <button type="submit" class="btn btn-primary btn-block">Войти</button>
+      <a href="#" id="forgot-password" class="auth-link">Забыли пароль?</a>
     </form>
-    <div class="auth-switch"><button class="link" onclick="showLogin()">Вернуться ко входу</button></div>
-    <div id="regMsg"></div>
+
+    <form id="register-form" class="auth-form">
+      <div class="form-group">
+        <label>Код приглашения</label>
+        <input type="text" id="invite-code" required placeholder="ABC123">
+      </div>
+      <div class="form-group">
+        <label>ФИО</label>
+        <input type="text" id="reg-name" required placeholder="Иванов Иван Иванович">
+      </div>
+      <div class="form-group">
+        <label>Логин</label>
+        <input type="text" id="reg-login" required placeholder="ivanov">
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="reg-email" required placeholder="ivanov@mail.ru">
+      </div>
+      <div class="form-group">
+        <label>Пароль</label>
+        <input type="password" id="reg-password" required minlength="6" placeholder="минимум 6 символов">
+      </div>
+      <button type="submit" class="btn btn-primary btn-block">Зарегистрироваться</button>
+    </form>
+
+    <div id="auth-message" class="auth-message"></div>
   </div>
 </div>
 
-<div id="app" class="layout hidden">
-  <aside id="side" class="side">
-    <div class="brand"><div class="bi">Ж</div> Электронный журнал</div>
-    <div id="nav" class="nav"></div>
+<!-- Экран приложения -->
+<div id="app-screen" style="display:none">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header"><h2>📚 ЭЖ</h2></div>
+    <nav class="sidebar-nav" id="sidebar-nav"></nav>
+    <div class="sidebar-footer">
+      <button id="theme-toggle" class="btn btn-ghost" title="Сменить тему">🌙</button>
+      <button id="logout-btn" class="btn btn-ghost">Выйти</button>
+    </div>
   </aside>
   <main class="main">
-    <header class="top">
-      <button class="secondary mobile" onclick="toggleSide()">☰</button>
-      <div id="topTitle">Главная</div>
-      <div class="user"><div id="topName"></div><div id="avatar" class="avatar">?</div><button class="secondary" onclick="toggleTheme()">☀/🌙</button><button class="secondary" onclick="logout()">Выйти</button></div>
+    <header class="topbar">
+      <button id="menu-toggle" class="btn btn-ghost only-mobile">☰</button>
+      <h1 id="page-title">Дашборд</h1>
+      <div class="user-info">
+        <span id="user-name"></span>
+        <span class="badge" id="user-role"></span>
+      </div>
     </header>
-    <div class="content">
-      <div id="sections"></div>
-    </div>
+    <div id="content" class="content"></div>
   </main>
 </div>
 
-<div id="modal" class="modal hidden"><div class="modalbox"><div class="modalhead"><h2 id="modalTitle"></h2><button class="close" onclick="closeModal()">×</button></div><div id="modalBody"></div></div></div>
-<div id="toast" class="toast hidden"></div>
+<div id="modal-root"></div>
+<div id="toast-root" class="toast-root"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
 
 <script>
-const firebaseConfig={
- apiKey:"AIzaSyBSb532Ppi7xXdfXTDfXT6P_ut_0saio", /* замените только если Firebase Console показывает другой ключ */
- authDomain:"zing-30a21.firebaseapp.com",
- databaseURL:"https://zing-30a21-default-rtdb.europe-west1.firebasedatabase.app",
- projectId:"zing-30a21",
- storageBucket:"zing-30a21.firebasestorage.app",
- messagingSenderId:"179467663659",
- appId:"1:179467663659:web:be71167fd0ffd412416d6e"
+/* ============================================================
+   КОНФИГУРАЦИЯ FIREBASE
+============================================================ */
+const firebaseConfig = {
+  apiKey: "AIzaSyBSb532Ppi7xXdfHcuDfXTp6U_ut_0saio",
+  authDomain: "zing-30a21.firebaseapp.com",
+  databaseURL: "https://zing-30a21-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "zing-30a21",
+  storageBucket: "zing-30a21.firebasestorage.app",
+  messagingSenderId: "179467663659",
+  appId: "1:179467663659:web:be71167fd0ffd412416d6e"
 };
 
-/* Вставьте исходный apiKey из задания в firebaseConfig.apiKey, если он отличается. */
 firebase.initializeApp(firebaseConfig);
-const auth=firebase.auth(), db=firebase.database();
-let currentUser=null,currentProfile=null,data={};
-const $=id=>document.getElementById(id);
-const esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
-const now=()=>Date.now();
+const auth = firebase.auth();
+const db   = firebase.database();
 
-function toast(t){$("toast").textContent=t;$("toast").classList.remove("hidden");setTimeout(()=>$("toast").classList.add("hidden"),2600)}
-function msg(id,t){$(id).innerHTML='<div class="msg">'+esc(t)+'</div>'}
-function showLogin(){$("register").classList.add("hidden");$("auth").classList.remove("hidden")}
-function showRegister(){$("auth").classList.add("hidden");$("register").classList.remove("hidden")}
-function toggleTheme(){document.body.classList.toggle("dark");localStorage.theme=document.body.classList.contains("dark")?"dark":"light"}
-function toggleSide(){$("side").classList.toggle("open")}
-function closeModal(){$("modal").classList.add("hidden")}
-function openModal(title,body){$("modalTitle").textContent=title;$("modalBody").innerHTML=body;$("modal").classList.remove("hidden")}
+// Вторичное приложение для создания пользователей без выхода текущего
+const secondaryApp  = firebase.initializeApp(firebaseConfig, 'Secondary');
+const secondaryAuth = secondaryApp.auth();
 
-function roleName(r){return({superAdmin:"Создатель",cityCreator:"Создатель города",schoolCreator:"Создатель школы",teacher:"Учитель",student:"Ученик",parent:"Родитель"})[r]||r}
+/* ============================================================
+   КОНСТАНТЫ
+============================================================ */
+const ADMIN_EMAIL    = 'admin@admin.local';
+const ADMIN_PASSWORD = 'admin';
+const ADMIN_LOGIN    = 'admin';
+const BOOTSTRAP_KEY  = 'ej_bootstrap_v1';
 
-function loginEmail(login){
- if(login.includes("@")) return Promise.resolve(login);
- return db.ref("usernames/"+login.toLowerCase()).once("value").then(s=>{
-   const v=s.val(); if(!v) throw new Error("Пользователь не найден");
-   return v.email;
- });
-}
-
-$("loginForm").onsubmit=async e=>{
- e.preventDefault(); $("authMsg").innerHTML="";
- try{
-   const email=await loginEmail($("login").value.trim());
-   await auth.signInWithEmailAndPassword(email,$("password").value);
- }catch(x){msg("authMsg",friendly(x))}
+/* ============================================================
+   УТИЛИТЫ
+============================================================ */
+const $  = (s) => document.querySelector(s);
+const $$ = (s) => document.querySelectorAll(s);
+const el = (tag, props = {}, ...children) => {
+  const n = document.createElement(tag);
+  Object.entries(props).forEach(([k, v]) => {
+    if (k === 'class') n.className = v;
+    else if (k === 'html') n.innerHTML = v;
+    else if (k.startsWith('on')) n.addEventListener(k.slice(2).toLowerCase(), v);
+    else n.setAttribute(k, v);
+  });
+  children.flat().forEach(c => n.append(c?.nodeType ? c : document.createTextNode(c ?? '')));
+  return n;
 };
 
-$("registerForm").onsubmit=async e=>{
- e.preventDefault();$("regMsg").innerHTML="";
- const code=$("invite").value.trim().toUpperCase();
- try{
-   const snap=await db.ref("invites/"+code).once("value"),inv=snap.val();
-   if(!inv)throw new Error("Приглашение не найдено");
-   if(inv.used)throw new Error("Приглашение уже использовано");
-   if(inv.expiresAt&&inv.expiresAt<now())throw new Error("Срок действия приглашения истёк");
-   if(inv.role!=="teacher")throw new Error("Этот код не предназначен для учителя");
-   const email=$("regEmail").value.trim(),login=$("regLogin").value.trim().toLowerCase();
-   const exists=await db.ref("usernames/"+login).once("value");
-   if(exists.exists())throw new Error("Такой логин уже занят");
-   const cred=await auth.createUserWithEmailAndPassword(email,$("regPassword").value);
-   const uid=cred.user.uid;
-   const profile={uid,role:"teacher",login,schoolId:inv.schoolId,cityId:inv.cityId||null,name:$("regName").value.trim(),email,createdAt:now(),active:true};
-   const updates={};
-   updates["users/"+uid]=profile;
-   updates["usernames/"+login]={uid,email};
-   updates["invites/"+code+"/used"]=true;
-   updates["invites/"+code+"/usedBy"]=uid;
-   updates["invites/"+code+"/usedAt"]=now();
-   await db.ref().update(updates);
-   toast("Аккаунт создан"); await loadApp(uid);
- }catch(x){msg("regMsg",friendly(x))}
+function toast(msg, type = 'info') {
+  const t = el('div', { class: `toast ${type}`, html: msg });
+  $('#toast-root').appendChild(t);
+  setTimeout(() => t.remove(), 4000);
+}
+
+function showModal(title, bodyHtml, actions = []) {
+  const root = $('#modal-root');
+  root.innerHTML = '';
+  const backdrop = el('div', { class: 'modal-backdrop' });
+  backdrop.innerHTML = `
+    <div class="modal">
+      <h3 class="modal-title">${title}</h3>
+      <div class="modal-body">${bodyHtml}</div>
+      <div class="modal-actions"></div>
+    </div>`;
+  const actionsEl = backdrop.querySelector('.modal-actions');
+  actions.forEach(a => {
+    const b = el('button', {
+      class: `btn ${a.class || 'btn-ghost'}`,
+      onclick: () => a.onClick ? a.onClick(backdrop) : closeModal()
+    }, a.label);
+    actionsEl.appendChild(b);
+  });
+  backdrop.onclick = (e) => { if (e.target === backdrop) closeModal(); };
+  root.appendChild(backdrop);
+  return backdrop;
+}
+function closeModal() { $('#modal-root').innerHTML = ''; }
+
+function confirmDialog(title, message) {
+  return new Promise(res => {
+    showModal(title, `<p>${message}</p>`, [
+      { label: 'Отмена', onClick: () => { closeModal(); res(false); } },
+      { label: 'Подтвердить', class: 'btn-danger', onClick: () => { closeModal(); res(true); } }
+    ]);
+  });
+}
+
+const fmt = {
+  date: (ts) => ts ? new Date(ts).toLocaleDateString('ru-RU') : '—',
+  dt:   (ts) => ts ? new Date(ts).toLocaleString('ru-RU') : '—'
 };
 
-async function resetPassword(){
- const login=prompt("Введите email для восстановления пароля:");
- if(!login)return;
- try{const email=await loginEmail(login.trim());await auth.sendPasswordResetEmail(email);toast("Письмо для сброса отправлено")}
- catch(x){alert(friendly(x))}
+function gradeClass(v) {
+  const n = Math.round(v);
+  if (n >= 5) return 'grade-5';
+  if (n === 4) return 'grade-4';
+  if (n === 3) return 'grade-3';
+  return 'grade-2';
+}
+function avgClass(v) {
+  if (v >= 4.5) return 'grade-5';
+  if (v >= 3.5) return 'grade-4';
+  if (v >= 2.5) return 'grade-3';
+  return 'grade-2';
 }
 
-function friendly(e){
- const c=e.code||"",m={ "auth/invalid-credential":"Неверный логин или пароль","auth/email-already-in-use":"Email уже используется","auth/weak-password":"Пароль слишком простой","auth/invalid-email":"Некорректный email","auth/too-many-requests":"Слишком много попыток. Попробуйте позже"};
- return m[c]||e.message||"Произошла ошибка";
+function translateError(err) {
+  const map = {
+    'auth/user-not-found':       'Пользователь не найден',
+    'auth/wrong-password':       'Неверный пароль',
+    'auth/invalid-email':        'Неверный email',
+    'auth/invalid-credential':   'Неверный логин или пароль',
+    'auth/email-already-in-use': 'Email уже используется',
+    'auth/weak-password':        'Слишком простой пароль (мин. 6 символов)',
+    'auth/too-many-requests':    'Слишком много попыток. Попробуйте позже.',
+    'auth/network-request-failed': 'Проблема с сетью'
+  };
+  return map[err.code] || err.message || 'Неизвестная ошибка';
 }
 
-auth.onAuthStateChanged(async u=>{
- if(!u){currentUser=null;currentProfile=null;$("app").classList.add("hidden");$("auth").classList.remove("hidden");return}
- try{await loadApp(u.uid)}catch(e){await auth.signOut();msg("authMsg","Профиль пользователя не найден")}
+/* ============================================================
+   АВТОСОЗДАНИЕ АДМИНИСТРАТОРА
+============================================================ */
+async function bootstrapAdmin() {
+  const loaderText = $('#loader-text');
+
+  // Если уже помечено как созданное — просто проверим вход
+  const alreadyDone = localStorage.getItem(BOOTSTRAP_KEY) === 'done';
+  if (alreadyDone) {
+    loaderText.textContent = 'Проверка входа…';
+    // Попробуем тихо войти, чтобы убедиться, что админ существует
+    try {
+      await auth.signInWithEmailAndPassword(ADMIN_EMAIL, ADMIN_PASSWORD);
+      await auth.signOut(); // всё равно покажем форму входа
+      return;
+    } catch (e) {
+      // Если не получилось — пробуем пересоздать
+    }
+  }
+
+  // Пытаемся войти
+  loaderText.textContent = 'Инициализация администратора…';
+  try {
+    await auth.signInWithEmailAndPassword(ADMIN_EMAIL, ADMIN_PASSWORD);
+    // Запись users могла быть удалена — восстановим
+    const uid = auth.currentUser.uid;
+    const snap = await db.ref('users/' + uid).once('value');
+    if (!snap.exists()) {
+      await db.ref('users/' + uid).set({
+        role: 'super_admin',
+        login: ADMIN_LOGIN,
+        email: ADMIN_EMAIL,
+        name: 'Главный администратор',
+        createdAt: Date.now()
+      });
+    }
+    await auth.signOut();
+    localStorage.setItem(BOOTSTRAP_KEY, 'done');
+    return;
+  } catch (e) {
+    // Не удалось войти — возможно, пользователя нет
+  }
+
+  // Пробуем создать
+  loaderText.textContent = 'Создание администратора…';
+  try {
+    const cred = await auth.createUserWithEmailAndPassword(ADMIN_EMAIL, ADMIN_PASSWORD);
+    const uid  = cred.user.uid;
+    await db.ref('users/' + uid).set({
+      role: 'super_admin',
+      login: ADMIN_LOGIN,
+      email: ADMIN_EMAIL,
+      name: 'Главный администратор',
+      createdAt: Date.now()
+    });
+    await auth.signOut();
+    localStorage.setItem(BOOTSTRAP_KEY, 'done');
+  } catch (e) {
+    // Например, email занят, но пароль другой, или сеть
+    console.warn('Bootstrap warn:', e);
+    if (e.code === 'auth/email-already-in-use') {
+      // Админ уже есть, но пароль другой. Просто пометим.
+      localStorage.setItem(BOOTSTRAP_KEY, 'done');
+    }
+  }
+}
+
+/* ============================================================
+   UI: тема
+============================================================ */
+function initTheme() {
+  const t = localStorage.getItem('theme') || 'light';
+  document.documentElement.dataset.theme = t;
+  const btn = $('#theme-toggle');
+  if (btn) {
+    btn.textContent = t === 'dark' ? '☀️' : '🌙';
+    btn.onclick = () => {
+      const cur = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+      document.documentElement.dataset.theme = cur;
+      localStorage.setItem('theme', cur);
+      btn.textContent = cur === 'dark' ? '☀️' : '🌙';
+    };
+  }
+}
+initTheme();
+
+/* ============================================================
+   АВТОРИЗАЦИЯ: вкладки, вход, регистрация, сброс
+============================================================ */
+function showAuthMsg(text, type = 'error') {
+  const el2 = $('#auth-message');
+  el2.textContent = text;
+  el2.className = 'auth-message ' + type;
+  setTimeout(() => { el2.className = 'auth-message'; }, 6000);
+}
+
+$$('.auth-tab').forEach(tab => {
+  tab.onclick = () => {
+    $$('.auth-tab').forEach(t => t.classList.remove('active'));
+    $$('.auth-form').forEach(f => f.classList.remove('active'));
+    tab.classList.add('active');
+    $(`#${tab.dataset.tab}-form`).classList.add('active');
+  };
 });
 
-async function loadApp(uid){
- currentUser=auth.currentUser;
- const s=await db.ref("users/"+uid).once("value");currentProfile=s.val();
- if(!currentProfile)throw Error("no profile");
- if(currentProfile.active===false)throw Error("account disabled");
- $("auth").classList.add("hidden");$("register").classList.add("hidden");$("app").classList.remove("hidden");
- $("topName").textContent=currentProfile.name||currentProfile.login;
- $("avatar").textContent=(currentProfile.name||currentProfile.login||"?")[0].toUpperCase();
- buildNav();renderDashboard();
+$('#login-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const loginInput = $('#login-input').value.trim();
+  const password   = $('#login-password').value;
+  if (!loginInput || !password) return;
+
+  try {
+    let email = loginInput;
+    if (!loginInput.includes('@')) {
+      const snap = await db.ref('users').orderByChild('login').equalTo(loginInput).once('value');
+      if (!snap.exists()) return showAuthMsg('Пользователь с таким логином не найден');
+      const user = Object.values(snap.val())[0];
+      email = user.email;
+    }
+    await auth.signInWithEmailAndPassword(email, password);
+  } catch (err) {
+    showAuthMsg(translateError(err));
+  }
+});
+
+$('#register-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const code     = $('#invite-code').value.trim().toUpperCase();
+  const name     = $('#reg-name').value.trim();
+  const login    = $('#reg-login').value.trim();
+  const email    = $('#reg-email').value.trim();
+  const password = $('#reg-password').value;
+
+  try {
+    const inviteSnap = await db.ref('invites/' + code).once('value');
+    if (!inviteSnap.exists()) return showAuthMsg('Неверный код приглашения');
+    const invite = inviteSnap.val();
+    if (invite.used) return showAuthMsg('Код уже использован');
+    if (invite.expiresAt && invite.expiresAt < Date.now()) return showAuthMsg('Код истёк');
+
+    const loginCheck = await db.ref('users').orderByChild('login').equalTo(login).once('value');
+    if (loginCheck.exists()) return showAuthMsg('Такой логин уже занят');
+
+    // Создаём через вторичный auth, чтобы не разлогинивать (на случай, если кто-то вошёл)
+    const cred = await secondaryAuth.createUserWithEmailAndPassword(email, password);
+    const uid = cred.user.uid;
+    await secondaryAuth.signOut();
+
+    await db.ref('users/' + uid).set({
+      role: invite.role || 'teacher',
+      login,
+      name,
+      email,
+      schoolId: invite.schoolId || null,
+      cityId: invite.cityId || null,
+      createdAt: Date.now()
+    });
+
+    await db.ref('invites/' + code).update({
+      used: true,
+      usedBy: uid,
+      usedAt: Date.now()
+    });
+
+    showAuthMsg('Регистрация успешна! Входим…', 'success');
+    setTimeout(async () => {
+      await auth.signInWithEmailAndPassword(email, password);
+    }, 800);
+  } catch (err) {
+    showAuthMsg(translateError(err));
+  }
+});
+
+$('#forgot-password').onclick = async (e) => {
+  e.preventDefault();
+  const val = prompt('Введите ваш email для сброса пароля:');
+  if (!val) return;
+  try {
+    await auth.sendPasswordResetEmail(val.trim());
+    showAuthMsg('Письмо отправлено. Проверьте почту.', 'success');
+  } catch (err) {
+    showAuthMsg(translateError(err));
+  }
+};
+
+/* ============================================================
+   СОСТОЯНИЕ ПРИЛОЖЕНИЯ
+============================================================ */
+const App = {
+  user: null,
+  profile: null,
+  cache: {
+    cities:{}, schools:{}, classes:{}, students:{},
+    grades:{}, workTypes:{}, invites:{}, users:{}
+  }
+};
+
+/* ============================================================
+   МЕНЮ
+============================================================ */
+const MENU = {
+  super_admin: [
+    { id: 'dashboard', label: '📊 Дашборд' },
+    { id: 'cities',    label: '🏙️ Города' },
+    { id: 'schools',   label: '🏫 Школы' },
+    { id: 'users',     label: '👥 Пользователи' },
+    { id: 'worktypes', label: '🏷️ Типы работ' },
+    { id: 'profile',   label: '⚙️ Профиль' }
+  ],
+  city_creator: [
+    { id: 'dashboard', label: '📊 Дашборд' },
+    { id: 'schools',   label: '🏫 Школы города' },
+    { id: 'users',     label: '👥 Пользователи' },
+    { id: 'profile',   label: '⚙️ Профиль' }
+  ],
+  school_creator: [
+    { id: 'dashboard', label: '📊 Дашборд' },
+    { id: 'invites',   label: '✉️ Приглашения' },
+    { id: 'users',     label: '👥 Учителя' },
+    { id: 'worktypes', label: '🏷️ Типы работ' },
+    { id: 'profile',   label: '⚙️ Профиль' }
+  ],
+  teacher: [
+    { id: 'dashboard', label: '📊 Дашборд' },
+    { id: 'classes',   label: '🎓 Классы' },
+    { id: 'journal',   label: '📖 Журнал' },
+    { id: 'students',  label: '👨‍🎓 Ученики' },
+    { id: 'worktypes', label: '🏷️ Типы работ' },
+    { id: 'profile',   label: '⚙️ Профиль' }
+  ],
+  student: [
+    { id: 'dashboard', label: '📊 Мои оценки' },
+    { id: 'profile',   label: '⚙️ Профиль' }
+  ],
+  parent: [
+    { id: 'dashboard', label: '📊 Оценки ребёнка' },
+    { id: 'profile',   label: '⚙️ Профиль' }
+  ]
+};
+
+function buildMenu() {
+  const nav = $('#sidebar-nav');
+  nav.innerHTML = '';
+  const items = MENU[App.profile.role] || [];
+  items.forEach(it => {
+    const a = el('div', {
+      class: 'nav-item' + (location.hash === '#' + it.id ? ' active' : ''),
+      onclick: () => navigate(it.id)
+    }, it.label);
+    nav.appendChild(a);
+  });
 }
 
-function navItem(id,text,fn){return `<button data-nav="${id}" onclick="${fn}">${text}</button>`}
-function buildNav(){
- let r=currentProfile.role,n="";
- n+=navItem("dashboard","🏠 Главная","renderDashboard()");
- if(r==="superAdmin"){n+=navItem("cities","🏙 Города","renderCities()");n+=navItem("schools","🏫 Школы","renderSchools()");n+=navItem("users","👥 Пользователи","renderUsers()")}
- if(r==="cityCreator"){n+=navItem("schools","🏫 Мои школы","renderSchools()")}
- if(r==="schoolCreator"){n+=navItem("teachers","👨‍🏫 Учителя","renderTeachers()");n+=navItem("invites","🔑 Приглашения","renderInvites()")}
- if(["teacher","schoolCreator","cityCreator","superAdmin"].includes(r)){n+=navItem("classes","📚 Классы","renderClasses()")}
- if(r==="teacher"){n+=navItem("students","👨‍🎓 Ученики","renderStudents()");n+=navItem("journal","📝 Журнал","renderJournal()");n+=navItem("types","⚙ Типы работ","renderTypes()");n+=navItem("stats","📊 Статистика","renderStats()")}
- n+=navItem("settings","⚙ Настройки","renderSettings()");
- $("nav").innerHTML=n;
+let currentView = 'dashboard';
+
+function navigate(view, params = {}) {
+  location.hash = '#' + view + (params.id ? '/' + params.id : '');
+  router();
 }
 
-function setPage(title,id,html){
- $("topTitle").textContent=title;
- $("sections").innerHTML=`<section id="${id}" class="section active">${html}</section>`;
- document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.nav===id));
+async function router() {
+  const hash = location.hash.slice(1) || 'dashboard';
+  const [view, id] = hash.split('/');
+  currentView = view;
+
+  const items = MENU[App.profile.role] || [];
+  const allowed = items.map(i => i.id);
+  if (!allowed.includes(view)) return navigate('dashboard');
+
+  $$('.nav-item').forEach(n => n.classList.remove('active'));
+  const idx = items.findIndex(i => i.id === view);
+  if (idx >= 0) $$('.nav-item')[idx]?.classList.add('active');
+
+  const renderers = {
+    dashboard: renderDashboard,
+    cities:    renderCities,
+    schools:   renderSchools,
+    users:     renderUsers,
+    invites:   renderInvites,
+    classes:   renderClasses,
+    class:     () => renderClassDetail(id),
+    journal:   renderJournal,
+    students:  renderStudents,
+    worktypes: renderWorkTypes,
+    profile:   renderProfile
+  };
+  const fn = renderers[view];
+  if (fn) await fn();
+  $('#sidebar').classList.remove('open');
 }
 
-async function getAll(path){return (await db.ref(path).once("value")).val()||{}}
-function own(obj){
- return Object.entries(obj).filter(([id,x])=>{
-  if(currentProfile.role==="superAdmin")return true;
-  if(currentProfile.role==="cityCreator")return x.cityId===currentProfile.cityId;
-  if(currentProfile.role==="schoolCreator")return x.schoolId===currentProfile.schoolId;
-  if(currentProfile.role==="teacher")return x.teacherId===currentUser.uid||x.schoolId===currentProfile.schoolId;
-  return false;
- });
+window.addEventListener('hashchange', router);
+
+/* ============================================================
+   ЗАГРУЗКА ДАННЫХ
+============================================================ */
+async function loadAll() {
+  const [cities, schools, classes, students, grades, workTypes, invites, users] =
+    await Promise.all([
+      db.ref('cities').once('value'),
+      db.ref('schools').once('value'),
+      db.ref('classes').once('value'),
+      db.ref('students').once('value'),
+      db.ref('grades').once('value'),
+      db.ref('workTypes').once('value'),
+      db.ref('invites').once('value'),
+      db.ref('users').once('value')
+    ]);
+  App.cache.cities    = cities.val()    || {};
+  App.cache.schools   = schools.val()   || {};
+  App.cache.classes   = classes.val()   || {};
+  App.cache.students  = students.val()  || {};
+  App.cache.grades    = grades.val()    || {};
+  App.cache.workTypes = workTypes.val() || {};
+  App.cache.invites   = invites.val()   || {};
+  App.cache.users     = users.val()     || {};
 }
 
-async function renderDashboard(){
- const [classes,students,grades,schools]=await Promise.all([getAll("classes"),getAll("students"),getAll("grades"),getAll("schools")]);
- const c=own(classes).length,s=own(students).length,g=own(grades).length,sc=own(schools).length;
- setPage("Главная","dashboard",`
- <div class="title"><div><h2>Добро пожаловать, ${esc(currentProfile.name||currentProfile.login)}!</h2><span class="muted">${roleName(currentProfile.role)}</span></div></div>
- <div class="cards">
-  <div class="card"><span class="stat-label">Классы</span><div class="value">${c}</div></div>
-  <div class="card"><span class="stat-label">Ученики</span><div class="value">${s}</div></div>
-  <div class="card"><span class="stat-label">Оценки</span><div class="value">${g}</div></div>
-  <div class="card"><span class="stat-label">Школы</span><div class="value">${sc}</div></div>
- </div>
- <div class="card"><h3>Быстрые действия</h3>
- ${currentProfile.role==="teacher"?'<button class="primary" onclick="openGradeModal()">+ Поставить оценку</button>':''}
- ${currentProfile.role==="schoolCreator"?'<button class="primary" onclick="createInvite()">+ Создать приглашение</button>':''}
- </div>`);
+function mySchools() {
+  const s = App.cache.schools;
+  if (App.profile.role === 'super_admin') return s;
+  if (App.profile.role === 'city_creator')
+    return Object.fromEntries(Object.entries(s).filter(([,v]) => v.cityId === App.profile.cityId));
+  if (App.profile.role === 'school_creator' || App.profile.role === 'teacher')
+    return Object.fromEntries(Object.entries(s).filter(([k]) => k === App.profile.schoolId));
+  return {};
+}
+function myClasses() {
+  return Object.fromEntries(
+    Object.entries(App.cache.classes).filter(([,c]) => c.teacherId === App.user.uid)
+  );
 }
 
-async function renderCities(){
- const cities=await getAll("cities");
- let rows=own(cities).map(([id,x])=>`<tr><td>${esc(x.name)}</td><td>${esc(x.creatorId||"—")}</td><td>${id}</td></tr>`).join("");
- setPage("Города","cities",`<div class="title"><h2>Города</h2><button class="primary" onclick="createCity()">+ Создать город</button></div><div class="tablebox"><table><tr><th>Название</th><th>Создатель</th><th>ID</th></tr>${rows||'<tr><td colspan="3" class="empty">Нет городов</td></tr>'}</table></div>`);
-}
-async function createCity(){
- openModal("Создать город",`<div class="field"><label>Название</label><input id="cityName"></div><button class="primary" onclick="saveCity()">Создать</button>`);
-}
-async function saveCity(){
- const name=$("cityName").value.trim();if(!name)return;
- const id=db.ref("cities").push().key;
- await db.ref("cities/"+id).set({name,creatorId:currentUser.uid,createdAt:now(),active:true});
- closeModal();toast("Город создан");renderCities();
+/* ============================================================
+   ВИДЫ
+============================================================ */
+async function renderDashboard() {
+  $('#page-title').textContent = 'Дашборд';
+  const c = $('#content');
+  c.innerHTML = '';
+  const role = App.profile.role;
+  let stats = [];
+
+  if (role === 'super_admin') {
+    stats = [
+      { label: 'Городов',       value: Object.keys(App.cache.cities).length },
+      { label: 'Школ',          value: Object.keys(App.cache.schools).length },
+      { label: 'Пользователей', value: Object.keys(App.cache.users).length }
+    ];
+  } else if (role === 'city_creator') {
+    const schools = mySchools();
+    stats = [
+      { label: 'Школ в городе', value: Object.keys(schools).length },
+      { label: 'Пользователей', value: Object.values(App.cache.users).filter(u => u.cityId === App.profile.cityId).length }
+    ];
+  } else if (role === 'school_creator') {
+    const schoolUsers = Object.values(App.cache.users).filter(u => u.schoolId === App.profile.schoolId);
+    stats = [
+      { label: 'Учителей', value: schoolUsers.filter(u => u.role === 'teacher').length },
+      { label: 'Классов',  value: Object.values(App.cache.classes).filter(cl => cl.schoolId === App.profile.schoolId).length },
+      { label: 'Учеников', value: countStudentsBySchool() }
+    ];
+  } else if (role === 'teacher') {
+    stats = [
+      { label: 'Моих классов',     value: Object.keys(myClasses()).length },
+      { label: 'Моих учеников',    value: countStudentsInMyClasses() },
+      { label: 'Оценок выставлено', value: countMyGrades() }
+    ];
+  } else {
+    stats = [
+      { label: 'Моих оценок',  value: countMyGradesAsStudent() },
+      { label: 'Средний балл', value: avgForStudent(App.user.uid) || '—' }
+    ];
+  }
+
+  const grid = el('div', { class: 'grid grid-3' });
+  stats.forEach(s => {
+    grid.appendChild(el('div', { class: 'stat-card' },
+      el('div', { class: 'stat-label' }, s.label),
+      el('div', { class: 'stat-value' }, String(s.value))
+    ));
+  });
+  c.appendChild(grid);
+
+  if (role === 'teacher') {
+    const recent = Object.entries(App.cache.grades)
+      .filter(([,g]) => g.teacherId === App.user.uid)
+      .sort((a,b) => (b[1].date || 0) - (a[1].date || 0))
+      .slice(0, 10);
+    const card = el('div', { class: 'card' });
+    card.appendChild(el('div', { class: 'card-header' },
+      el('div', { class: 'card-title' }, 'Последние оценки')));
+    if (!recent.length) {
+      card.appendChild(el('div', { class: 'empty' }, 'Пока нет оценок'));
+    } else {
+      const t = el('table');
+      t.innerHTML = `<thead><tr><th>Дата</th><th>Ученик</th><th>Предмет</th><th>Оценка</th></tr></thead>`;
+      const tb = el('tbody');
+      recent.forEach(([,g]) => {
+        const st = App.cache.students[g.studentId];
+        const tr = el('tr');
+        tr.innerHTML = `
+          <td>${fmt.date(g.date)}</td>
+          <td>${st?.name || '—'}</td>
+          <td>${g.subject || '—'}</td>
+          <td><span class="grade ${gradeClass(g.value)}">${g.value}</span></td>`;
+        tb.appendChild(tr);
+      });
+      t.appendChild(tb);
+      card.appendChild(t);
+    }
+    c.appendChild(card);
+  }
 }
 
-async function renderSchools(){
- const schools=await getAll("schools");
- let rows=own(schools).map(([id,x])=>`<tr><td>${esc(x.name)}</td><td>${esc(x.cityId||"—")}</td><td>${id}</td></tr>`).join("");
- setPage("Школы","schools",`<div class="title"><h2>Школы</h2>${currentProfile.role!=="cityCreator"?"":"<button class='primary' onclick='createSchool()'>+ Создать школу</button>"}</div><div class="tablebox"><table><tr><th>Школа</th><th>Город</th><th>ID</th></tr>${rows||'<tr><td colspan="3" class="empty">Нет школ</td></tr>'}</table></div>`);
-}
-async function createSchool(){
- openModal("Создать школу",`<div class="field"><label>Название школы</label><input id="schoolName"></div><button class="primary" onclick="saveSchool()">Создать</button>`);
-}
-async function saveSchool(){
- const name=$("schoolName").value.trim();if(!name)return;
- const id=db.ref("schools").push().key;
- await db.ref("schools/"+id).set({name,cityId:currentProfile.cityId,creatorId:currentUser.uid,createdAt:now(),active:true});
- closeModal();toast("Школа создана");renderSchools();
-}
-
-async function renderUsers(){
- const users=await getAll("users"),rows=Object.values(users).map(x=>`<tr><td>${esc(x.name)}</td><td>${esc(x.login)}</td><td><span class="badge">${esc(roleName(x.role))}</span></td><td>${esc(x.schoolId||"—")}</td></tr>`).join("");
- setPage("Пользователи","users",`<div class="title"><h2>Пользователи</h2></div><div class="tablebox"><table><tr><th>Имя</th><th>Логин</th><th>Роль</th><th>Школа</th></tr>${rows||'<tr><td colspan="4" class="empty">Нет пользователей</td></tr>'}</table></div>`);
-}
-
-async function renderTeachers(){
- const users=await getAll("users"),rows=Object.values(users).filter(x=>x.role==="teacher"&&x.schoolId===currentProfile.schoolId).map(x=>`<tr><td>${esc(x.name)}</td><td>${esc(x.login)}</td><td>${esc(x.email)}</td><td>${x.active===false?"Отключён":"Активен"}</td></tr>`).join("");
- setPage("Учителя","teachers",`<div class="title"><h2>Учителя</h2><button class="primary" onclick="createInvite()">+ Пригласить учителя</button></div><div class="tablebox"><table><tr><th>ФИО</th><th>Логин</th><th>Email</th><th>Статус</th></tr>${rows||'<tr><td colspan="4" class="empty">Учителей пока нет</td></tr>'}</table></div>`);
-}
-
-function createInvite(){
- const code=crypto.getRandomValues(new Uint32Array(2)).reduce((a,b)=>a+b.toString(36).toUpperCase(),"").slice(0,8);
- const id=db.ref("invites").push().key;
- db.ref("invites/"+code).set({role:"teacher",schoolId:currentProfile.schoolId,cityId:currentProfile.cityId||null,createdBy:currentUser.uid,used:false,expiresAt:now()+7*86400000});
- openModal("Приглашение создано",`<p>Код приглашения:</p><h1 style="letter-spacing:4px">${code}</h1><p class="muted">Действует 7 дней и может быть использован один раз.</p><button class="primary" onclick="navigator.clipboard?.writeText('${code}');toast('Код скопирован')">Копировать код</button>`);
-}
-
-async function renderInvites(){
- const inv=await getAll("invites");
- const rows=Object.entries(inv).filter(([id,x])=>x.schoolId===currentProfile.schoolId).map(([id,x])=>`<tr><td><b>${id}</b></td><td>${x.used?"Использован":"Активен"}</td><td>${x.expiresAt?new Date(x.expiresAt).toLocaleDateString("ru-RU"):"—"}</td></tr>`).join("");
- setPage("Приглашения","invites",`<div class="title"><h2>Приглашения</h2><button class="primary" onclick="createInvite()">+ Создать</button></div><div class="tablebox"><table><tr><th>Код</th><th>Статус</th><th>Истекает</th></tr>${rows||'<tr><td colspan="3" class="empty">Нет приглашений</td></tr>'}</table></div>`);
-}
-
-async function renderClasses(){
- const classes=await getAll("classes");
- const rows=own(classes).filter(([id,x])=>currentProfile.role!=="teacher"||x.teacherId===currentUser.uid).map(([id,x])=>`<tr><td><b>${esc(x.name)}</b></td><td>${esc(x.year||"")}</td><td>${(x.subjects||[]).map(esc).join(", ")}</td><td><button class="secondary" onclick="classStudents('${id}')">Ученики</button></td></tr>`).join("");
- setPage("Классы","classes",`<div class="title"><h2>Мои классы</h2>${currentProfile.role==="teacher"?'<button class="primary" onclick="createClass()">+ Создать класс</button>':''}</div><div class="tablebox"><table><tr><th>Класс</th><th>Год</th><th>Предметы</th><th></th></tr>${rows||'<tr><td colspan="4" class="empty">Классов пока нет</td></tr>'}</table></div>`);
-}
-function createClass(){
- openModal("Новый класс",`<div class="field"><label>Название</label><input id="className" placeholder="7А"></div><div class="field"><label>Учебный год</label><input id="classYear" value="${new Date().getFullYear()}"></div><div class="field"><label>Предметы через запятую</label><input id="subjects" placeholder="Математика, Русский язык"></div><button class="primary" onclick="saveClass()">Создать</button>`);
-}
-async function saveClass(){
- const id=db.ref("classes").push().key,subs=$("subjects").value.split(",").map(x=>x.trim()).filter(Boolean);
- await db.ref("classes/"+id).set({name:$("className").value.trim(),year:$("classYear").value.trim(),subjects:subs,schoolId:currentProfile.schoolId,teacherId:currentUser.uid,createdAt:now(),active:true});
- closeModal();toast("Класс создан");renderClasses();
+async function renderCities() {
+  $('#page-title').textContent = 'Города';
+  const c = $('#content');
+  c.innerHTML = '';
+  const card = el('div', { class: 'card' });
+  card.appendChild(el('div', { class: 'card-header' },
+    el('div', { class: 'card-title' }, 'Список городов'),
+    el('button', { class: 'btn btn-primary', onclick: addCityDialog }, '+ Добавить город')
+  ));
+  const cities = Object.entries(App.cache.cities);
+  if (!cities.length) {
+    card.appendChild(el('div', { class: 'empty' }, 'Городов пока нет'));
+  } else {
+    const t = el('table');
+    t.innerHTML = `<thead><tr><th>Название</th><th>Создан</th><th></th></tr></thead>`;
+    const tb = el('tbody');
+    cities.forEach(([id, city]) => {
+      const tr = el('tr');
+      tr.innerHTML = `<td>${city.name}</td><td>${fmt.date(city.createdAt)}</td>`;
+      const actions = el('td');
+      actions.appendChild(el('button', {
+        class: 'btn btn-sm btn-ghost',
+        onclick: () => createCityCreatorDialog(id)
+      }, '➕ Создателя города'));
+      actions.appendChild(el('button', {
+        class: 'btn btn-sm btn-ghost',
+        onclick: async () => {
+          if (await confirmDialog('Удалить город?', `Город "${city.name}" будет удалён.`)) {
+            await db.ref('cities/' + id).remove();
+            toast('Город удалён', 'success');
+            await loadAll(); renderCities();
+          }
+        }
+      }, '🗑️'));
+      tr.appendChild(actions);
+      tb.appendChild(tr);
+    });
+    t.appendChild(tb);
+    card.appendChild(t);
+  }
+  c.appendChild(card);
 }
 
-async function renderStudents(){
- const students=await getAll("students"),classes=await getAll("classes");
- const rows=own(students).filter(([id,x])=>Object.values(classes).some(c=>c.schoolId===currentProfile.schoolId&&c.teacherId===currentUser.uid&&c.name&&Object.keys(classes).find(k=>classes[k]===c)===x.classId)).map(([id,x])=>`<tr><td>${esc(x.name)}</td><td>${esc(classes[x.classId]?.name||x.classId)}</td></tr>`).join("");
- setPage("Ученики","students",`<div class="title"><h2>Ученики</h2><button class="primary" onclick="addStudent()">+ Добавить</button></div><div class="tablebox"><table><tr><th>ФИО</th><th>Класс</th></tr>${rows||'<tr><td colspan="2" class="empty">Ученики пока не добавлены</td></tr>'}</table></div>`);
-}
-async function addStudent(){
- const classes=await getAll("classes"),list=Object.entries(classes).filter(([id,x])=>x.teacherId===currentUser.uid).map(([id,x])=>`<option value="${id}">${esc(x.name)}</option>`).join("");
- openModal("Добавить ученика",`<div class="field"><label>ФИО</label><input id="studentName"></div><div class="field"><label>Класс</label><select id="studentClass">${list}</select></div><button class="primary" onclick="saveStudent()">Добавить</button>`);
-}
-async function saveStudent(){
- const id=db.ref("students").push().key;
- await db.ref("students/"+id).set({name:$("studentName").value.trim(),classId:$("studentClass").value,schoolId:currentProfile.schoolId,createdAt:now()});
- closeModal();toast("Ученик добавлен");renderStudents();
-}
-async function classStudents(cid){location.hash="";const students=await getAll("students"),rows=Object.entries(students).filter(([id,x])=>x.classId===cid).map(([id,x])=>`<tr><td>${esc(x.name)}</td></tr>`).join("");setPage("Ученики класса","classStudents",`<div class="title"><h2>Ученики</h2><button class="secondary" onclick="renderClasses()">← Назад</button></div><div class="tablebox"><table><tr><th>ФИО</th></tr>${rows||'<tr><td class="empty">Нет учеников</td></tr>'}</table></div>`)}
-
-async function renderTypes(){
- const types=await getAll("workTypes");
- let rows=Object.entries(types).filter(([id,x])=>!x.schoolId||x.schoolId===currentProfile.schoolId).map(([id,x])=>`<tr><td>${esc(x.name)}</td><td>${x.weight}</td></tr>`).join("");
- setPage("Типы работ","types",`<div class="title"><h2>Типы работ</h2><button class="primary" onclick="addType()">+ Добавить</button></div><div class="tablebox"><table><tr><th>Тип</th><th>Вес</th></tr>${rows||'<tr><td colspan="2" class="empty">Нет типов</td></tr>'}</table></div>`);
-}
-function addType(){openModal("Тип работы",`<div class="field"><label>Название</label><input id="typeName"></div><div class="field"><label>Вес</label><input id="typeWeight" type="number" min="1" value="1"></div><button class="primary" onclick="saveType()">Сохранить</button>`)}
-async function saveType(){const id=db.ref("workTypes").push().key;await db.ref("workTypes/"+id).set({name:$("typeName").value.trim(),weight:Number($("typeWeight").value),schoolId:currentProfile.schoolId,createdBy:currentUser.uid});closeModal();toast("Тип создан");renderTypes()}
-
-async function renderJournal(){
- const [grades,students,classes]=await Promise.all([getAll("grades"),getAll("students"),getAll("classes")]);
- const allowed=Object.fromEntries(Object.entries(students).filter(([id,x])=>x.schoolId===currentProfile.schoolId));
- const rows=Object.entries(grades).filter(([id,g])=>allowed[g.studentId]&&(currentProfile.role!=="teacher"||g.teacherId===currentUser.uid)).sort((a,b)=>(b[1].date||"").localeCompare(a[1].date||"")).map(([id,g])=>{
-  const st=allowed[g.studentId];return `<tr><td>${esc(st?.name)}</td><td>${esc(classes[g.classId]?.name||"")}</td><td>${esc(g.subject)}</td><td>${esc(g.date)}</td><td>${esc(g.typeName||g.typeId||"")}</td><td><span class="grade g${g.value}">${g.value}</span></td><td>${g.weight}</td></tr>`
- }).join("");
- setPage("Журнал","journal",`<div class="title"><h2>Журнал</h2><div><button class="primary" onclick="openGradeModal()">+ Оценка</button> <button class="secondary" onclick="exportCSV()">CSV</button></div></div><div class="tablebox"><div class="toolbar"><input id="journalSearch" placeholder="Поиск ученика..." oninput="filterTable(this,'journalTable')"></div><table id="journalTable"><tr><th>Ученик</th><th>Класс</th><th>Предмет</th><th>Дата</th><th>Работа</th><th>Оценка</th><th>Вес</th></tr>${rows||'<tr><td colspan="7" class="empty">Оценок пока нет</td></tr>'}</table></div>`);
-}
-function filterTable(inp,id){const q=inp.value.toLowerCase();document.querySelectorAll("#"+id+" tr").forEach((r,i)=>{if(i)r.style.display=r.textContent.toLowerCase().includes(q)?"":"none"})}
-
-async function openGradeModal(){
- const [students,classes,types]=await Promise.all([getAll("students"),getAll("classes"),getAll("workTypes")]);
- const st=Object.entries(students).filter(([id,x])=>x.schoolId===currentProfile.schoolId&&Object.values(classes).some(c=>c.teacherId===currentUser.uid&&Object.keys(classes).find(k=>classes[k]===c)===x.classId));
- const opt=st.map(([id,x])=>`<option value="${id}" data-class="${x.classId}">${esc(x.name)}</option>`).join("");
- const t=Object.entries(types).filter(([id,x])=>!x.schoolId||x.schoolId===currentProfile.schoolId).map(([id,x])=>`<option value="${id}" data-weight="${x.weight}">${esc(x.name)} (вес ${x.weight})</option>`).join("");
- openModal("Добавить оценку",`<div class="field"><label>Ученик</label><select id="gradeStudent">${opt}</select></div><div class="field"><label>Предмет</label><input id="gradeSubject" placeholder="Математика"></div><div class="field"><label>Дата</label><input id="gradeDate" type="date" value="${new Date().toISOString().slice(0,10)}"></div><div class="field"><label>Тип работы</label><select id="gradeType" onchange="document.getElementById('gradeWeight').value=this.options[this.selectedIndex]?.dataset.weight||1">${t}</select></div><div class="field"><label>Вес</label><input id="gradeWeight" type="number" min="1" value="1"></div><div class="field"><label>Оценка</label><select id="gradeValue"><option>5</option><option>4</option><option>3</option><option>2</option></select></div><button class="primary" onclick="saveGrade()">Сохранить</button>`);
-}
-async function saveGrade(){
- const students=await getAll("students"),types=await getAll("workTypes"),sid=$("gradeStudent").value,st=students[sid];
- const type=types[$("gradeType").value]||{};
- const id=db.ref("grades").push().key;
- const grade={studentId:sid,classId:st.classId,subject:$("gradeSubject").value.trim(),teacherId:currentUser.uid,schoolId:currentProfile.schoolId,date:$("gradeDate").value,typeId:$("gradeType").value,typeName:type.name||"",weight:Number($("gradeWeight").value),value:Number($("gradeValue").value),createdAt:now(),updatedAt:now()};
- await db.ref("grades/"+id).set(grade);
- await db.ref("gradeHistory/"+db.ref("gradeHistory").push().key).set({gradeId:id,action:"create",userId:currentUser.uid,newValue:grade.value,newWeight:grade.weight,timestamp:now()});
- closeModal();toast("Оценка сохранена");renderJournal();
+async function renderSchools() {
+  $('#page-title').textContent = 'Школы';
+  const c = $('#content');
+  c.innerHTML = '';
+  const card = el('div', { class: 'card' });
+  const canCreate = ['super_admin','city_creator'].includes(App.profile.role);
+  card.appendChild(el('div', { class: 'card-header' },
+    el('div', { class: 'card-title' }, 'Список школ'),
+    canCreate ? el('button', { class: 'btn btn-primary', onclick: addSchoolDialog }, '+ Добавить школу') : el('span')
+  ));
+  const schools = Object.entries(mySchools());
+  if (!schools.length) {
+    card.appendChild(el('div', { class: 'empty' }, 'Школ пока нет'));
+  } else {
+    const t = el('table');
+    t.innerHTML = `<thead><tr><th>Название</th><th>Город</th><th>Создана</th><th></th></tr></thead>`;
+    const tb = el('tbody');
+    schools.forEach(([id, s]) => {
+      const city = App.cache.cities[s.cityId];
+      const tr = el('tr');
+      tr.innerHTML = `
+        <td>${s.name}</td>
+        <td>${city?.name || '—'}</td>
+        <td>${fmt.date(s.createdAt)}</td>`;
+      const actions = el('td');
+      actions.appendChild(el('button', {
+        class: 'btn btn-sm btn-ghost',
+        onclick: () => createSchoolCreatorDialog(id, s.cityId)
+      }, '➕ Создателя школы'));
+      actions.appendChild(el('button', {
+        class: 'btn btn-sm btn-ghost',
+        onclick: async () => {
+          if (await confirmDialog('Удалить школу?', `Школа "${s.name}" будет удалена.`)) {
+            await db.ref('schools/' + id).remove();
+            toast('Школа удалена', 'success');
+            await loadAll(); renderSchools();
+          }
+        }
+      }, '🗑️'));
+      tr.appendChild(actions);
+      tb.appendChild(tr);
+    });
+    t.appendChild(tb);
+    card.appendChild(t);
+  }
+  c.appendChild(card);
 }
 
-async function renderStats(){
- const [grades,students]=await Promise.all([getAll("grades"),getAll("students")]);
- const groups={};
- Object.values(grades).filter(g=>g.teacherId===currentUser.uid).forEach(g=>{const k=g.studentId;if(!groups[k])groups[k]={sum:0,w:0};groups[k].sum+=g.value*g.weight;groups[k].w+=g.weight});
- const rows=Object.entries(groups).map(([sid,x])=>`<tr><td>${esc(students[sid]?.name||sid)}</td><td>${x.w?(x.sum/x.w).toFixed(2):"—"}</td><td>${x.w}</td></tr>`).join("");
- setPage("Статистика","stats",`<div class="title"><h2>Средневзвешенный балл</h2></div><div class="tablebox"><table><tr><th>Ученик</th><th>Средний</th><th>Сумма весов</th></tr>${rows||'<tr><td colspan="3" class="empty">Нет данных</td></tr>'}</table></div>`);
+async function renderUsers() {
+  $('#page-title').textContent = 'Пользователи';
+  const c = $('#content');
+  c.innerHTML = '';
+  let users = Object.entries(App.cache.users);
+  if (App.profile.role === 'city_creator') {
+    users = users.filter(([,u]) => u.cityId === App.profile.cityId);
+  } else if (App.profile.role === 'school_creator') {
+    users = users.filter(([,u]) => u.schoolId === App.profile.schoolId);
+  }
+  const card = el('div', { class: 'card' });
+  card.appendChild(el('div', { class: 'card-header' },
+    el('div', { class: 'card-title' }, 'Пользователи')));
+  if (!users.length) {
+    card.appendChild(el('div', { class: 'empty' }, 'Нет пользователей'));
+  } else {
+    const t = el('table');
+    t.innerHTML = `<thead><tr><th>ФИО</th><th>Логин</th><th>Email</th><th>Роль</th><th></th></tr></thead>`;
+    const tb = el('tbody');
+    users.forEach(([uid, u]) => {
+      const tr = el('tr');
+      tr.innerHTML = `
+        <td>${u.name || '—'}</td>
+        <td>${u.login || '—'}</td>
+        <td>${u.email || '—'}</td>
+        <td><span class="badge">${u.role}</span></td>`;
+      const actions = el('td');
+      actions.appendChild(el('button', {
+        class: 'btn btn-sm btn-ghost',
+        onclick: () => resetPasswordDialog(u.email)
+      }, '🔑 Пароль'));
+      tr.appendChild(actions);
+      tb.appendChild(tr);
+    });
+    t.appendChild(tb);
+    card.appendChild(t);
+  }
+  c.appendChild(card);
 }
 
-async function exportCSV(){
- const grades=await getAll("grades"),students=await getAll("students");
- const rows=[["Ученик","Предмет","Дата","Тип работы","Вес","Оценка"]];
- Object.values(grades).filter(g=>g.teacherId===currentUser.uid).forEach(g=>rows.push([students[g.studentId]?.name||"",g.subject,g.date,g.typeName||g.typeId,g.weight,g.value]));
- const csv="\uFEFF"+rows.map(r=>r.map(x=>`"${String(x).replaceAll('"','""')}"`).join(";")).join("\n");
- const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv;charset=utf-8"}));a.download="journal.csv";a.click();URL.revokeObjectURL(a.href);
+async function renderInvites() {
+  $('#page-title').textContent = 'Приглашения';
+  const c = $('#content');
+  c.innerHTML = '';
+  const card = el('div', { class: 'card' });
+  card.appendChild(el('div', { class: 'card-header' },
+    el('div', { class: 'card-title' }, 'Коды приглашения для учителей'),
+    el('button', { class: 'btn btn-primary', onclick: createInvite }, '+ Создать код')
+  ));
+  const invites = Object.entries(App.cache.invites)
+    .filter(([,i]) => i.createdBy === App.user.uid)
+    .sort((a,b) => (b[1].createdAt||0) - (a[1].createdAt||0));
+  if (!invites.length) {
+    card.appendChild(el('div', { class: 'empty' }, 'Кодов пока нет'));
+  } else {
+    const t = el('table');
+    t.innerHTML = `<thead><tr><th>Код</th><th>Статус</th><th>Создан</th><th>Истекает</th></tr></thead>`;
+    const tb = el('tbody');
+    invites.forEach(([code, inv]) => {
+      const status = inv.used ? '✅ Использован' : (inv.expiresAt < Date.now() ? '⌛ Истёк' : '🟢 Активен');
+      const tr = el('tr');
+      tr.innerHTML = `
+        <td><span class="invite-code ${inv.used?'used':''}">${code}</span></td>
+        <td>${status}</td>
+        <td>${fmt.date(inv.createdAt)}</td>
+        <td>${fmt.date(inv.expiresAt)}</td>`;
+      tb.appendChild(tr);
+    });
+    t.appendChild(tb);
+    card.appendChild(t);
+  }
+  c.appendChild(card);
 }
 
-function renderSettings(){setPage("Настройки","settings",`<div class="title"><h2>Настройки</h2></div><div class="card"><h3>Профиль</h3><p><b>Имя:</b> ${esc(currentProfile.name)}</p><p><b>Логин:</b> ${esc(currentProfile.login)}</p><p><b>Роль:</b> ${esc(roleName(currentProfile.role))}</p><button class="secondary" onclick="toggleTheme()">Переключить тему</button></div>`)}
-async function logout(){await auth.signOut()}
-function toggleSide(){ $("side").classList.toggle("open") }
+async function renderClasses() {
+  $('#page-title').textContent = 'Мои классы';
+  const c = $('#content');
+  c.innerHTML = '';
+  const card = el('div', { class: 'card' });
+  card.appendChild(el('div', { class: 'card-header' },
+    el('div', { class: 'card-title' }, 'Классы'),
+    el('button', { class: 'btn btn-primary', onclick: addClassDialog }, '+ Создать класс')
+  ));
+  const classes = Object.entries(myClasses());
+  if (!classes.length) {
+    card.appendChild(el('div', { class: 'empty' }, 'У вас пока нет классов'));
+  } else {
+    const grid = el('div', { class: 'grid grid-3' });
+    classes.forEach(([id, cl]) => {
+      const studentCount = Object.values(App.cache.students).filter(s => s.classId === id).length;
+      const ccard = el('div', { class: 'stat-card' });
+      ccard.innerHTML = `
+        <div class="stat-label">${cl.year || '—'} год</div>
+        <div class="stat-value" style="font-size:20px;">${cl.name}</div>
+        <p style="color:var(--text-muted);font-size:12px;margin-top:6px;">
+          👨‍🎓 ${studentCount} учеников • 📚 ${(cl.subjects||[]).length} предметов
+        </p>`;
+      const actions = el('div', { style: 'margin-top:12px;display:flex;gap:6px' });
+      actions.appendChild(el('button', {
+        class: 'btn btn-sm btn-primary',
+        onclick: () => navigate('class', { id })
+      }, 'Открыть'));
+      actions.appendChild(el('button', {
+        class: 'btn btn-sm btn-ghost',
+        onclick: async () => {
+          if (await confirmDialog('Удалить класс?', `Класс "${cl.name}" и его ученики будут удалены.`)) {
+            const updates = { ['classes/' + id]: null };
+            Object.entries(App.cache.students).forEach(([sid, s]) => {
+              if (s.classId === id) updates['students/' + sid] = null;
+            });
+            Object.entries(App.cache.grades).forEach(([gid, g]) => {
+              if (g.classId === id) updates['grades/' + gid] = null;
+            });
+            await db.ref().update(updates);
+            toast('Класс удалён', 'success');
+            await loadAll(); renderClasses();
+          }
+        }
+      }, '🗑️'));
+      ccard.appendChild(actions);
+      grid.appendChild(ccard);
+    });
+    card.appendChild(grid);
+  }
+  c.appendChild(card);
+}
 
-if(localStorage.theme==="dark")document.body.classList.add("dark");
+async function renderClassDetail(classId) {
+  const cl = App.cache.classes[classId];
+  if (!cl || cl.teacherId !== App.user.uid) return navigate('classes');
+  $('#page-title').textContent = `Класс ${cl.name}`;
+  const c = $('#content');
+  c.innerHTML = '';
+
+  const card = el('div', { class: 'card' });
+  card.appendChild(el('div', { class: 'card-header' },
+    el('div', { class: 'card-title' }, 'Ученики класса'),
+    el('button', { class: 'btn btn-primary btn-sm', onclick: () => addStudentDialog(classId) }, '+ Добавить ученика')
+  ));
+  const students = Object.entries(App.cache.students).filter(([,s]) => s.classId === classId);
+  if (!students.length) {
+    card.appendChild(el('div', { class: 'empty' }, 'Нет учеников'));
+  } else {
+    const t = el('table');
+    t.innerHTML = `<thead><tr><th>ФИО</th><th>Средний</th><th></th></tr></thead>`;
+    const tb = el('tbody');
+    students.forEach(([sid, s]) => {
+      const avg = avgForStudent(sid, classId);
+      const tr = el('tr');
+      tr.innerHTML = `
+        <td>${s.name}</td>
+        <td><span class="grade ${avgClass(avg)}">${avg || '—'}</span></td>`;
+      const a = el('td');
+      a.appendChild(el('button', {
+        class: 'btn btn-sm btn-ghost',
+        onclick: () => deleteStudent(sid, s.name)
+      }, '🗑️'));
+      tr.appendChild(a);
+      tb.appendChild(tr);
+    });
+    t.appendChild(tb);
+    card.appendChild(t);
+  }
+  c.appendChild(card);
+
+  const back = el('button', { class: 'btn btn-ghost', onclick: () => navigate('classes') }, '← Назад к классам');
+  c.appendChild(back);
+}
+
+async function renderJournal() {
+  $('#page-title').textContent = 'Журнал оценок';
+  const c = $('#content');
+  c.innerHTML = '';
+  const classes = myClasses();
+  if (!Object.keys(classes).length) {
+    c.appendChild(el('div', { class: 'card empty' }, 'Сначала создайте класс'));
+    return;
+  }
+  const card = el('div', { class: 'card' });
+  const toolbar = el('div', { class: 'toolbar' });
+
+  const classSel = el('select');
+  classSel.innerHTML = '<option value="">— Все классы —</option>';
+  Object.entries(classes).forEach(([id, cl]) =>
+    classSel.appendChild(el('option', { value: id }, cl.name)));
+
+  const subjectSel = el('select');
+  subjectSel.innerHTML = '<option value="">— Все предметы —</option>';
+
+  const searchInput = el('input', { placeholder: '🔍 Поиск ученика', type: 'text' });
+
+  const updateSubjects = () => {
+    const cid = classSel.value;
+    subjectSel.innerHTML = '<option value="">— Все предметы —</option>';
+    if (cid && classes[cid].subjects) {
+      classes[cid].subjects.forEach(s => subjectSel.appendChild(el('option', { value: s }, s)));
+    }
+  };
+  classSel.onchange = () => { updateSubjects(); drawGrades(); };
+  subjectSel.onchange = drawGrades;
+  searchInput.oninput = drawGrades;
+
+  toolbar.append(classSel, subjectSel, searchInput);
+  card.appendChild(el('div', { class: 'card-header' },
+    el('div', { class: 'card-title' }, 'Оценки'),
+    el('button', { class: 'btn btn-primary btn-sm', onclick: () => addGradeDialog(classSel.value) }, '+ Выставить оценку')
+  ));
+  card.appendChild(toolbar);
+
+  const tableWrap = el('div');
+  card.appendChild(tableWrap);
+  c.appendChild(card);
+
+  function drawGrades() {
+    tableWrap.innerHTML = '';
+    const cid = classSel.value;
+    const subj = subjectSel.value;
+    const q = searchInput.value.toLowerCase().trim();
+
+    let grades = Object.entries(App.cache.grades).filter(([,g]) => g.teacherId === App.user.uid);
+    if (cid) grades = grades.filter(([,g]) => g.classId === cid);
+    if (subj) grades = grades.filter(([,g]) => g.subject === subj);
+
+    const byStudent = {};
+    grades.forEach(([gid, g]) => {
+      const s = App.cache.students[g.studentId];
+      if (!s) return;
+      if (q && !s.name.toLowerCase().includes(q)) return;
+      (byStudent[g.studentId] ||= []).push({ gid, ...g });
+    });
+
+    if (!Object.keys(byStudent).length) {
+      tableWrap.appendChild(el('div', { class: 'empty' }, 'Оценок не найдено'));
+      return;
+    }
+
+    const t = el('table');
+    t.innerHTML = `<thead><tr><th>Ученик</th><th>Оценки</th><th>Средний</th></tr></thead>`;
+    const tb = el('tbody');
+    Object.entries(byStudent).forEach(([sid, list]) => {
+      list.sort((a,b) => (a.date||0) - (b.date||0));
+      const avg = weightedAvg(list);
+      const tr = el('tr');
+      const td1 = el('td'); td1.textContent = App.cache.students[sid].name;
+      const td2 = el('td');
+      list.forEach(g => {
+        const wt = App.cache.workTypes[g.typeId];
+        const title = `${wt?.name || ''} (вес ${g.weight})\n${fmt.date(g.date)}\n${g.subject}`;
+        const span = el('span', {
+          class: 'grade ' + gradeClass(g.value),
+          title,
+          style: 'margin-right:4px;',
+          onclick: () => editGradeDialog(g.gid)
+        }, String(g.value));
+        td2.appendChild(span);
+      });
+      const td3 = el('td');
+      td3.innerHTML = `<span class="grade ${avgClass(avg)}">${avg || '—'}</span>`;
+      tr.append(td1, td2, td3);
+      tb.appendChild(tr);
+    });
+    t.appendChild(tb);
+    tableWrap.appendChild(t);
+
+    const exp = el('button', {
+      class: 'btn btn-sm btn-ghost',
+      style: 'margin-top:12px;',
+      onclick: () => exportCSV(byStudent)
+    }, '📥 Экспорт CSV');
+    tableWrap.appendChild(exp);
+  }
+  drawGrades();
+}
+
+async function renderStudents() {
+  $('#page-title').textContent = 'Ученики';
+  const c = $('#content');
+  c.innerHTML = '';
+  const card = el('div', { class: 'card' });
+  card.appendChild(el('div', { class: 'card-header' },
+    el('div', { class: 'card-title' }, 'Все мои ученики')));
+  const myClassIds = Object.keys(myClasses());
+  const students = Object.entries(App.cache.students).filter(([,s]) => myClassIds.includes(s.classId));
+  if (!students.length) {
+    card.appendChild(el('div', { class: 'empty' }, 'Учеников пока нет'));
+  } else {
+    const t = el('table');
+    t.innerHTML = `<thead><tr><th>ФИО</th><th>Класс</th><th>Средний</th></tr></thead>`;
+    const tb = el('tbody');
+    students.forEach(([sid, s]) => {
+      const cl = App.cache.classes[s.classId];
+      const avg = avgForStudent(sid, s.classId);
+      const tr = el('tr');
+      tr.innerHTML = `
+        <td>${s.name}</td>
+        <td>${cl?.name || '—'}</td>
+        <td><span class="grade ${avgClass(avg)}">${avg || '—'}</span></td>`;
+      tb.appendChild(tr);
+    });
+    t.appendChild(tb);
+    card.appendChild(t);
+  }
+  c.appendChild(card);
+}
+
+async function renderWorkTypes() {
+  $('#page-title').textContent = 'Типы работ';
+  const c = $('#content');
+  c.innerHTML = '';
+  const card = el('div', { class: 'card' });
+  card.appendChild(el('div', { class: 'card-header' },
+    el('div', { class: 'card-title' }, 'Типы работ и веса'),
+    el('button', { class: 'btn btn-primary', onclick: addWorkTypeDialog }, '+ Добавить тип')
+  ));
+  const items = Object.entries(App.cache.workTypes);
+  if (!items.length) {
+    card.appendChild(el('div', { class: 'empty' }, 'Типов работ пока нет'));
+  } else {
+    const t = el('table');
+    t.innerHTML = `<thead><tr><th>Название</th><th>Вес</th><th></th></tr></thead>`;
+    const tb = el('tbody');
+    items.forEach(([id, w]) => {
+      const tr = el('tr');
+      tr.innerHTML = `<td>${w.name}</td><td>${w.weight}</td>`;
+      const a = el('td');
+      a.appendChild(el('button', {
+        class: 'btn btn-sm btn-ghost',
+        onclick: async () => {
+          if (await confirmDialog('Удалить тип?', `Тип "${w.name}" будет удалён.`)) {
+            await db.ref('workTypes/' + id).remove();
+            await loadAll(); renderWorkTypes();
+          }
+        }
+      }, '🗑️'));
+      tr.appendChild(a);
+      tb.appendChild(tr);
+    });
+    t.appendChild(tb);
+    card.appendChild(t);
+  }
+  c.appendChild(card);
+}
+
+async function renderProfile() {
+  $('#page-title').textContent = 'Профиль';
+  const c = $('#content');
+  c.innerHTML = '';
+  const p = App.profile;
+  const card = el('div', { class: 'card' });
+  card.innerHTML = `
+    <div class="card-header"><div class="card-title">Мой профиль</div></div>
+    <p style="margin-bottom:8px"><b>ФИО:</b> ${p.name || '—'}</p>
+    <p style="margin-bottom:8px"><b>Логин:</b> ${p.login || '—'}</p>
+    <p style="margin-bottom:8px"><b>Email:</b> ${p.email || '—'}</p>
+    <p style="margin-bottom:8px"><b>Роль:</b> <span class="badge">${p.role}</span></p>
+    <p style="margin-bottom:8px"><b>Школа:</b> ${App.cache.schools[p.schoolId]?.name || '—'}</p>
+    <p><b>Город:</b> ${App.cache.cities[p.cityId]?.name || '—'}</p>
+  `;
+  c.appendChild(card);
+}
+
+/* ============================================================
+   ДИАЛОГИ
+============================================================ */
+function addCityDialog() {
+  showModal('Новый город', `
+    <div class="form-group"><label>Название города</label>
+      <input id="m-city-name" placeholder="Москва"></div>
+  `, [
+    { label: 'Отмена' },
+    { label: 'Создать', class: 'btn-primary', onClick: async () => {
+      const name = document.getElementById('m-city-name').value.trim();
+      if (!name) return;
+      const id = db.ref('cities').push().key;
+      await db.ref('cities/' + id).set({ name, creatorId: App.user.uid, createdAt: Date.now() });
+      closeModal(); toast('Город создан', 'success');
+      await loadAll(); renderCities();
+    }}
+  ]);
+}
+
+function addSchoolDialog() {
+  const cities = App.cache.cities;
+  const cityOpts = Object.entries(cities)
+    .filter(([id]) => App.profile.role !== 'city_creator' || id === App.profile.cityId)
+    .map(([id, c]) => `<option value="${id}">${c.name}</option>`).join('');
+
+  if (!cityOpts) {
+    return toast('Сначала создайте город', 'warning');
+  }
+
+  showModal('Новая школа', `
+    <div class="form-group"><label>Название</label>
+      <input id="m-school-name" placeholder="Школа №1"></div>
+    <div class="form-group"><label>Город</label>
+      <select id="m-school-city">${cityOpts}</select></div>
+  `, [
+    { label: 'Отмена' },
+    { label: 'Создать', class: 'btn-primary', onClick: async () => {
+      const name = document.getElementById('m-school-name').value.trim();
+      const cityId = document.getElementById('m-school-city').value;
+      if (!name || !cityId) return;
+      const id = db.ref('schools').push().key;
+      await db.ref('schools/' + id).set({ name, cityId, creatorId: App.user.uid, createdAt: Date.now() });
+      closeModal(); toast('Школа создана', 'success');
+      await loadAll(); renderSchools();
+    }}
+  ]);
+}
+
+function createCityCreatorDialog(cityId) {
+  showModal('Создатель города', `
+    <div class="form-group"><label>ФИО</label><input id="cc-name"></div>
+    <div class="form-group"><label>Логин</label><input id="cc-login"></div>
+    <div class="form-group"><label>Email</label><input id="cc-email" type="email"></div>
+    <div class="form-group"><label>Пароль</label><input id="cc-pass" type="password" minlength="6"></div>
+  `, [
+    { label: 'Отмена' },
+    { label: 'Создать', class: 'btn-primary', onClick: async () => {
+      const name  = document.getElementById('cc-name').value.trim();
+      const login = document.getElementById('cc-login').value.trim();
+      const email = document.getElementById('cc-email').value.trim();
+      const pass  = document.getElementById('cc-pass').value;
+      if (!name || !login || !email || pass.length < 6)
+        return toast('Заполните все поля (пароль ≥6)', 'error');
+      try {
+        const cred = await secondaryAuth.createUserWithEmailAndPassword(email, pass);
+        const uid  = cred.user.uid;
+        await secondaryAuth.signOut();
+        await db.ref('users/' + uid).set({
+          role: 'city_creator', login, name, email,
+          cityId, createdAt: Date.now()
+        });
+        closeModal(); toast('Создатель города создан', 'success');
+        await loadAll(); renderCities();
+      } catch (err) { toast(translateError(err), 'error'); }
+    }}
+  ]);
+}
+
+function createSchoolCreatorDialog(schoolId, cityId) {
+  showModal('Создатель школы', `
+    <div class="form-group"><label>ФИО</label><input id="sc-name"></div>
+    <div class="form-group"><label>Логин</label><input id="sc-login"></div>
+    <div class="form-group"><label>Email</label><input id="sc-email" type="email"></div>
+    <div class="form-group"><label>Пароль</label><input id="sc-pass" type="password" minlength="6"></div>
+  `, [
+    { label: 'Отмена' },
+    { label: 'Создать', class: 'btn-primary', onClick: async () => {
+      const name  = document.getElementById('sc-name').value.trim();
+      const login = document.getElementById('sc-login').value.trim();
+      const email = document.getElementById('sc-email').value.trim();
+      const pass  = document.getElementById('sc-pass').value;
+      if (!name || !login || !email || pass.length < 6)
+        return toast('Заполните все поля (пароль ≥6)', 'error');
+      try {
+        const cred = await secondaryAuth.createUserWithEmailAndPassword(email, pass);
+        const uid  = cred.user.uid;
+        await secondaryAuth.signOut();
+        await db.ref('users/' + uid).set({
+          role: 'school_creator', login, name, email,
+          schoolId, cityId, createdAt: Date.now()
+        });
+        closeModal(); toast('Создатель школы создан', 'success');
+        await loadAll(); renderSchools();
+      } catch (err) { toast(translateError(err), 'error'); }
+    }}
+  ]);
+}
+
+function createInvite() {
+  const code = Math.random().toString(36).substring(2, 8).toUpperCase();
+  const expiresAt = Date.now() + 7 * 24 * 60 * 60 * 1000;
+  db.ref('invites/' + code).set({
+    role: 'teacher',
+    schoolId: App.profile.schoolId,
+    cityId: App.profile.cityId,
+    createdBy: App.user.uid,
+    used: false,
+    createdAt: Date.now(),
+    expiresAt
+  }).then(async () => {
+    toast(`Код создан: <b>${code}</b>`, 'success');
+    await loadAll(); renderInvites();
+  });
+}
+
+function addClassDialog() {
+  showModal('Новый класс', `
+    <div class="form-group"><label>Название класса</label><input id="m-cl-name" placeholder="5А"></div>
+    <div class="form-group"><label>Год</label>
+      <input id="m-cl-year" type="number" value="${new Date().getFullYear()}"></div>
+    <div class="form-group"><label>Предметы (через запятую)</label>
+      <input id="m-cl-subjects" placeholder="Математика, Русский язык, Физика"></div>
+  `, [
+    { label: 'Отмена' },
+    { label: 'Создать', class: 'btn-primary', onClick: async () => {
+      const name = document.getElementById('m-cl-name').value.trim();
+      const year = +document.getElementById('m-cl-year').value;
+      const subjects = document.getElementById('m-cl-subjects').value
+        .split(',').map(s => s.trim()).filter(Boolean);
+      if (!name) return;
+      const id = db.ref('classes').push().key;
+      await db.ref('classes/' + id).set({
+        name, year, subjects,
+        teacherId: App.user.uid,
+        schoolId: App.profile.schoolId,
+        createdAt: Date.now()
+      });
+      closeModal(); toast('Класс создан', 'success');
+      await loadAll(); renderClasses();
+    }}
+  ]);
+}
+
+function addStudentDialog(classId) {
+  showModal('Новый ученик', `
+    <div class="form-group"><label>ФИО</label><input id="m-st-name"></div>
+  `, [
+    { label: 'Отмена' },
+    { label: 'Добавить', class: 'btn-primary', onClick: async () => {
+      const name = document.getElementById('m-st-name').value.trim();
+      if (!name) return;
+      const id = db.ref('students').push().key;
+      await db.ref('students/' + id).set({ name, classId, createdAt: Date.now() });
+      closeModal(); toast('Ученик добавлен', 'success');
+      await loadAll(); renderClassDetail(classId);
+    }}
+  ]);
+}
+
+async function deleteStudent(sid, name) {
+  if (await confirmDialog('Удалить ученика?', `"${name}" будет удалён вместе с оценками.`)) {
+    const updates = { ['students/' + sid]: null };
+    Object.entries(App.cache.grades).forEach(([gid, g]) => {
+      if (g.studentId === sid) updates['grades/' + gid] = null;
+    });
+    await db.ref().update(updates);
+    toast('Ученик удалён', 'success');
+    await loadAll(); router();
+  }
+}
+
+function addGradeDialog(classId) {
+  const classes = myClasses();
+  const classOpts = Object.entries(classes).map(([id, c]) =>
+    `<option value="${id}" ${id === classId ? 'selected' : ''}>${c.name}</option>`).join('');
+
+  const workTypes = Object.entries(App.cache.workTypes);
+  if (!workTypes.length) return toast('Сначала создайте тип работы', 'warning');
+  const wtOpts = workTypes.map(([id, w]) =>
+    `<option value="${id}" data-weight="${w.weight}">${w.name} (вес ${w.weight})</option>`).join('');
+
+  showModal('Выставить оценку', `
+    <div class="form-group"><label>Класс</label><select id="m-g-class">${classOpts}</select></div>
+    <div class="form-group"><label>Ученик</label><select id="m-g-student"></select></div>
+    <div class="form-group"><label>Предмет</label><select id="m-g-subject"></select></div>
+    <div class="form-group"><label>Тип работы</label><select id="m-g-type">${wtOpts}</select></div>
+    <div class="form-group"><label>Дата</label>
+      <input id="m-g-date" type="date" value="${new Date().toISOString().slice(0,10)}"></div>
+    <div class="form-group"><label>Оценка (2–5)</label>
+      <select id="m-g-value">
+        <option value="5">5</option><option value="4">4</option>
+        <option value="3">3</option><option value="2">2</option>
+      </select></div>
+  `, [
+    { label: 'Отмена' },
+    { label: 'Сохранить', class: 'btn-primary', onClick: async () => {
+      const cid = document.getElementById('m-g-class').value;
+      const sid = document.getElementById('m-g-student').value;
+      const subject = document.getElementById('m-g-subject').value;
+      const typeId = document.getElementById('m-g-type').value;
+      const date = new Date(document.getElementById('m-g-date').value).getTime();
+      const value = +document.getElementById('m-g-value').value;
+      const wt = App.cache.workTypes[typeId];
+      if (!sid || !subject || !typeId) return toast('Заполните все поля', 'error');
+
+      const gid = db.ref('grades').push().key;
+      await db.ref('grades/' + gid).set({
+        studentId: sid, classId: cid, subject, teacherId: App.user.uid,
+        date, typeId, weight: wt.weight, value, history: []
+      });
+      closeModal(); toast('Оценка выставлена', 'success');
+      await loadAll(); router();
+    }}
+  ]);
+
+  const fillStudents = () => {
+    const cid = document.getElementById('m-g-class').value;
+    const sel = document.getElementById('m-g-student');
+    sel.innerHTML = '';
+    Object.entries(App.cache.students)
+      .filter(([,s]) => s.classId === cid)
+      .sort((a,b) => a[1].name.localeCompare(b[1].name))
+      .forEach(([sid, s]) => sel.appendChild(new Option(s.name, sid)));
+  };
+  const fillSubjects = () => {
+    const cid = document.getElementById('m-g-class').value;
+    const sel = document.getElementById('m-g-subject');
+    sel.innerHTML = '';
+    (App.cache.classes[cid]?.subjects || []).forEach(s => sel.appendChild(new Option(s, s)));
+  };
+  document.getElementById('m-g-class').onchange = () => { fillStudents(); fillSubjects(); };
+  fillStudents(); fillSubjects();
+}
+
+function editGradeDialog(gid) {
+  const g = App.cache.grades[gid];
+  if (!g) return;
+  const wt = App.cache.workTypes[g.typeId];
+  showModal('Изменить оценку', `
+    <p style="margin-bottom:6px"><b>Ученик:</b> ${App.cache.students[g.studentId]?.name || '—'}</p>
+    <p style="margin-bottom:6px"><b>Предмет:</b> ${g.subject}</p>
+    <p style="margin-bottom:6px"><b>Тип:</b> ${wt?.name || '—'} (вес ${g.weight})</p>
+    <p style="margin-bottom:6px"><b>Дата:</b> ${fmt.date(g.date)}</p>
+    <div class="form-group" style="margin-top:14px;">
+      <label>Новая оценка</label>
+      <select id="m-eg-value">
+        ${[5,4,3,2].map(v => `<option value="${v}" ${v===g.value?'selected':''}>${v}</option>`).join('')}
+      </select>
+    </div>
+  `, [
+    { label: 'Удалить', class: 'btn-danger', onClick: async () => {
+      if (await confirmDialog('Удалить оценку?', 'Действие необратимо.')) {
+        await db.ref('grades/' + gid).remove();
+        closeModal(); toast('Оценка удалена', 'success');
+        await loadAll(); router();
+      }
+    }},
+    { label: 'Отмена' },
+    { label: 'Сохранить', class: 'btn-primary', onClick: async () => {
+      const newVal = +document.getElementById('m-eg-value').value;
+      if (newVal === g.value) return closeModal();
+      const history = [...(g.history || []), {
+        changedBy: App.user.uid, changedAt: Date.now(),
+        oldValue: g.value, newValue: newVal
+      }];
+      await db.ref('grades/' + gid).update({ value: newVal, history });
+      closeModal(); toast('Оценка изменена', 'success');
+      await loadAll(); router();
+    }}
+  ]);
+}
+
+function addWorkTypeDialog() {
+  showModal('Новый тип работы', `
+    <div class="form-group"><label>Название</label>
+      <input id="m-wt-name" placeholder="Контрольная работа"></div>
+    <div class="form-group"><label>Вес (1–10)</label>
+      <input id="m-wt-weight" type="number" min="1" max="10" value="1"></div>
+  `, [
+    { label: 'Отмена' },
+    { label: 'Создать', class: 'btn-primary', onClick: async () => {
+      const name = document.getElementById('m-wt-name').value.trim();
+      const weight = +document.getElementById('m-wt-weight').value;
+      if (!name || weight < 1) return;
+      const id = db.ref('workTypes').push().key;
+      await db.ref('workTypes/' + id).set({
+        name, weight, schoolId: App.profile.schoolId, createdBy: App.user.uid
+      });
+      closeModal(); toast('Тип добавлен', 'success');
+      await loadAll(); renderWorkTypes();
+    }}
+  ]);
+}
+
+function resetPasswordDialog(email) {
+  if (!email) return toast('У пользователя нет email', 'error');
+  showModal('Сброс пароля', `<p>Отправить письмо для сброса пароля на <b>${email}</b>?</p>`, [
+    { label: 'Отмена' },
+    { label: 'Отправить', class: 'btn-primary', onClick: async () => {
+      try {
+        await auth.sendPasswordResetEmail(email);
+        toast('Письмо отправлено', 'success');
+      } catch (e) { toast(e.message, 'error'); }
+      closeModal();
+    }}
+  ]);
+}
+
+/* ============================================================
+   ВЫЧИСЛЕНИЯ
+============================================================ */
+function weightedAvg(list) {
+  const sum = list.reduce((a, g) => a + g.value * g.weight, 0);
+  const w   = list.reduce((a, g) => a + g.weight, 0);
+  return w ? Math.round(sum / w * 100) / 100 : 0;
+}
+function avgForStudent(studentId, classId) {
+  const list = Object.values(App.cache.grades)
+    .filter(g => g.studentId === studentId && (!classId || g.classId === classId));
+  return weightedAvg(list);
+}
+function countStudentsBySchool() {
+  const schoolClasses = Object.entries(App.cache.classes)
+    .filter(([,cl]) => cl.schoolId === App.profile.schoolId).map(([id]) => id);
+  return Object.values(App.cache.students).filter(s => schoolClasses.includes(s.classId)).length;
+}
+function countStudentsInMyClasses() {
+  const ids = Object.keys(myClasses());
+  return Object.values(App.cache.students).filter(s => ids.includes(s.classId)).length;
+}
+function countMyGrades() {
+  return Object.values(App.cache.grades).filter(g => g.teacherId === App.user.uid).length;
+}
+function countMyGradesAsStudent() {
+  return Object.values(App.cache.grades).filter(g => g.studentId === App.user.uid).length;
+}
+
+/* ============================================================
+   ЭКСПОРТ
+============================================================ */
+function exportCSV(byStudent) {
+  let csv = 'Ученик;Предмет;Дата;Тип;Вес;Оценка\n';
+  Object.entries(byStudent).forEach(([sid, list]) => {
+    const name = App.cache.students[sid]?.name || '';
+    list.forEach(g => {
+      const wt = App.cache.workTypes[g.typeId]?.name || '';
+      csv += [name, g.subject, fmt.date(g.date), wt, g.weight, g.value].join(';') + '\n';
+    });
+  });
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'grades.csv'; a.click();
+  URL.revokeObjectURL(url);
+}
+
+/* ============================================================
+   ПЕРЕКЛЮЧЕНИЕ ЭКРАНОВ
+============================================================ */
+function showLoader(text) {
+  $('#loader-text').textContent = text || 'Загрузка…';
+  $('#loader-screen').style.display = 'flex';
+  $('#auth-screen').style.display = 'none';
+  $('#app-screen').style.display = 'none';
+}
+function showAuth() {
+  $('#loader-screen').style.display = 'none';
+  $('#auth-screen').style.display = 'flex';
+  $('#app-screen').style.display = 'none';
+}
+function showApp() {
+  $('#loader-screen').style.display = 'none';
+  $('#auth-screen').style.display = 'none';
+  $('#app-screen').style.display = 'flex';
+}
+
+/* ============================================================
+   АВТОРИЗАЦИЯ / СТАРТ
+============================================================ */
+$('#logout-btn').onclick = () => auth.signOut();
+$('#menu-toggle').onclick = () => $('#sidebar').classList.toggle('open');
+
+auth.onAuthStateChanged(async (user) => {
+  if (!user) {
+    showAuth();
+    return;
+  }
+  App.user = user;
+  showLoader('Загрузка профиля…');
+
+  try {
+    const snap = await db.ref('users/' + user.uid).once('value');
+    if (!snap.exists()) {
+      // Создаём запись, если её нет (напр., admin при первом входе)
+      await db.ref('users/' + user.uid).set({
+        role: 'super_admin',
+        login: user.email.split('@')[0],
+        email: user.email,
+        name: user.email,
+        createdAt: Date.now()
+      });
+      const snap2 = await db.ref('users/' + user.uid).once('value');
+      App.profile = snap2.val();
+    } else {
+      App.profile = snap.val();
+    }
+
+    $('#user-name').textContent = App.profile.name || App.profile.login || '';
+    $('#user-role').textContent = App.profile.role || '';
+
+    await loadAll();
+    buildMenu();
+    showApp();
+    if (!location.hash) location.hash = '#dashboard';
+    router();
+  } catch (err) {
+    console.error(err);
+    toast('Ошибка загрузки профиля: ' + err.message, 'error');
+    showAuth();
+  }
+});
+
+/* ============================================================
+   ЗАПУСК
+============================================================ */
+(async () => {
+  showLoader('Инициализация…');
+  try {
+    await bootstrapAdmin();
+  } catch (e) {
+    console.warn('bootstrap err', e);
+  }
+  showLoader('Проверка сессии…');
+  // onAuthStateChanged сам переключит экран
+  // Если через 3 секунды ничего — покажем форму входа
+  setTimeout(() => {
+    if (!App.user && $('#loader-screen').style.display !== 'none') {
+      showAuth();
+    }
+  }, 3000);
+})();
 </script>
 </body>
 </html>
