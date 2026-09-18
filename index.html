@@ -289,7 +289,6 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db   = firebase.database();
 
-// Вторичное приложение для создания пользователей без выхода текущего
 const secondaryApp  = firebase.initializeApp(firebaseConfig, 'Secondary');
 const secondaryAuth = secondaryApp.auth();
 
@@ -297,10 +296,10 @@ const secondaryAuth = secondaryApp.auth();
    КОНСТАНТЫ
 ============================================================ */
 const ADMIN_EMAIL       = 'admin@admin.local';
-const ADMIN_PASSWORD    = 'admin123';         // реальный пароль в Firebase (≥6 символов)
-const ADMIN_PASSWORD_UI = 'admin';            // что вводит пользователь
+const ADMIN_PASSWORD    = 'admin123';
+const ADMIN_PASSWORD_UI = 'admin';
 const ADMIN_LOGIN       = 'admin';
-const BOOTSTRAP_KEY     = 'ej_bootstrap_v2';  // версия ключа
+const BOOTSTRAP_KEY     = 'ej_bootstrap_v2';
 
 /* ============================================================
    УТИЛИТЫ
@@ -398,13 +397,11 @@ function translateError(err) {
 async function bootstrapAdmin() {
   const loaderText = $('#loader-text');
 
-  // 1) Пробуем войти под админом
   loaderText.textContent = 'Проверка администратора…';
   try {
     const cred = await auth.signInWithEmailAndPassword(ADMIN_EMAIL, ADMIN_PASSWORD);
     const uid  = cred.user.uid;
 
-    // Запись users могла быть удалена — восстановим
     const snap = await db.ref('users/' + uid).once('value');
     if (!snap.exists()) {
       await db.ref('users/' + uid).set({
@@ -423,7 +420,6 @@ async function bootstrapAdmin() {
     console.log('[bootstrap] вход не удался:', e.code);
   }
 
-  // 2) Создаём админа
   loaderText.textContent = 'Создание администратора…';
   try {
     const cred = await auth.createUserWithEmailAndPassword(ADMIN_EMAIL, ADMIN_PASSWORD);
@@ -508,7 +504,7 @@ $('#login-form').addEventListener('submit', async (e) => {
       email = user.email;
     }
 
-    // ⬇ Подмена пароля для админа: пользователь вводит "admin", в Firebase идёт "admin123"
+    // Подмена пароля для админа: пользователь вводит "admin", в Firebase идёт "admin123"
     if ((loginInput === ADMIN_LOGIN || email === ADMIN_EMAIL) && password === ADMIN_PASSWORD_UI) {
       password = ADMIN_PASSWORD;
     }
@@ -658,6 +654,8 @@ async function router() {
   const hash = location.hash.slice(1) || 'dashboard';
   const [view, id] = hash.split('/');
   currentView = view;
+
+  if (!App.profile) return; // защита: если профиль ещё не загружен
 
   const items = MENU[App.profile.role] || [];
   const allowed = items.map(i => i.id);
@@ -1649,21 +1647,56 @@ function showApp() {
 }
 
 /* ============================================================
-   АВТОРИЗАЦИЯ / СТАРТ
+   КНОПКА ВЫХОДА
 ============================================================ */
-$('#logout-btn').onclick = () => auth.signOut();
+$('#logout-btn').onclick = async () => {
+  const btn = $('#logout-btn');
+  btn.disabled = true;
+  btn.textContent = 'Выход…';
+
+  // Сбрасываем локальное состояние — чтобы никакие async-задачи
+  // не «вернули» пользователя обратно в приложение
+  authToken++;
+  App.user = null;
+  App.profile = null;
+
+  try {
+    await auth.signOut();
+    // Принудительная перезагрузка: гарантирует чистое состояние
+    location.reload();
+  } catch (err) {
+    console.error('Logout error:', err);
+    toast('Ошибка выхода: ' + (err.message || err.code), 'error');
+    btn.disabled = false;
+    btn.textContent = 'Выйти';
+  }
+};
+
 $('#menu-toggle').onclick = () => $('#sidebar').classList.toggle('open');
 
+/* ============================================================
+   ЗАЩИТА ОТ ГОНКИ + ОТСЛЕЖИВАНИЕ АВТОРИЗАЦИИ
+============================================================ */
+let authToken = 0;
+
 auth.onAuthStateChanged(async (user) => {
+  const myToken = ++authToken; // «своя» версия запроса
+
+  // Пользователь вышел — показываем форму входа
   if (!user) {
+    App.user = null;
+    App.profile = null;
     showAuth();
     return;
   }
+
   App.user = user;
   showLoader('Загрузка профиля…');
 
   try {
     const snap = await db.ref('users/' + user.uid).once('value');
+    if (myToken !== authToken) return; // отменено (logout/повторный вход)
+
     if (!snap.exists()) {
       await db.ref('users/' + user.uid).set({
         role: 'super_admin',
@@ -1673,6 +1706,7 @@ auth.onAuthStateChanged(async (user) => {
         createdAt: Date.now()
       });
       const snap2 = await db.ref('users/' + user.uid).once('value');
+      if (myToken !== authToken) return;
       App.profile = snap2.val();
     } else {
       App.profile = snap.val();
@@ -1682,11 +1716,14 @@ auth.onAuthStateChanged(async (user) => {
     $('#user-role').textContent = App.profile.role || '';
 
     await loadAll();
+    if (myToken !== authToken) return; // отменено во время загрузки
+
     buildMenu();
     showApp();
     if (!location.hash) location.hash = '#dashboard';
     router();
   } catch (err) {
+    if (myToken !== authToken) return;
     console.error(err);
     toast('Ошибка загрузки профиля: ' + err.message, 'error');
     showAuth();
