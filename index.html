@@ -115,8 +115,11 @@ input:focus,select:focus,textarea:focus{
 .btn-primary{background:linear-gradient(135deg,var(--primary),#38BDF8);color:#fff;box-shadow:0 4px 12px rgba(14,165,233,.28)}
 .btn-primary:hover{background:linear-gradient(135deg,var(--primary-hover),var(--primary));transform:translateY(-1px);box-shadow:0 6px 18px rgba(14,165,233,.4)}
 .btn-danger{background:var(--danger);color:#fff}
+.btn-danger:hover{background:#DC2626;transform:translateY(-1px)}
 .btn-ghost{background:transparent;color:var(--text);border:1.5px solid var(--border)}
 .btn-ghost:hover{background:var(--bg);border-color:var(--primary);color:var(--primary)}
+.btn-warn{background:transparent;color:var(--danger);border:1.5px solid var(--danger)}
+.btn-warn:hover{background:var(--danger);color:#fff}
 .btn-block{width:100%}
 .btn-sm{padding:6px 11px;font-size:12px;border-radius:8px;gap:5px}
 .btn:disabled{opacity:.5;cursor:not-allowed}
@@ -180,6 +183,8 @@ tbody tr:last-child td{border-bottom:none}
 .modal-wide{max-width:680px}
 .modal-title{font-size:17px;margin-bottom:16px;font-weight:800;letter-spacing:-.01em;display:flex;align-items:center;gap:10px}
 .modal-title svg{color:var(--primary);flex-shrink:0}
+.modal-body{font-size:14px;line-height:1.65;color:var(--text)}
+.modal-body b{color:var(--text);font-weight:700}
 .modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:20px;flex-wrap:wrap}
 .toast-root{position:fixed;top:20px;right:20px;z-index:300;display:flex;flex-direction:column;gap:10px;pointer-events:none}
 .toast{background:var(--bg-elev);color:var(--text);padding:12px 16px;border-radius:12px;box-shadow:var(--shadow-lg);font-size:13px;animation:slideIn .3s ease;pointer-events:auto;max-width:340px;border-left:4px solid var(--primary);font-weight:500;display:flex;align-items:flex-start;gap:10px}
@@ -210,6 +215,10 @@ tbody tr:last-child td{border-bottom:none}
 .subject-item input[type="checkbox"]{width:16px;height:16px;margin:0;flex-shrink:0;accent-color:var(--primary);cursor:pointer}
 .subject-counter{margin-top:8px;font-size:12px;color:var(--text-muted)}
 .subject-counter b{color:var(--primary);font-weight:700}
+
+/* ============================================================
+   ★★ ЖУРНАЛ — АДАПТИВНЫЙ
+============================================================ */
 .journal-shell{
   display:flex;flex-direction:column;
   height:calc(100vh - 100px);
@@ -237,7 +246,13 @@ tbody tr:last-child td{border-bottom:none}
   display:flex;gap:10px;flex-wrap:wrap;
 }
 .journal-sub b{color:var(--text);font-weight:700}
-.journal-scroll{flex:1;overflow:auto;-webkit-overflow-scrolling:touch;position:relative}
+
+/* Скролл-контейнер */
+.journal-scroll{
+  flex:1;overflow:auto;-webkit-overflow-scrolling:touch;
+  position:relative;
+}
+
 .j-table{
   border-collapse:separate;border-spacing:0;
   font-size:var(--j-font);
@@ -269,6 +284,8 @@ tbody tr:last-child td{border-bottom:none}
   font-size:calc(var(--j-font) - 1px);font-weight:700;
   color:var(--text-muted);letter-spacing:.02em;
 }
+
+/* Левая фиксированная колонка */
 .j-table .col-num{
   position:sticky;left:0;z-index:3;
   width:var(--j-num-w);min-width:var(--j-num-w);max-width:var(--j-num-w);
@@ -282,17 +299,28 @@ tbody tr:last-child td{border-bottom:none}
   background:var(--bg-elev);overflow:hidden;text-overflow:ellipsis;
 }
 .j-table thead .col-num,.j-table thead .col-name{z-index:5;background:var(--bg)}
+/* Тень у левой фиксированной части */
+.j-table .col-name{
+  box-shadow:2px 0 6px rgba(15,23,42,.06);
+}
+
+/* ★★★ ПРАВАЯ ФИКСИРОВАННАЯ ЧАСТЬ — Средний + Итог ★★★ */
 .j-table .col-avg{
-  position:sticky;right:var(--j-avg-w);z-index:3;
-  width:var(--j-avg-w);min-width:var(--j-avg-w);
-  font-weight:800;font-size:var(--j-font);background:var(--bg-elev);
+  position:sticky;right:var(--j-avg-w);z-index:6;
+  width:var(--j-avg-w);min-width:var(--j-avg-w);max-width:var(--j-avg-w);
+  font-weight:800;font-size:var(--j-font);
+  background:var(--bg-elev);
+  border-left:2px solid var(--border);
 }
 .j-table .col-final{
-  position:sticky;right:0;z-index:3;
-  width:var(--j-avg-w);min-width:var(--j-avg-w);
-  font-weight:800;font-size:var(--j-font);background:var(--bg-elev);
+  position:sticky;right:0;z-index:6;
+  width:var(--j-avg-w);min-width:var(--j-avg-w);max-width:var(--j-avg-w);
+  font-weight:800;font-size:var(--j-font);
+  background:var(--bg-elev);
+  box-shadow:-6px 0 10px rgba(15,23,42,.08);
 }
-.j-table thead .col-avg,.j-table thead .col-final{z-index:5;background:var(--bg)}
+.j-table thead .col-avg,.j-table thead .col-final{z-index:7;background:var(--bg)}
+
 .j-table td.date-cell{padding:0;min-width:var(--j-cell);width:var(--j-cell)}
 .j-cell{
   display:inline-flex;align-items:center;justify-content:center;
@@ -333,6 +361,7 @@ tbody tr:last-child td{border-bottom:none}
 .g-avg-3{color:#D97706}
 .g-avg-2{color:#DC2626}
 .g-avg-1{color:#991B1B}
+
 .lesson-tip{
   position:absolute;z-index:100;background:var(--bg-elev);
   border:1px solid var(--border);border-radius:8px;padding:8px 10px;
@@ -372,8 +401,7 @@ tbody tr:last-child td{border-bottom:none}
     <rect width="120" height="120" rx="28" fill="#0EA5E9"/>
     <path d="M25 40 Q60 30 60 40 Q60 30 95 40 L95 82 Q60 72 60 82 Q60 72 25 82 Z" fill="#FFFFFF"/>
     <line x1="60" y1="40" x2="60" y2="82" stroke="#0EA5E9" stroke-width="2"/>
-    <path d="M42 60 L56 74 L84 46" stroke="#FACC15" stroke-width="6"
-          stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path d="M42 60 L56 74 L84 46" stroke="#FACC15" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
   </svg>
   <div id="loader-text" style="color:var(--text-muted);font-size:13px;font-weight:600;">Загрузка…</div>
 </div>
@@ -385,8 +413,7 @@ tbody tr:last-child td{border-bottom:none}
         <rect width="120" height="120" rx="28" fill="#0EA5E9"/>
         <path d="M25 40 Q60 30 60 40 Q60 30 95 40 L95 82 Q60 72 60 82 Q60 72 25 82 Z" fill="#FFFFFF"/>
         <line x1="60" y1="40" x2="60" y2="82" stroke="#0EA5E9" stroke-width="2"/>
-        <path d="M42 60 L56 74 L84 46" stroke="#FACC15" stroke-width="6"
-              stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <path d="M42 60 L56 74 L84 46" stroke="#FACC15" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
       </svg>
       <h1>Класс Жур</h1>
       <p class="auth-subtitle">Электронный журнал для школ</p>
@@ -434,8 +461,7 @@ tbody tr:last-child td{border-bottom:none}
           <rect width="120" height="120" rx="28" fill="#0EA5E9"/>
           <path d="M25 40 Q60 30 60 40 Q60 30 95 40 L95 82 Q60 72 60 82 Q60 72 25 82 Z" fill="#FFFFFF"/>
           <line x1="60" y1="40" x2="60" y2="82" stroke="#0EA5E9" stroke-width="2"/>
-          <path d="M42 60 L56 74 L84 46" stroke="#FACC15" stroke-width="6"
-                stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <path d="M42 60 L56 74 L84 46" stroke="#FACC15" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
         </svg>
         <div class="brand-text">
           <div class="brand-name">Класс Жур</div>
@@ -474,10 +500,8 @@ tbody tr:last-child td{border-bottom:none}
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
 
 <script>
-/* ============================================================
-   КОНФИГУРАЦИЯ FIREBASE
-============================================================ */
-const firebaseConfig = {
+/* КОНФИГУРАЦИЯ */
+var firebaseConfig = {
   apiKey: "AIzaSyBSb532Ppi7xXdfHcuDfXTp6U_ut_0saio",
   authDomain: "zing-30a21.firebaseapp.com",
   databaseURL: "https://zing-30a21-default-rtdb.europe-west1.firebasedatabase.app",
@@ -487,61 +511,59 @@ const firebaseConfig = {
   appId: "1:179467663659:web:be71167fd0ffd412416d6e"
 };
 firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db = firebase.database();
-const secondaryApp = firebase.initializeApp(firebaseConfig, 'Secondary');
-const secondaryAuth = secondaryApp.auth();
+var auth = firebase.auth();
+var db = firebase.database();
+var secondaryApp = firebase.initializeApp(firebaseConfig, 'Secondary');
+var secondaryAuth = secondaryApp.auth();
 
-/* ============================================================
-   SVG ИКОНКИ
-============================================================ */
-const ICON_PATHS = {
-  dashboard: '<line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>',
-  city: '<path d="M3 21h18"/><path d="M5 21V7l8-4v18"/><path d="M19 21V11l-6-4"/>',
-  school: '<path d="M14 22v-4a2 2 0 1 0-4 0v4"/><path d="M18 10l4 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-8l4-2"/><path d="M18 5v17M6 5v17"/><rect x="4" y="2" width="16" height="4" rx="1"/>',
-  users: '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>',
-  tag: '<path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/>',
-  cap: '<path d="M22 10l-10-5L2 10l10 5 10-5z"/><path d="M6 12v5c3 3 9 3 12 0v-5M22 10v6"/>',
-  book: '<path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>',
-  student: '<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
-  mail: '<path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>',
-  user: '<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
-  sun: '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>',
-  moon: '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>',
-  logout: '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>',
-  plus: '<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>',
-  trash: '<polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/>',
-  key: '<circle cx="7.5" cy="15.5" r="5.5"/><path d="M21 2l-10 10"/><path d="M15.5 7.5l3 3L22 7l-3-3"/>',
-  download: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>',
-  arrowLeft: '<line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>',
-  pencil: '<path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/>',
-  check: '<polyline points="20 6 9 17 4 12"/>',
-  clock: '<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>',
-  circle: '<circle cx="12" cy="12" r="6" fill="currentColor" stroke="none"/>',
-  info: '<circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>',
-  checkCircle: '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>',
-  alertCircle: '<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>',
-  xCircle: '<circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>',
-  userPlus: '<path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/>',
-  search: '<circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>',
-  list: '<line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>',
-  calendar: '<rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>',
-  zap: '<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>',
-  monitor: '<rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>'
+/* SVG-иконки */
+var ICON_PATHS = {
+  dashboard:'<line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>',
+  city:'<path d="M3 21h18"/><path d="M5 21V7l8-4v18"/><path d="M19 21V11l-6-4"/>',
+  school:'<path d="M14 22v-4a2 2 0 1 0-4 0v4"/><path d="M18 10l4 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-8l4-2"/><path d="M18 5v17M6 5v17"/><rect x="4" y="2" width="16" height="4" rx="1"/>',
+  users:'<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>',
+  tag:'<path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/>',
+  cap:'<path d="M22 10l-10-5L2 10l10 5 10-5z"/><path d="M6 12v5c3 3 9 3 12 0v-5M22 10v6"/>',
+  book:'<path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>',
+  student:'<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+  mail:'<path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>',
+  user:'<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+  sun:'<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>',
+  moon:'<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>',
+  logout:'<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>',
+  plus:'<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>',
+  trash:'<polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/>',
+  key:'<circle cx="7.5" cy="15.5" r="5.5"/><path d="M21 2l-10 10"/><path d="M15.5 7.5l3 3L22 7l-3-3"/>',
+  download:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>',
+  arrowLeft:'<line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>',
+  pencil:'<path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/>',
+  check:'<polyline points="20 6 9 17 4 12"/>',
+  clock:'<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>',
+  circle:'<circle cx="12" cy="12" r="6" fill="currentColor" stroke="none"/>',
+  info:'<circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>',
+  checkCircle:'<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>',
+  alertCircle:'<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>',
+  xCircle:'<circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>',
+  userPlus:'<path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/>',
+  search:'<circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>',
+  list:'<line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>',
+  calendar:'<rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>',
+  zap:'<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>',
+  monitor:'<rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>'
 };
 function ic(name, size) {
   if (size === undefined) size = 18;
   return '<svg xmlns="http://www.w3.org/2000/svg" width="' + size + '" height="' + size + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + (ICON_PATHS[name] || '') + '</svg>';
 }
 
-const ROLE_LABELS = {
+var ROLE_LABELS = {
   super_admin:'Создатель', city_creator:'Создатель города',
   school_creator:'Создатель школы', teacher:'Учитель',
   student:'Ученик', parent:'Родитель'
 };
 function roleLabel(r) { return ROLE_LABELS[r] || r || '—'; }
 
-const DEFAULT_WORK_TYPES = [
+var DEFAULT_WORK_TYPES = [
   { name:'Ответ на уроке',              weight:1, code:'ОТВ' },
   { name:'Диктант',                     weight:2, code:'ДКТ' },
   { name:'Проверочная работа',          weight:3, code:'П/Р' },
@@ -549,7 +571,7 @@ const DEFAULT_WORK_TYPES = [
   { name:'Итоговая контрольная работа', weight:7, code:'ИКР' }
 ];
 
-const POPULAR_SUBJECTS = [
+var POPULAR_SUBJECTS = [
   { group:'Начальная школа', items:['Русский язык','Литературное чтение','Математика','Окружающий мир','Технология','Изобразительное искусство','Музыка','Физическая культура','ОРКСЭ','Шахматы'] },
   { group:'Точные науки', items:['Алгебра','Геометрия','Физика','Химия','Информатика','Астрономия','Вероятность и статистика'] },
   { group:'Естественные науки', items:['Биология','География','Экология','Природоведение'] },
@@ -558,30 +580,30 @@ const POPULAR_SUBJECTS = [
   { group:'Прочее', items:['ОБЖ','Черчение','Финансовая грамотность','Проектная деятельность'] }
 ];
 
-const HARDCODED_ADMIN = {
+var HARDCODED_ADMIN = {
   login:'admin', password:'admin',
   profile:{ role:'super_admin', login:'admin', name:'Главный администратор', email:'admin@local' }
 };
 
-const SESSION_KEY = 'ej_session_v1';
+var SESSION_KEY = 'ej_session_v1';
 function getSession() {
-  try { const r = localStorage.getItem(SESSION_KEY); return r ? JSON.parse(r) : null; }
+  try { var r = localStorage.getItem(SESSION_KEY); return r ? JSON.parse(r) : null; }
   catch (e) { return null; }
 }
 function setSession(u, p) { localStorage.setItem(SESSION_KEY, JSON.stringify({ user:u, profile:p })); }
 function clearSession() { localStorage.removeItem(SESSION_KEY); }
 
-const $ = function(s) { return document.querySelector(s); };
-const $$ = function(s) { return document.querySelectorAll(s); };
+var $ = function(s) { return document.querySelector(s); };
+var $$ = function(s) { return document.querySelectorAll(s); };
 function el(tag, props) {
   var children = Array.prototype.slice.call(arguments, 2);
   var n = document.createElement(tag);
   if (props) {
-    Object.entries(props).forEach(function(entry) {
-      var k = entry[0], v = entry[1];
+    Object.keys(props).forEach(function(k) {
+      var v = props[k];
       if (k === 'class') n.className = v;
       else if (k === 'html') n.innerHTML = v;
-      else if (k.startsWith('on')) n.addEventListener(k.slice(2).toLowerCase(), v);
+      else if (k.indexOf('on') === 0) n.addEventListener(k.slice(2).toLowerCase(), v);
       else n.setAttribute(k, v);
     });
   }
@@ -591,7 +613,7 @@ function el(tag, props) {
   return n;
 }
 
-const TOAST_ICONS = { success:'checkCircle', error:'xCircle', warning:'alertCircle', info:'info' };
+var TOAST_ICONS = { success:'checkCircle', error:'xCircle', warning:'alertCircle', info:'info' };
 function toast(msg, type) {
   if (!type) type = 'info';
   var t = el('div', { class:'toast ' + type, html: ic(TOAST_ICONS[type] || 'info', 18) + '<div>' + msg + '</div>' });
@@ -627,16 +649,21 @@ function closeModal() { $('#modal-root').innerHTML = ''; }
 
 function confirmDialog(title, message) {
   return new Promise(function(res) {
-    showModal(ic('alertCircle', 20) + ' ' + title, '<p>' + message + '</p>', [
+    showModal(ic('alertCircle', 20) + ' ' + title, '<div>' + message + '</div>', [
       { label:'Отмена', onClick: function() { closeModal(); res(false); } },
       { label:'Подтвердить', class:'btn-danger', onClick: function() { closeModal(); res(true); } }
     ]);
   });
 }
+function warnDialog(title, message, confirmLabel) {
+  return new Promise(function(res) {
+    showModal(ic('alertCircle', 20) + ' ' + title, '<div>' + message + '</div>', [
+      { label:'Отмена', onClick: function() { closeModal(); res(false); } },
+      { label: confirmLabel || 'Подтвердить', class:'btn-danger', onClick: function() { closeModal(); res(true); } }
+    ]);
+  });
+}
 
-/* ============================================================
-   ★ ЛОКАЛЬНЫЕ ДАТЫ (фикс сдвига на день раньше)
-============================================================ */
 function toLocalDateStr(dms) {
   var d = new Date(dms);
   var y = d.getFullYear();
@@ -650,7 +677,7 @@ function parseLocalDate(str) {
   return new Date(parts[0], parts[1] - 1, parts[2]).getTime();
 }
 
-const fmt = {
+var fmt = {
   date: function(ts) { return ts ? new Date(ts).toLocaleDateString('ru-RU') : '—'; },
   dt: function(ts) { return ts ? new Date(ts).toLocaleString('ru-RU') : '—'; }
 };
@@ -685,9 +712,6 @@ function translateError(err) {
   return m[err.code] || err.message || 'Ошибка';
 }
 
-/* ============================================================
-   ТЕМА + УСТРОЙСТВО
-============================================================ */
 function initTheme() {
   var t = localStorage.getItem('theme') || 'light';
   document.documentElement.dataset.theme = t;
@@ -726,9 +750,6 @@ initDevice();
 
 $('#logout-btn').innerHTML = ic('logout', 16) + ' Выйти';
 
-/* ============================================================
-   АВТОРИЗАЦИЯ
-============================================================ */
 function showAuthMsg(text, type) {
   if (!type) type = 'error';
   var e = $('#auth-message');
@@ -825,10 +846,7 @@ $('#forgot-password').onclick = async function(e) {
   }
 };
 
-/* ============================================================
-   СОСТОЯНИЕ
-============================================================ */
-const App = {
+var App = {
   user: null,
   profile: null,
   cache: {
@@ -837,7 +855,7 @@ const App = {
   }
 };
 
-const MENU = {
+var MENU = {
   super_admin: [
     { id:'dashboard', icon:'dashboard', label:'Дашборд' },
     { id:'cities',    icon:'city',      label:'Города' },
@@ -903,17 +921,10 @@ async function router() {
   if (idx >= 0 && $$('.nav-item')[idx]) $$('.nav-item')[idx].classList.add('active');
 
   var renderers = {
-    dashboard: renderDashboard,
-    cities: renderCities,
-    schools: renderSchools,
-    users: renderUsers,
-    invites: renderInvites,
-    classes: renderClasses,
-    class: function() { return renderClassDetail(id); },
-    journal: renderJournal,
-    students: renderStudents,
-    worktypes: renderWorkTypes,
-    profile: renderProfile
+    dashboard: renderDashboard, cities: renderCities, schools: renderSchools,
+    users: renderUsers, invites: renderInvites, classes: renderClasses,
+    class: function() { return renderClassDetail(id); }, journal: renderJournal,
+    students: renderStudents, worktypes: renderWorkTypes, profile: renderProfile
   };
   var fn = renderers[view];
   if (fn) await fn();
@@ -921,9 +932,6 @@ async function router() {
 }
 window.addEventListener('hashchange', router);
 
-/* ============================================================
-   ЗАГРУЗКА ДАННЫХ
-============================================================ */
 async function loadAll() {
   var results = await Promise.all([
     db.ref('cities').once('value'),
@@ -976,16 +984,12 @@ function mySchools() {
   }
   return {};
 }
-
 function myClasses() {
   return Object.fromEntries(
     Object.entries(App.cache.classes).filter(function(e) { return e[1].teacherId === App.user.uid; })
   );
 }
 
-/* ============================================================
-   ВИДЫ
-============================================================ */
 async function renderDashboard() {
   $('#page-title').textContent = 'Дашборд';
   var c = $('#content'); c.innerHTML = '';
@@ -1110,7 +1114,6 @@ async function renderUsers() {
   var users = Object.entries(App.cache.users);
   if (App.profile.role === 'city_creator') users = users.filter(function(e) { return e[1].cityId === App.profile.cityId; });
   else if (App.profile.role === 'school_creator') users = users.filter(function(e) { return e[1].schoolId === App.profile.schoolId; });
-
   var card = el('div', { class:'card' });
   card.appendChild(el('div', { class:'card-header' }, el('div', { class:'card-title' }, 'Пользователи')));
   if (!users.length) {
@@ -1216,7 +1219,6 @@ async function renderClassDetail(classId) {
   if (!cl || cl.teacherId !== App.user.uid) return navigate('classes');
   $('#page-title').textContent = 'Класс ' + cl.name;
   var c = $('#content'); c.innerHTML = '';
-
   var info = el('div', { class:'card' });
   info.innerHTML =
     '<div class="card-header"><div class="card-title">' + cl.name + ' • ' + (cl.year || '') + ' год</div></div>' +
@@ -1225,13 +1227,11 @@ async function renderClassDetail(classId) {
       '<span><b>Предметы:</b> ' + ((cl.subjects || []).join(', ') || '—') + '</span>' +
     '</div>';
   c.appendChild(info);
-
   var card = el('div', { class:'card' });
   card.appendChild(el('div', { class:'card-header' },
     el('div', { class:'card-title' }, 'Ученики класса'),
     el('button', { class:'btn btn-primary btn-sm', html: ic('userPlus', 14) + ' Добавить учеников', onclick: function() { addStudentDialog(classId); } })
   ));
-
   var st = Object.entries(App.cache.students).filter(function(e) { return e[1].classId === classId; });
   if (!st.length) {
     card.appendChild(el('div', { class:'empty' }, 'Учеников пока нет'));
@@ -1256,7 +1256,7 @@ async function renderClassDetail(classId) {
 }
 
 /* ============================================================
-   ★★ ЖУРНАЛ
+   ЖУРНАЛ
 ============================================================ */
 async function renderJournal() {
   $('#page-title').textContent = 'Журнал';
@@ -1274,8 +1274,6 @@ async function renderJournal() {
   if (!state.subject || subs.indexOf(state.subject) === -1) state.subject = subs[0] || null;
 
   var shell = el('div', { class:'journal-shell' });
-
-  /* Панель фильтров */
   var top = el('div', { class:'journal-top' });
 
   var classFilter = el('div', { class:'filter' });
@@ -1303,6 +1301,12 @@ async function renderJournal() {
   top.appendChild(el('button', { class:'btn btn-primary', html: ic('zap', 14) + ' Заполнить год', onclick: function() { fillYearDialog(state.classId, state.subject); } }));
   top.appendChild(el('button', { class:'btn btn-primary', html: ic('plus', 14) + ' Урок', onclick: function() { openLessonDialog({ classId: state.classId, subject: state.subject }); } }));
   top.appendChild(el('button', { class:'btn btn-ghost', html: ic('download', 14) + ' CSV', onclick: function() { exportJournalCSV(state.classId, state.subject); } }));
+  /* ★ Кнопка сброса предмета */
+  top.appendChild(el('button', {
+    class:'btn btn-warn',
+    html: ic('trash', 14) + ' Сбросить предмет',
+    onclick: function() { resetSubjectDialog(state.classId, state.subject); }
+  }));
   shell.appendChild(top);
 
   var tname = App.profile.name || App.profile.login || '—';
@@ -1316,6 +1320,76 @@ async function renderJournal() {
   else scroll.appendChild(el('div', { class:'empty' }, 'Нет данных — добавьте учеников или уроки'));
   shell.appendChild(scroll);
   c.appendChild(shell);
+}
+
+/* ★★★ СБРОС ПРЕДМЕТА — 3 подтверждения ★★★ */
+async function resetSubjectDialog(classId, subject) {
+  var cls = App.cache.classes[classId];
+  if (!cls || !subject) return toast('Предмет не выбран', 'warning');
+
+  var lessonsCount = 0, gradesCount = 0;
+  Object.values(App.cache.lessons).forEach(function(l) {
+    if (l.classId === classId && l.subject === subject) lessonsCount++;
+  });
+  Object.values(App.cache.grades).forEach(function(g) {
+    if (g.classId === classId && g.subject === subject) gradesCount++;
+  });
+
+  /* Шаг 1 */
+  var ok1 = await warnDialog(
+    'Сбросить предмет?',
+    'Вы собираетесь полностью сбросить предмет <b>«' + subject + '»</b> в классе <b>' + cls.name + '</b>.<br><br>' +
+    'Будут удалены:<br>' +
+    '• Уроков (с темами и ДЗ): <b>' + lessonsCount + '</b><br>' +
+    '• Оценок: <b>' + gradesCount + '</b><br><br>' +
+    'Сам предмет останется в списке класса — можно будет начать вести его заново.<br><br>' +
+    'Продолжить?',
+    'Да, продолжить'
+  );
+  if (!ok1) return;
+
+  /* Шаг 2 */
+  var ok2 = await warnDialog(
+    'Точно уверены?',
+    'Это <b>необратимое действие</b>.<br><br>' +
+    'Ученики: <b>' + Object.values(App.cache.students).filter(function(s) { return s.classId === classId; }).length + '</b><br>' +
+    'Уроков к удалению: <b>' + lessonsCount + '</b><br>' +
+    'Оценок к удалению: <b>' + gradesCount + '</b><br><br>' +
+    'Вы действительно хотите продолжить?',
+    'Да, я уверен'
+  );
+  if (!ok2) return;
+
+  /* Шаг 3 — последнее предупреждение */
+  var ok3 = await warnDialog(
+    'Последнее предупреждение!',
+    '<b>Восстановить данные будет невозможно.</b><br><br>' +
+    'Учитель потеряет все темы уроков, домашние задания и оценки по предмету «' + subject + '».<br><br>' +
+    'Ученики и класс <b>не удалятся</b>.<br><br>' +
+    'Нажмите «Удалить навсегда», если хотите завершить сброс.',
+    'Удалить навсегда'
+  );
+  if (!ok3) return;
+
+  /* Выполняем удаление */
+  var updates = {};
+  Object.entries(App.cache.lessons).forEach(function(e) {
+    if (e[1].classId === classId && e[1].subject === subject) updates['lessons/' + e[0]] = null;
+  });
+  Object.entries(App.cache.grades).forEach(function(e) {
+    if (e[1].classId === classId && e[1].subject === subject) updates['grades/' + e[0]] = null;
+  });
+
+  try {
+    if (Object.keys(updates).length) {
+      await db.ref().update(updates);
+    }
+    toast('Предмет «' + subject + '» сброшен: удалено ' + lessonsCount + ' уроков и ' + gradesCount + ' оценок', 'success');
+    await loadAll();
+    renderJournal();
+  } catch (err) {
+    toast('Ошибка: ' + err.message, 'error');
+  }
 }
 
 function buildJournalTable(classId, subject) {
@@ -1364,7 +1438,6 @@ function buildJournalTable(classId, subject) {
   var table = el('table', { class:'j-table' });
   var thead = el('thead');
 
-  /* Строка 1: месяцы */
   var tr1 = el('tr');
   tr1.appendChild(el('th', { class:'col-num', rowspan:'3' }, '№'));
   tr1.appendChild(el('th', { class:'col-name', rowspan:'3' }, 'Ф.И. ученика'));
@@ -1375,7 +1448,6 @@ function buildJournalTable(classId, subject) {
   tr1.appendChild(el('th', { class:'col-final', rowspan:'3' }, 'Итог'));
   thead.appendChild(tr1);
 
-  /* Строка 2: даты */
   var tr2 = el('tr');
   var today = new Date().setHours(0,0,0,0);
   allDates.forEach(function(dms) {
@@ -1395,7 +1467,6 @@ function buildJournalTable(classId, subject) {
   });
   thead.appendChild(tr2);
 
-  /* Строка 3: код типа работы */
   var tr3 = el('tr');
   allDates.forEach(function(dms) {
     var dayG = grades.filter(function(g) { return g.dms === dms; });
@@ -1409,7 +1480,6 @@ function buildJournalTable(classId, subject) {
   thead.appendChild(tr3);
   table.appendChild(thead);
 
-  /* Тело */
   var tbody = el('tbody');
   students.forEach(function(entry, idx) {
     var sid = entry[0], s = entry[1];
@@ -1490,7 +1560,6 @@ function openLessonDialog(opts) {
     var topic = document.getElementById('ls-topic').value.trim();
     var hw = document.getElementById('ls-hw').value.trim();
     if (!date) return toast('Укажите дату', 'error');
-
     var dms = parseLocalDate(date);
     var payload = {
       classId: classId, subject: subject,
@@ -1498,7 +1567,6 @@ function openLessonDialog(opts) {
       date: dms, topic: topic, homework: hw,
       updatedAt: Date.now()
     };
-
     if (existing) {
       await db.ref('lessons/' + existing[0]).update(payload);
       toast('Урок обновлён', 'success');
@@ -1525,7 +1593,6 @@ function openLessonDialog(opts) {
   );
 }
 
-/* ★ Заполнить год */
 function fillYearDialog(classId, subject) {
   var curY = new Date().getFullYear();
   var curM = new Date().getMonth();
@@ -1629,7 +1696,6 @@ function openGradeCellDialog(classId, subject, studentId, dateMs, existingGradeI
   if (!wt.length) return toast('Сначала создайте типы работ', 'warning');
 
   var selectedValue = existing ? existing.value : null;
-
   var wtOpts = wt.map(function(e) {
     return '<option value="' + e[0] + '"' + (existing && existing.typeId === e[0] ? ' selected' : '') + '>' + e[1].name + ' (вес ' + e[1].weight + ')</option>';
   }).join('');
@@ -1661,10 +1727,7 @@ function openGradeCellDialog(classId, subject, studentId, dateMs, existingGradeI
     if (existing) {
       var hist = (existing.history || []).slice();
       if (existing.value !== selectedValue) {
-        hist.push({
-          changedBy: App.user.uid, changedAt: Date.now(),
-          oldValue: existing.value, newValue: selectedValue
-        });
+        hist.push({ changedBy: App.user.uid, changedAt: Date.now(), oldValue: existing.value, newValue: selectedValue });
       }
       await db.ref('grades/' + existingGradeId).update({
         value: selectedValue, date: gd, typeId: typeId, weight: w.weight, notes: notes, history: hist
@@ -1747,9 +1810,6 @@ function exportJournalCSV(classId, subject) {
   URL.revokeObjectURL(u);
 }
 
-/* ============================================================
-   УЧЕНИКИ
-============================================================ */
 async function renderStudents() {
   $('#page-title').textContent = 'Ученики';
   var c = $('#content'); c.innerHTML = '';
@@ -1758,9 +1818,8 @@ async function renderStudents() {
   var card = el('div', { class:'card' });
   card.appendChild(el('div', { class:'card-header' },
     el('div', { class:'card-title' }, 'Все мои ученики'),
-    has
-      ? el('button', { class:'btn btn-primary btn-sm', html: ic('userPlus', 14) + ' Добавить учеников', onclick: addStudentsDialog })
-      : el('span', { class:'hint' }, 'Сначала создайте класс')
+    has ? el('button', { class:'btn btn-primary btn-sm', html: ic('userPlus', 14) + ' Добавить учеников', onclick: addStudentsDialog })
+        : el('span', { class:'hint' }, 'Сначала создайте класс')
   ));
   var ids = Object.keys(cls);
   var st = Object.entries(App.cache.students).filter(function(e) { return ids.indexOf(e[1].classId) !== -1; })
@@ -1785,9 +1844,6 @@ async function renderStudents() {
   c.appendChild(card);
 }
 
-/* ============================================================
-   ТИПЫ РАБОТ
-============================================================ */
 async function renderWorkTypes() {
   $('#page-title').textContent = 'Типы работ';
   var c = $('#content'); c.innerHTML = '';
@@ -1823,9 +1879,6 @@ async function renderWorkTypes() {
   c.appendChild(card);
 }
 
-/* ============================================================
-   ПРОФИЛЬ (с выбором устройства)
-============================================================ */
 async function renderProfile() {
   $('#page-title').textContent = 'Профиль';
   var c = $('#content'); c.innerHTML = '';
@@ -1874,9 +1927,6 @@ async function renderProfile() {
   }
 }
 
-/* ============================================================
-   ДИАЛОГИ
-============================================================ */
 function addCityDialog() {
   showModal(ic('city', 20) + ' Новый город',
     '<div class="form-group"><label>Название</label>' +
@@ -2225,9 +2275,6 @@ function resetPasswordDialog(email) {
   );
 }
 
-/* ============================================================
-   ВЫЧИСЛЕНИЯ
-============================================================ */
 function weightedAvg(list) {
   var s = list.reduce(function(a, g) { return a + g.value * g.weight; }, 0);
   var w = list.reduce(function(a, g) { return a + g.weight; }, 0);
@@ -2252,9 +2299,6 @@ function countMyGrades() {
   return Object.values(App.cache.grades).filter(function(g) { return g.teacherId === App.user.uid; }).length;
 }
 
-/* ============================================================
-   ПЕРЕКЛЮЧЕНИЕ ЭКРАНОВ
-============================================================ */
 function showLoader(text) {
   $('#loader-text').textContent = text || 'Загрузка…';
   $('#loader-screen').style.display = 'flex';
@@ -2272,9 +2316,6 @@ function showApp() {
   $('#app-screen').style.display = 'flex';
 }
 
-/* ============================================================
-   СТАРТ
-============================================================ */
 async function startApp(user, profile) {
   App.user = user;
   App.profile = profile;
@@ -2307,9 +2348,6 @@ $('#logout-btn').onclick = async function() {
 };
 $('#menu-toggle').onclick = function() { $('#sidebar').classList.toggle('open'); };
 
-/* ============================================================
-   ВОССТАНОВЛЕНИЕ СЕССИИ
-============================================================ */
 (async function() {
   showLoader('Загрузка…');
   var s = getSession();
