@@ -118,6 +118,8 @@ input:focus,select:focus,textarea:focus{
 .btn-danger:hover{background:#DC2626;transform:translateY(-1px)}
 .btn-ghost{background:transparent;color:var(--text);border:1.5px solid var(--border)}
 .btn-ghost:hover{background:var(--bg);border-color:var(--primary);color:var(--primary)}
+.btn-success{background:var(--success);color:#fff}
+.btn-success:hover{background:#059669}
 .btn-warn{background:transparent;color:var(--danger);border:1.5px solid var(--danger)}
 .btn-warn:hover{background:var(--danger);color:#fff}
 .btn-block{width:100%}
@@ -214,10 +216,6 @@ tbody tr:last-child td{border-bottom:none}
 .subject-item input[type="checkbox"]{width:16px;height:16px;margin:0;flex-shrink:0;accent-color:var(--primary);cursor:pointer}
 .subject-counter{margin-top:8px;font-size:12px;color:var(--text-muted)}
 .subject-counter b{color:var(--primary);font-weight:700}
-
-/* ============================================================
-   ЖУРНАЛ
-============================================================ */
 .journal-shell{
   display:flex;flex-direction:column;
   height:calc(100vh - 100px);
@@ -245,188 +243,93 @@ tbody tr:last-child td{border-bottom:none}
   display:flex;gap:10px;flex-wrap:wrap;
 }
 .journal-sub b{color:var(--text);font-weight:700}
-
-/* ★ СКРОЛЛ-КОНТЕЙНЕР — БЕЗ -webkit-overflow-scrolling */
-.journal-scroll{
-  flex:1;
-  overflow:auto;
+.journal-scroll{flex:1;overflow:auto}
+.j-table{border-collapse:separate;border-spacing:0;font-size:var(--j-font);width:max-content;min-width:100%;font-variant-numeric:tabular-nums}
+.j-table th,.j-table td{
+  border-right:1px solid var(--border);border-bottom:1px solid var(--border);
+  padding:0;text-align:center;background:var(--bg-elev);
+  white-space:nowrap;height:var(--j-row);
 }
-
-.j-table{
-  border-collapse:separate;
-  border-spacing:0;
-  font-size:var(--j-font);
-  width:max-content;
-  min-width:100%;
-  font-variant-numeric:tabular-nums;
-}
-.j-table th,
-.j-table td{
-  border-right:1px solid var(--border);
-  border-bottom:1px solid var(--border);
-  padding:0;
-  text-align:center;
-  background:var(--bg-elev);
-  white-space:nowrap;
-  height:var(--j-row);
-}
-
-/* Шапка */
 .j-table thead th{
-  background:var(--bg);
-  font-weight:700;
-  font-size:var(--j-head-font);
-  color:var(--text-muted);
-  position:-webkit-sticky;
-  position:sticky;
-  z-index:2;
-  padding:0 2px;
+  background:var(--bg);font-weight:700;font-size:var(--j-head-font);
+  color:var(--text-muted);position:-webkit-sticky;position:sticky;z-index:2;padding:0 2px;
 }
 .j-table thead tr:nth-child(1) th{top:0;height:20px}
 .j-table thead tr:nth-child(2) th{top:20px;height:var(--j-row)}
 .j-table thead tr:nth-child(3) th{top:calc(20px + var(--j-row));height:16px;font-size:calc(var(--j-font) - 1px)}
-
-/* Левая фикс. колонка */
 .j-table .col-num{
-  position:-webkit-sticky;position:sticky;
-  left:0;z-index:5;
+  position:-webkit-sticky;position:sticky;left:0;z-index:5;
   width:var(--j-num-w);min-width:var(--j-num-w);max-width:var(--j-num-w);
-  font-size:calc(var(--j-font) - 1px);
-  color:var(--text-muted);font-weight:600;
+  font-size:calc(var(--j-font) - 1px);color:var(--text-muted);font-weight:600;
   background:var(--bg-elev);
 }
 .j-table .col-name{
-  position:-webkit-sticky;position:sticky;
-  left:var(--j-num-w);z-index:5;
+  position:-webkit-sticky;position:sticky;left:var(--j-num-w);z-index:5;
   width:var(--j-name-w);min-width:var(--j-name-w);max-width:var(--j-name-w);
-  text-align:left;padding:0 6px;
-  font-size:var(--j-font);font-weight:500;
-  background:var(--bg-elev);
-  overflow:hidden;text-overflow:ellipsis;
+  text-align:left;padding:0 6px;font-size:var(--j-font);font-weight:500;
+  background:var(--bg-elev);overflow:hidden;text-overflow:ellipsis;
   box-shadow:3px 0 6px -3px rgba(15,23,42,.15);
 }
-.j-table thead .col-num,
-.j-table thead .col-name{z-index:7;background:var(--bg)}
-
-/* ★★★ ПРАВАЯ ФИКСИРОВАННАЯ ЧАСТЬ ★★★ */
-.j-table .col-avg,
-.j-table .col-final{
-  position:-webkit-sticky !important;
-  position:sticky !important;
+.j-table thead .col-num,.j-table thead .col-name{z-index:7;background:var(--bg)}
+.j-table .col-avg,.j-table .col-final{
+  position:-webkit-sticky !important;position:sticky !important;
   background:var(--bg-elev) !important;
 }
 .j-table .col-avg{
-  right:var(--j-avg-w);
-  z-index:5;
+  right:var(--j-avg-w);z-index:5;
   width:var(--j-avg-w);min-width:var(--j-avg-w);max-width:var(--j-avg-w);
   font-weight:800;font-size:var(--j-font);
   border-left:2px solid var(--border) !important;
 }
 .j-table .col-final{
-  right:0;
-  z-index:5;
+  right:0;z-index:5;
   width:var(--j-avg-w);min-width:var(--j-avg-w);max-width:var(--j-avg-w);
   font-weight:800;font-size:var(--j-font);
   box-shadow:-3px 0 8px -3px rgba(15,23,42,.15);
 }
-.j-table thead .col-avg,
-.j-table thead .col-final{z-index:7;background:var(--bg) !important}
-
-/* ★★ ЯЧЕЙКА ОЦЕНКИ — КВАДРАТНАЯ ★★ */
+.j-table thead .col-avg,.j-table thead .col-final{z-index:7;background:var(--bg) !important}
 .j-table td.date-cell{
-  padding:0 !important;
-  position:relative;
-  width:var(--j-cell);
-  min-width:var(--j-cell);
-  max-width:var(--j-cell);
-  height:var(--j-row);
-  vertical-align:middle;
-  line-height:normal;
+  padding:0 !important;position:relative;
+  width:var(--j-cell);min-width:var(--j-cell);max-width:var(--j-cell);
+  height:var(--j-row);vertical-align:middle;line-height:normal;
 }
 .j-cell{
-  position:absolute;
-  top:1px;
-  left:1px;
-  right:1px;
-  bottom:1px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  border-radius:4px;
-  font-weight:800;
-  color:#fff;
-  font-size:var(--j-font);
-  cursor:pointer;
-  transition:filter .12s ease, box-shadow .12s ease;
-  line-height:1;
+  position:absolute;top:1px;left:1px;right:1px;bottom:1px;
+  display:flex;align-items:center;justify-content:center;
+  border-radius:4px;font-weight:800;color:#fff;font-size:var(--j-font);
+  cursor:pointer;transition:filter .12s ease, box-shadow .12s ease;line-height:1;
 }
-.j-cell:hover{
-  filter:brightness(1.15);
-  box-shadow:0 0 0 2px var(--primary);
-  z-index:6;
-}
-.j-cell.empty{
-  background:transparent;
-  border:1px dashed rgba(148,163,184,.4);
-  color:transparent;
-}
-.j-cell.empty::after{
-  content:'+';
-  font-size:var(--j-font);
-  font-weight:600;
-  opacity:0;
-  color:var(--text-muted);
-}
-.j-cell.empty:hover{
-  border-color:var(--primary);
-  background:rgba(14,165,233,.1);
-  color:var(--primary);
-  filter:none;
-}
-.j-cell.empty:hover::after{
-  opacity:1;
-  color:var(--primary);
-}
-.g5{background:#10B981}
-.g4{background:#84CC16}
-.g3{background:#F59E0B}
-.g2{background:#EF4444}
-.g1{background:#991B1B}
+.j-cell:hover{filter:brightness(1.15);box-shadow:0 0 0 2px var(--primary);z-index:6}
+.j-cell.empty{background:transparent;border:1px dashed rgba(148,163,184,.4);color:transparent}
+.j-cell.empty::after{content:'+';font-size:var(--j-font);font-weight:600;opacity:0;color:var(--text-muted)}
+.j-cell.empty:hover{border-color:var(--primary);background:rgba(14,165,233,.1);color:var(--primary);filter:none}
+.j-cell.empty:hover::after{opacity:1;color:var(--primary)}
+.g5{background:#10B981}.g4{background:#84CC16}.g3{background:#F59E0B}.g2{background:#EF4444}.g1{background:#991B1B}
 
-.j-table .date-h{
-  cursor:pointer;
-  transition:background var(--transition);
-  padding:0 1px;
-  min-width:var(--j-cell);
+/* ★ Посещаемость — маленький значок в углу ячейки */
+.j-att-badge{
+  position:absolute;top:-1px;right:-1px;
+  width:9px;height:9px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:7px;font-weight:800;color:#fff;
+  border:1px solid var(--bg-elev);
+  z-index:3;line-height:1;
 }
+.j-att-badge.n{background:#EF4444}
+.j-att-badge.u{background:#F59E0B}
+.j-att-badge.o{background:#64748B}
+.j-cell.has-att{position:relative}
+
+.j-table .date-h{cursor:pointer;transition:background var(--transition);padding:0 1px;min-width:var(--j-cell)}
 .j-table .date-h:hover{background:rgba(14,165,233,.15);color:var(--primary)}
 .j-table .date-h.weekend{color:#EF4444}
-.j-table .date-h.today{
-  background:linear-gradient(135deg,rgba(14,165,233,.18),rgba(168,85,247,.12));
-  color:var(--primary);font-weight:800;
-}
-.j-table .month-h{
-  background:linear-gradient(180deg,var(--bg) 0%,rgba(14,165,233,.06) 100%) !important;
-  font-weight:800;color:var(--text) !important;
-  font-size:var(--j-head-font) !important;
-  letter-spacing:.03em;padding:0 2px;
-}
-.g-avg-5{color:#10B981}
-.g-avg-4{color:#65A30D}
-.g-avg-3{color:#D97706}
-.g-avg-2{color:#DC2626}
-.g-avg-1{color:#991B1B}
-
-.lesson-tip{
-  position:fixed;z-index:1000;background:var(--bg-elev);
-  border:1px solid var(--border);border-radius:8px;padding:8px 10px;
-  box-shadow:var(--shadow-lg);max-width:240px;font-size:11px;line-height:1.4;
-  pointer-events:none;animation:fadeIn .15s ease;
-}
+.j-table .date-h.today{background:linear-gradient(135deg,rgba(14,165,233,.18),rgba(168,85,247,.12));color:var(--primary);font-weight:800}
+.j-table .month-h{background:linear-gradient(180deg,var(--bg) 0%,rgba(14,165,233,.06) 100%) !important;font-weight:800;color:var(--text) !important;font-size:var(--j-head-font) !important;letter-spacing:.03em;padding:0 2px}
+.g-avg-5{color:#10B981}.g-avg-4{color:#65A30D}.g-avg-3{color:#D97706}.g-avg-2{color:#DC2626}.g-avg-1{color:#991B1B}
+.lesson-tip{position:fixed;z-index:1000;background:var(--bg-elev);border:1px solid var(--border);border-radius:8px;padding:8px 10px;box-shadow:var(--shadow-lg);max-width:240px;font-size:11px;line-height:1.4;pointer-events:none;animation:fadeIn .15s ease}
 .lesson-tip .tip-title{font-size:9px;text-transform:uppercase;color:var(--text-muted);font-weight:700;letter-spacing:.05em;margin-bottom:2px}
 .lesson-tip .tip-body{color:var(--text);margin-bottom:6px}
 .lesson-tip .tip-body:last-child{margin-bottom:0}
-
 .grade-picker{display:flex;gap:8px;flex-wrap:wrap}
 .grade-btn{
   width:44px;height:44px;border-radius:10px;border:2px solid var(--border);
@@ -441,6 +344,19 @@ tbody tr:last-child td{border-bottom:none}
 .grade-btn.active.gb-3{background:#F59E0B}
 .grade-btn.active.gb-2{background:#EF4444}
 .grade-btn.active.gb-1{background:#991B1B}
+.att-picker{display:flex;gap:8px;flex-wrap:wrap}
+.att-btn{
+  min-width:44px;height:44px;padding:0 14px;border-radius:10px;border:2px solid var(--border);
+  background:var(--bg);color:var(--text);font-size:14px;font-weight:800;
+  cursor:pointer;transition:var(--transition);
+  display:inline-flex;align-items:center;justify-content:center;gap:4px;
+}
+.att-btn:hover{transform:translateY(-2px);border-color:var(--primary)}
+.att-btn.active{color:#fff;border-color:transparent;box-shadow:0 4px 12px rgba(0,0,0,.15)}
+.att-btn.active.ab-n{background:#EF4444}
+.att-btn.active.ab-u{background:#F59E0B}
+.att-btn.active.ab-o{background:#64748B}
+.att-btn .lbl{font-size:9px;opacity:.7;font-weight:600}
 .weekday-picker{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
 .weekday-picker label{
   padding:6px 10px;border:1.5px solid var(--border);border-radius:8px;
@@ -571,6 +487,31 @@ var db = firebase.database();
 var secondaryApp = firebase.initializeApp(firebaseConfig, 'Secondary');
 var secondaryAuth = secondaryApp.auth();
 
+/* ★ Четверти */
+var QUARTERS = [
+  { id:'q1', name:'I четверть',  sm:8,  sd:1, em:9,  ed:27, short:'I' },
+  { id:'q2', name:'II четверть', sm:10, sd:5, em:11, ed:28, short:'II' },
+  { id:'q3', name:'III четверть',sm:0,  sd:9, em:2,  ed:22, short:'III' },
+  { id:'q4', name:'IV четверть', sm:3,  sd:1, em:4,  ed:31, short:'IV' }
+];
+function inQuarter(dms, qid) {
+  if (!qid || qid === 'all') return true;
+  var q = null;
+  for (var i = 0; i < QUARTERS.length; i++) if (QUARTERS[i].id === qid) { q = QUARTERS[i]; break; }
+  if (!q) return true;
+  var d = new Date(dms);
+  var m = d.getMonth(), day = d.getDate();
+  if (m < q.sm || m > q.em) return false;
+  if (m === q.sm && day < q.sd) return false;
+  if (m === q.em && day > q.ed) return false;
+  return true;
+}
+function quarterName(qid) {
+  if (!qid || qid === 'all') return 'Весь год';
+  for (var i = 0; i < QUARTERS.length; i++) if (QUARTERS[i].id === qid) return QUARTERS[i].name;
+  return 'Весь год';
+}
+
 var ICON_PATHS = {
   dashboard:'<line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>',
   city:'<path d="M3 21h18"/><path d="M5 21V7l8-4v18"/><path d="M19 21V11l-6-4"/>',
@@ -589,6 +530,7 @@ var ICON_PATHS = {
   trash:'<polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/>',
   key:'<circle cx="7.5" cy="15.5" r="5.5"/><path d="M21 2l-10 10"/><path d="M15.5 7.5l3 3L22 7l-3-3"/>',
   download:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>',
+  upload:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>',
   arrowLeft:'<line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>',
   pencil:'<path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/>',
   check:'<polyline points="20 6 9 17 4 12"/>',
@@ -603,7 +545,8 @@ var ICON_PATHS = {
   list:'<line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>',
   calendar:'<rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>',
   zap:'<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>',
-  monitor:'<rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>'
+  monitor:'<rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>',
+  file:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>'
 };
 function ic(name, size) {
   if (size === undefined) size = 18;
@@ -795,9 +738,7 @@ function applyDevice(mode) {
 function initDevice() {
   applyDevice(localStorage.getItem('device') || 'auto');
   window.addEventListener('resize', function() {
-    if ((localStorage.getItem('device') || 'auto') === 'auto') {
-      applyDevice('auto');
-    }
+    if ((localStorage.getItem('device') || 'auto') === 'auto') applyDevice('auto');
   });
 }
 initDevice();
@@ -826,7 +767,6 @@ $('#login-form').addEventListener('submit', async function(e) {
   var loginInput = $('#login-input').value.trim();
   var password = $('#login-password').value;
   if (!loginInput || !password) return;
-
   if (loginInput === HARDCODED_ADMIN.login && password === HARDCODED_ADMIN.password) {
     var user = { uid:'admin-local', email:HARDCODED_ADMIN.profile.email };
     var profile = Object.assign({}, HARDCODED_ADMIN.profile, { createdAt:Date.now() });
@@ -834,7 +774,6 @@ $('#login-form').addEventListener('submit', async function(e) {
     startApp(user, profile);
     return;
   }
-
   try {
     var email = loginInput;
     if (loginInput.indexOf('@') === -1) {
@@ -843,9 +782,7 @@ $('#login-form').addEventListener('submit', async function(e) {
       email = Object.values(snap.val())[0].email;
     }
     await auth.signInWithEmailAndPassword(email, password);
-  } catch (err) {
-    showAuthMsg(translateError(err));
-  }
+  } catch (err) { showAuthMsg(translateError(err)); }
 });
 
 $('#register-form').addEventListener('submit', async function(e) {
@@ -855,21 +792,17 @@ $('#register-form').addEventListener('submit', async function(e) {
   var login = $('#reg-login').value.trim();
   var email = $('#reg-email').value.trim();
   var password = $('#reg-password').value;
-
   try {
     var iSnap = await db.ref('invites/' + code).once('value');
     if (!iSnap.exists()) return showAuthMsg('Неверный код приглашения');
     var invite = iSnap.val();
     if (invite.used) return showAuthMsg('Код уже использован');
     if (invite.expiresAt && invite.expiresAt < Date.now()) return showAuthMsg('Код истёк');
-
     var lCheck = await db.ref('users').orderByChild('login').equalTo(login).once('value');
     if (lCheck.exists()) return showAuthMsg('Такой логин уже занят');
-
     var cred = await secondaryAuth.createUserWithEmailAndPassword(email, password);
     var uid = cred.user.uid;
     await secondaryAuth.signOut();
-
     await db.ref('users/' + uid).set({
       role: invite.role || 'teacher',
       login: login, name: name, email: email,
@@ -877,15 +810,10 @@ $('#register-form').addEventListener('submit', async function(e) {
       cityId: invite.cityId || null,
       createdAt: Date.now()
     });
-
     await db.ref('invites/' + code).update({ used:true, usedBy:uid, usedAt:Date.now() });
     showAuthMsg('Регистрация успешна! Входим…', 'success');
-    setTimeout(async function() {
-      await auth.signInWithEmailAndPassword(email, password);
-    }, 800);
-  } catch (err) {
-    showAuthMsg(translateError(err));
-  }
+    setTimeout(async function() { await auth.signInWithEmailAndPassword(email, password); }, 800);
+  } catch (err) { showAuthMsg(translateError(err)); }
 });
 
 $('#forgot-password').onclick = async function(e) {
@@ -895,17 +823,15 @@ $('#forgot-password').onclick = async function(e) {
   try {
     await auth.sendPasswordResetEmail(v.trim());
     showAuthMsg('Письмо отправлено. Проверьте почту.', 'success');
-  } catch (err) {
-    showAuthMsg(translateError(err));
-  }
+  } catch (err) { showAuthMsg(translateError(err)); }
 };
 
 var App = {
-  user: null,
-  profile: null,
+  user: null, profile: null,
   cache: {
     cities:{}, schools:{}, classes:{}, students:{},
-    grades:{}, workTypes:{}, invites:{}, users:{}, lessons:{}
+    grades:{}, workTypes:{}, invites:{}, users:{},
+    lessons:{}, attendance:{}
   }
 };
 
@@ -952,28 +878,23 @@ function buildMenu() {
     }));
   });
 }
-
 function navigate(view, params) {
   if (!params) params = {};
   location.hash = '#' + view + (params.id ? '/' + params.id : '');
   router();
 }
-
 async function router() {
   var hash = location.hash.slice(1) || 'dashboard';
   var parts = hash.split('/');
   var view = parts[0], id = parts[1];
   if (!App.profile) return;
-
   var items = MENU[App.profile.role] || [];
   var allowed = items.map(function(i) { return i.id; });
   ['class'].forEach(function(v) { if (allowed.indexOf(v) === -1) allowed.push(v); });
   if (allowed.indexOf(view) === -1) return navigate('dashboard');
-
   $$('.nav-item').forEach(function(n) { n.classList.remove('active'); });
   var idx = items.findIndex(function(i) { return i.id === view; });
   if (idx >= 0 && $$('.nav-item')[idx]) $$('.nav-item')[idx].classList.add('active');
-
   var renderers = {
     dashboard: renderDashboard, cities: renderCities, schools: renderSchools,
     users: renderUsers, invites: renderInvites, classes: renderClasses,
@@ -996,7 +917,8 @@ async function loadAll() {
     db.ref('workTypes').once('value'),
     db.ref('invites').once('value'),
     db.ref('users').once('value'),
-    db.ref('lessons').once('value')
+    db.ref('lessons').once('value'),
+    db.ref('attendance').once('value')
   ]);
   App.cache.cities = results[0].val() || {};
   App.cache.schools = results[1].val() || {};
@@ -1007,6 +929,7 @@ async function loadAll() {
   App.cache.invites = results[6].val() || {};
   App.cache.users = results[7].val() || {};
   App.cache.lessons = results[8].val() || {};
+  App.cache.attendance = results[9].val() || {};
 }
 
 async function bootstrapDefaultWorkTypes() {
@@ -1049,7 +972,6 @@ async function renderDashboard() {
   var c = $('#content'); c.innerHTML = '';
   var role = App.profile.role;
   var stats = [];
-
   if (role === 'super_admin') {
     stats = [
       { label:'Городов', value: Object.keys(App.cache.cities).length },
@@ -1075,7 +997,6 @@ async function renderDashboard() {
       { label:'Оценок выставлено', value: countMyGrades() }
     ];
   }
-
   var g = el('div', { class:'grid grid-3' });
   stats.forEach(function(s) {
     g.appendChild(el('div', { class:'stat-card' },
@@ -1095,9 +1016,8 @@ async function renderCities() {
     el('button', { class:'btn btn-primary', html: ic('plus', 16) + ' Добавить город', onclick: addCityDialog })
   ));
   var cities = Object.entries(App.cache.cities);
-  if (!cities.length) {
-    card.appendChild(el('div', { class:'empty' }, 'Городов пока нет'));
-  } else {
+  if (!cities.length) card.appendChild(el('div', { class:'empty' }, 'Городов пока нет'));
+  else {
     var t = el('table');
     t.innerHTML = '<thead><tr><th>Название</th><th>Создан</th><th></th></tr></thead>';
     var tb = el('tbody');
@@ -1114,11 +1034,9 @@ async function renderCities() {
           await loadAll(); renderCities();
         }
       }}));
-      tr.appendChild(a);
-      tb.appendChild(tr);
+      tr.appendChild(a); tb.appendChild(tr);
     });
-    t.appendChild(tb);
-    card.appendChild(t);
+    t.appendChild(tb); card.appendChild(t);
   }
   c.appendChild(card);
 }
@@ -1133,9 +1051,8 @@ async function renderSchools() {
     canCreate ? el('button', { class:'btn btn-primary', html: ic('plus', 16) + ' Добавить школу', onclick: addSchoolDialog }) : el('span')
   ));
   var schools = Object.entries(mySchools());
-  if (!schools.length) {
-    card.appendChild(el('div', { class:'empty' }, 'Школ пока нет'));
-  } else {
+  if (!schools.length) card.appendChild(el('div', { class:'empty' }, 'Школ пока нет'));
+  else {
     var t = el('table');
     t.innerHTML = '<thead><tr><th>Название</th><th>Город</th><th>Создана</th><th></th></tr></thead>';
     var tb = el('tbody');
@@ -1153,11 +1070,9 @@ async function renderSchools() {
           await loadAll(); renderSchools();
         }
       }}));
-      tr.appendChild(a);
-      tb.appendChild(tr);
+      tr.appendChild(a); tb.appendChild(tr);
     });
-    t.appendChild(tb);
-    card.appendChild(t);
+    t.appendChild(tb); card.appendChild(t);
   }
   c.appendChild(card);
 }
@@ -1170,9 +1085,8 @@ async function renderUsers() {
   else if (App.profile.role === 'school_creator') users = users.filter(function(e) { return e[1].schoolId === App.profile.schoolId; });
   var card = el('div', { class:'card' });
   card.appendChild(el('div', { class:'card-header' }, el('div', { class:'card-title' }, 'Пользователи')));
-  if (!users.length) {
-    card.appendChild(el('div', { class:'empty' }, 'Нет пользователей'));
-  } else {
+  if (!users.length) card.appendChild(el('div', { class:'empty' }, 'Нет пользователей'));
+  else {
     var t = el('table');
     t.innerHTML = '<thead><tr><th>ФИО</th><th>Логин</th><th>Email</th><th>Роль</th><th></th></tr></thead>';
     var tb = el('tbody');
@@ -1182,11 +1096,9 @@ async function renderUsers() {
       tr.innerHTML = '<td>' + (u.name || '—') + '</td><td>' + (u.login || '—') + '</td><td>' + (u.email || '—') + '</td><td><span class="badge">' + roleLabel(u.role) + '</span></td>';
       var a = el('td');
       a.appendChild(el('button', { class:'btn btn-sm btn-ghost', html: ic('key', 14) + ' Пароль', onclick: function() { resetPasswordDialog(u.email); } }));
-      tr.appendChild(a);
-      tb.appendChild(tr);
+      tr.appendChild(a); tb.appendChild(tr);
     });
-    t.appendChild(tb);
-    card.appendChild(t);
+    t.appendChild(tb); card.appendChild(t);
   }
   c.appendChild(card);
 }
@@ -1201,9 +1113,8 @@ async function renderInvites() {
   ));
   var inv = Object.entries(App.cache.invites).filter(function(e) { return e[1].createdBy === App.user.uid; })
     .sort(function(a, b) { return (b[1].createdAt || 0) - (a[1].createdAt || 0); });
-  if (!inv.length) {
-    card.appendChild(el('div', { class:'empty' }, 'Кодов пока нет'));
-  } else {
+  if (!inv.length) card.appendChild(el('div', { class:'empty' }, 'Кодов пока нет'));
+  else {
     var t = el('table');
     t.innerHTML = '<thead><tr><th>Код</th><th>Статус</th><th>Создан</th><th>Истекает</th></tr></thead>';
     var tb = el('tbody');
@@ -1217,8 +1128,7 @@ async function renderInvites() {
       tr.innerHTML = '<td><span class="invite-code ' + (i.used ? 'used' : '') + '">' + code + '</span></td><td>' + st + '</td><td>' + fmt.date(i.createdAt) + '</td><td>' + fmt.date(i.expiresAt) + '</td>';
       tb.appendChild(tr);
     });
-    t.appendChild(tb);
-    card.appendChild(t);
+    t.appendChild(tb); card.appendChild(t);
   }
   c.appendChild(card);
 }
@@ -1232,9 +1142,8 @@ async function renderClasses() {
     el('button', { class:'btn btn-primary', html: ic('plus', 16) + ' Создать класс', onclick: addClassDialog })
   ));
   var cls = Object.entries(myClasses());
-  if (!cls.length) {
-    card.appendChild(el('div', { class:'empty' }, 'У вас пока нет классов'));
-  } else {
+  if (!cls.length) card.appendChild(el('div', { class:'empty' }, 'У вас пока нет классов'));
+  else {
     var g = el('div', { class:'grid grid-3' });
     cls.forEach(function(entry) {
       var id = entry[0], cl = entry[1];
@@ -1255,13 +1164,13 @@ async function renderClasses() {
           Object.entries(App.cache.students).forEach(function(e2) { if (e2[1].classId === id) u['students/' + e2[0]] = null; });
           Object.entries(App.cache.grades).forEach(function(e2) { if (e2[1].classId === id) u['grades/' + e2[0]] = null; });
           Object.entries(App.cache.lessons).forEach(function(e2) { if (e2[1].classId === id) u['lessons/' + e2[0]] = null; });
+          Object.entries(App.cache.attendance).forEach(function(e2) { if (e2[1].classId === id) u['attendance/' + e2[0]] = null; });
           await db.ref().update(u);
           toast('Класс удалён', 'success');
           await loadAll(); renderClasses();
         }
       }}));
-      cc.appendChild(a);
-      g.appendChild(cc);
+      cc.appendChild(a); g.appendChild(cc);
     });
     card.appendChild(g);
   }
@@ -1273,6 +1182,7 @@ async function renderClassDetail(classId) {
   if (!cl || cl.teacherId !== App.user.uid) return navigate('classes');
   $('#page-title').textContent = 'Класс ' + cl.name;
   var c = $('#content'); c.innerHTML = '';
+
   var info = el('div', { class:'card' });
   info.innerHTML =
     '<div class="card-header"><div class="card-title">' + cl.name + ' • ' + (cl.year || '') + ' год</div></div>' +
@@ -1281,15 +1191,19 @@ async function renderClassDetail(classId) {
       '<span><b>Предметы:</b> ' + ((cl.subjects || []).join(', ') || '—') + '</span>' +
     '</div>';
   c.appendChild(info);
+
   var card = el('div', { class:'card' });
   card.appendChild(el('div', { class:'card-header' },
     el('div', { class:'card-title' }, 'Ученики класса'),
-    el('button', { class:'btn btn-primary btn-sm', html: ic('userPlus', 14) + ' Добавить учеников', onclick: function() { addStudentDialog(classId); } })
+    el('div', { style:'display:flex;gap:6px;flex-wrap:wrap;' },
+      el('button', { class:'btn btn-success btn-sm', html: ic('upload', 14) + ' Импорт CSV', onclick: function() { importCSVDialog(classId); } }),
+      el('button', { class:'btn btn-primary btn-sm', html: ic('userPlus', 14) + ' Добавить', onclick: function() { addStudentDialog(classId); } })
+    )
   ));
+
   var st = Object.entries(App.cache.students).filter(function(e) { return e[1].classId === classId; });
-  if (!st.length) {
-    card.appendChild(el('div', { class:'empty' }, 'Учеников пока нет'));
-  } else {
+  if (!st.length) card.appendChild(el('div', { class:'empty' }, 'Учеников пока нет'));
+  else {
     var t = el('table');
     t.innerHTML = '<thead><tr><th>#</th><th>ФИО</th><th></th></tr></thead>';
     var tb = el('tbody');
@@ -1299,16 +1213,17 @@ async function renderClassDetail(classId) {
       tr.innerHTML = '<td>' + (i + 1) + '</td><td>' + s.name + '</td>';
       var a = el('td');
       a.appendChild(el('button', { class:'btn btn-sm btn-ghost', html: ic('trash', 14), onclick: function() { deleteStudent(sid, s.name); } }));
-      tr.appendChild(a);
-      tb.appendChild(tr);
+      tr.appendChild(a); tb.appendChild(tr);
     });
-    t.appendChild(tb);
-    card.appendChild(t);
+    t.appendChild(tb); card.appendChild(t);
   }
   c.appendChild(card);
   c.appendChild(el('button', { class:'btn btn-ghost', html: ic('arrowLeft', 16) + ' Назад', onclick: function() { navigate('classes'); } }));
 }
 
+/* ============================================================
+   ЖУРНАЛ
+============================================================ */
 async function renderJournal() {
   $('#page-title').textContent = 'Журнал';
   var c = $('#content'); c.innerHTML = '';
@@ -1318,11 +1233,12 @@ async function renderJournal() {
     return;
   }
 
-  var state = App._journalState = App._journalState || { classId: Object.keys(classes)[0], subject: null };
+  var state = App._journalState = App._journalState || { classId: Object.keys(classes)[0], subject: null, quarterId: 'all' };
   if (!classes[state.classId]) state.classId = Object.keys(classes)[0];
   var curCls = classes[state.classId];
   var subs = curCls.subjects || [];
   if (!state.subject || subs.indexOf(state.subject) === -1) state.subject = subs[0] || null;
+  if (!state.quarterId) state.quarterId = 'all';
 
   var shell = el('div', { class:'journal-shell' });
   var top = el('div', { class:'journal-top' });
@@ -1349,23 +1265,55 @@ async function renderJournal() {
   })();
   top.appendChild(subjectFilter);
 
-  top.appendChild(el('button', { class:'btn btn-primary', html: ic('zap', 14) + ' Заполнить год', onclick: function() { fillYearDialog(state.classId, state.subject); } }));
+  /* ★ Селектор четверти */
+  var quarterFilter = el('div', { class:'filter' });
+  quarterFilter.appendChild(el('label', {}, 'Период'));
+  (function() {
+    var s = el('select');
+    s.appendChild(new Option('Весь год', 'all'));
+    QUARTERS.forEach(function(q) { s.appendChild(new Option(q.name, q.id)); });
+    s.value = state.quarterId;
+    s.onchange = function() { state.quarterId = s.value; renderJournal(); };
+    quarterFilter.appendChild(s);
+  })();
+  top.appendChild(quarterFilter);
+
+  top.appendChild(el('button', { class:'btn btn-primary', html: ic('zap', 14) + ' Год', onclick: function() { fillYearDialog(state.classId, state.subject); } }));
   top.appendChild(el('button', { class:'btn btn-primary', html: ic('plus', 14) + ' Урок', onclick: function() { openLessonDialog({ classId: state.classId, subject: state.subject }); } }));
-  top.appendChild(el('button', { class:'btn btn-ghost', html: ic('download', 14) + ' CSV', onclick: function() { exportJournalCSV(state.classId, state.subject); } }));
+
+  /* ★ Excel */
+  top.appendChild(el('button', {
+    class:'btn btn-success',
+    html: ic('file', 14) + ' Excel',
+    onclick: function() { exportJournalXLS(state.classId, state.subject, state.quarterId); }
+  }));
+
+  /* CSV */
+  top.appendChild(el('button', {
+    class:'btn btn-ghost',
+    html: ic('download', 14) + ' CSV',
+    onclick: function() { exportJournalCSV(state.classId, state.subject, state.quarterId); }
+  }));
+
+  /* Сброс */
   top.appendChild(el('button', {
     class:'btn btn-warn',
-    html: ic('trash', 14) + ' Сбросить предмет',
+    html: ic('trash', 14) + ' Сбросить',
     onclick: function() { resetSubjectDialog(state.classId, state.subject); }
   }));
   shell.appendChild(top);
 
   var tname = App.profile.name || App.profile.login || '—';
   var sub = el('div', { class:'journal-sub' });
-  sub.innerHTML = '<span><b>Класс:</b> ' + curCls.name + '</span><span><b>Предмет:</b> ' + (state.subject || '—') + '</span><span><b>Учитель:</b> ' + tname + '</span>';
+  sub.innerHTML =
+    '<span><b>Класс:</b> ' + curCls.name + '</span>' +
+    '<span><b>Предмет:</b> ' + (state.subject || '—') + '</span>' +
+    '<span><b>Период:</b> ' + quarterName(state.quarterId) + '</span>' +
+    '<span><b>Учитель:</b> ' + tname + '</span>';
   shell.appendChild(sub);
 
   var scroll = el('div', { class:'journal-scroll' });
-  var table = buildJournalTable(state.classId, state.subject);
+  var table = buildJournalTable(state.classId, state.subject, state.quarterId);
   if (table) scroll.appendChild(table);
   else scroll.appendChild(el('div', { class:'empty' }, 'Нет данных — добавьте учеников или уроки'));
   shell.appendChild(scroll);
@@ -1376,62 +1324,38 @@ async function resetSubjectDialog(classId, subject) {
   var cls = App.cache.classes[classId];
   if (!cls || !subject) return toast('Предмет не выбран', 'warning');
 
-  var lessonsCount = 0, gradesCount = 0;
-  Object.values(App.cache.lessons).forEach(function(l) {
-    if (l.classId === classId && l.subject === subject) lessonsCount++;
-  });
-  Object.values(App.cache.grades).forEach(function(g) {
-    if (g.classId === classId && g.subject === subject) gradesCount++;
-  });
+  var lessonsCount = 0, gradesCount = 0, attCount = 0;
+  Object.values(App.cache.lessons).forEach(function(l) { if (l.classId === classId && l.subject === subject) lessonsCount++; });
+  Object.values(App.cache.grades).forEach(function(g) { if (g.classId === classId && g.subject === subject) gradesCount++; });
+  Object.values(App.cache.attendance).forEach(function(a) { if (a.classId === classId && a.subject === subject) attCount++; });
 
-  var ok1 = await warnDialog(
-    'Сбросить предмет?',
-    'Вы собираетесь полностью сбросить предмет <b>«' + subject + '»</b> в классе <b>' + cls.name + '</b>.<br><br>' +
-    'Будут удалены:<br>• Уроков (с темами и ДЗ): <b>' + lessonsCount + '</b><br>• Оценок: <b>' + gradesCount + '</b><br><br>' +
-    'Сам предмет останется в списке класса.<br><br>Продолжить?',
-    'Да, продолжить'
-  );
+  var ok1 = await warnDialog('Сбросить предмет?',
+    'Полный сброс предмета <b>«' + subject + '»</b> в классе <b>' + cls.name + '</b>.<br><br>' +
+    'Будут удалены:<br>• Уроков: <b>' + lessonsCount + '</b><br>• Оценок: <b>' + gradesCount + '</b><br>• Отметок посещаемости: <b>' + attCount + '</b><br><br>Продолжить?',
+    'Да, продолжить');
   if (!ok1) return;
-
-  var ok2 = await warnDialog(
-    'Точно уверены?',
-    'Это <b>необратимое действие</b>.<br><br>' +
-    'Ученики: <b>' + Object.values(App.cache.students).filter(function(s) { return s.classId === classId; }).length + '</b><br>' +
-    'Уроков к удалению: <b>' + lessonsCount + '</b><br>Оценок к удалению: <b>' + gradesCount + '</b><br><br>' +
-    'Вы действительно хотите продолжить?',
-    'Да, я уверен'
-  );
+  var ok2 = await warnDialog('Точно уверены?',
+    'Это <b>необратимое действие</b>.<br><br>Оценок к удалению: <b>' + gradesCount + '</b><br><br>Вы действительно хотите продолжить?',
+    'Да, я уверен');
   if (!ok2) return;
-
-  var ok3 = await warnDialog(
-    'Последнее предупреждение!',
-    '<b>Восстановить данные будет невозможно.</b><br><br>' +
-    'Учитель потеряет все темы уроков, домашние задания и оценки по предмету «' + subject + '».<br><br>' +
-    'Ученики и класс <b>не удалятся</b>.<br><br>' +
-    'Нажмите «Удалить навсегда», если хотите завершить сброс.',
-    'Удалить навсегда'
-  );
+  var ok3 = await warnDialog('Последнее предупреждение!',
+    '<b>Восстановить данные будет невозможно.</b><br><br>Нажмите «Удалить навсегда» для завершения.',
+    'Удалить навсегда');
   if (!ok3) return;
 
   var updates = {};
-  Object.entries(App.cache.lessons).forEach(function(e) {
-    if (e[1].classId === classId && e[1].subject === subject) updates['lessons/' + e[0]] = null;
-  });
-  Object.entries(App.cache.grades).forEach(function(e) {
-    if (e[1].classId === classId && e[1].subject === subject) updates['grades/' + e[0]] = null;
-  });
+  Object.entries(App.cache.lessons).forEach(function(e) { if (e[1].classId === classId && e[1].subject === subject) updates['lessons/' + e[0]] = null; });
+  Object.entries(App.cache.grades).forEach(function(e) { if (e[1].classId === classId && e[1].subject === subject) updates['grades/' + e[0]] = null; });
+  Object.entries(App.cache.attendance).forEach(function(e) { if (e[1].classId === classId && e[1].subject === subject) updates['attendance/' + e[0]] = null; });
 
   try {
     if (Object.keys(updates).length) await db.ref().update(updates);
-    toast('Предмет «' + subject + '» сброшен: удалено ' + lessonsCount + ' уроков и ' + gradesCount + ' оценок', 'success');
-    await loadAll();
-    renderJournal();
-  } catch (err) {
-    toast('Ошибка: ' + err.message, 'error');
-  }
+    toast('Предмет «' + subject + '» сброшен: ' + lessonsCount + ' уроков, ' + gradesCount + ' оценок, ' + attCount + ' отметок', 'success');
+    await loadAll(); renderJournal();
+  } catch (err) { toast('Ошибка: ' + err.message, 'error'); }
 }
 
-function buildJournalTable(classId, subject) {
+function buildJournalTable(classId, subject, quarterId) {
   var students = Object.entries(App.cache.students)
     .filter(function(e) { return e[1].classId === classId; })
     .sort(function(a, b) { return a[1].name.localeCompare(b[1].name); });
@@ -1446,14 +1370,20 @@ function buildJournalTable(classId, subject) {
     .filter(function(e) { return e[1].classId === classId && e[1].subject === subject; })
     .map(function(e) { return Object.assign({}, e[1], { id: e[0], dms: new Date(e[1].date).setHours(0,0,0,0) }); });
 
+  var atts = Object.entries(App.cache.attendance)
+    .filter(function(e) { return e[1].classId === classId && e[1].subject === subject; })
+    .map(function(e) { return Object.assign({}, e[1], { id: e[0], dms: new Date(e[1].date).setHours(0,0,0,0) }); });
+
+  /* Собираем даты */
   var dateSet = {};
-  lessons.forEach(function(l) { dateSet[l.dms] = true; });
-  grades.forEach(function(g) { dateSet[g.dms] = true; });
+  lessons.forEach(function(l) { if (inQuarter(l.dms, quarterId)) dateSet[l.dms] = true; });
+  grades.forEach(function(g) { if (inQuarter(g.dms, quarterId)) dateSet[g.dms] = true; });
+  atts.forEach(function(a) { if (inQuarter(a.dms, quarterId)) dateSet[a.dms] = true; });
   var allDates = Object.keys(dateSet).map(Number).sort(function(a, b) { return a - b; });
 
   if (!allDates.length) {
     var w = el('div');
-    w.innerHTML = '<div class="empty" style="padding:60px;"><div style="font-size:14px;margin-bottom:6px;">Журнал пуст</div><div style="font-size:12px;">Нажмите «Заполнить год» или «+ Урок»</div></div>';
+    w.innerHTML = '<div class="empty" style="padding:60px;"><div style="font-size:14px;margin-bottom:6px;">Журнал пуст' + (quarterId !== 'all' ? ' в этой четверти' : '') + '</div><div style="font-size:12px;">Нажмите «Год» или «+ Урок», либо выберите другую четверть</div></div>';
     return w;
   }
 
@@ -1469,6 +1399,8 @@ function buildJournalTable(classId, subject) {
   grades.forEach(function(g) { gIdx.set(g.studentId + '_' + g.dms, g); });
   var lIdx = new Map();
   lessons.forEach(function(l) { lIdx.set(l.dms, l); });
+  var aIdx = new Map();
+  atts.forEach(function(a) { aIdx.set(a.studentId + '_' + a.dms, a); });
 
   var table = el('table', { class:'j-table' });
   var thead = el('thead');
@@ -1479,8 +1411,8 @@ function buildJournalTable(classId, subject) {
   mm.forEach(function(m) {
     tr1.appendChild(el('th', { class:'month-h', colspan:String(m.dates.length) }, m.name));
   });
-  tr1.appendChild(el('th', { class:'col-avg', rowspan:'3' }, 'Средний'));
-  tr1.appendChild(el('th', { class:'col-final', rowspan:'3' }, 'Итог'));
+  tr1.appendChild(el('th', { class:'col-avg', rowspan:'3' }, quarterId !== 'all' ? 'Средн.' : 'Средний'));
+  tr1.appendChild(el('th', { class:'col-final', rowspan:'3' }, quarterId !== 'all' ? 'Итог ' + quarterName(quarterId).substring(0, 4).trim() : 'Итог'));
   thead.appendChild(tr1);
 
   var tr2 = el('tr');
@@ -1525,23 +1457,34 @@ function buildJournalTable(classId, subject) {
     allDates.forEach(function(dms) {
       var td = el('td', { class:'date-cell' });
       var g = gIdx.get(sid + '_' + dms);
+      var a = aIdx.get(sid + '_' + dms);
+      var attHtml = '';
+      if (a) {
+        var mark = (a.mark || 'н').toLowerCase();
+        var letter = mark === 'н' ? 'Н' : (mark === 'у' ? 'У' : 'О');
+        attHtml = '<span class="j-att-badge ' + mark + '" title="' + (mark === 'н' ? 'Отсутствовал' : (mark === 'у' ? 'Уважительная' : 'Опоздал')) + '">' + letter + '</span>';
+      }
       if (g) {
         var cell = el('div', {
-          class:'j-cell ' + gradeClass(g.value),
-          title: (App.cache.workTypes[g.typeId] ? App.cache.workTypes[g.typeId].name : '') + '\n' + fmt.date(g.date)
-        }, String(g.value));
+          class:'j-cell ' + gradeClass(g.value) + (a ? ' has-att' : ''),
+          html: String(g.value) + attHtml,
+          title: (App.cache.workTypes[g.typeId] ? App.cache.workTypes[g.typeId].name : '') + '\n' + fmt.date(g.date) + (a ? '\nПосещаемость: ' + (a.mark || '—') : '')
+        });
         cell.onclick = function() { openGradeCellDialog(classId, subject, sid, dms, g.id); };
         td.appendChild(cell);
       } else {
-        var cell2 = el('div', { class:'j-cell empty', title:'Поставить оценку' });
+        var cls2 = 'j-cell empty' + (a ? ' has-att' : '');
+        var cell2 = el('div', { class:cls2, html: attHtml, title: a ? 'Посещаемость: ' + (a.mark || '—') : 'Поставить оценку' });
         cell2.onclick = function() { openGradeCellDialog(classId, subject, sid, dms); };
         td.appendChild(cell2);
       }
       tr.appendChild(td);
     });
 
+    /* Средний и итог — только за выбранную четверть */
     var sg = Object.values(App.cache.grades).filter(function(g) {
-      return g.studentId === sid && g.classId === classId && g.subject === subject;
+      return g.studentId === sid && g.classId === classId && g.subject === subject &&
+        inQuarter(new Date(g.date).setHours(0,0,0,0), quarterId);
     });
     var avg = weightedAvg(sg);
     tr.appendChild(el('td', { class:'col-avg ' + avgClass(avg) }, avg ? String(avg) : '—'));
@@ -1574,11 +1517,9 @@ function openLessonDialog(opts) {
   var dateStr = dateMs ? toLocalDateStr(dateMs) : toLocalDateStr(Date.now());
   var existing = Object.entries(App.cache.lessons).find(function(e) {
     var l = e[1];
-    return l.classId === classId && l.subject === subject &&
-      new Date(l.date).setHours(0,0,0,0) === parseLocalDate(dateStr);
+    return l.classId === classId && l.subject === subject && new Date(l.date).setHours(0,0,0,0) === parseLocalDate(dateStr);
   });
   var cls = App.cache.classes[classId];
-
   var actions = [];
   if (existing) {
     actions.push({ label:'Удалить', class:'btn-danger', onClick: async function() {
@@ -1596,34 +1537,17 @@ function openLessonDialog(opts) {
     var hw = document.getElementById('ls-hw').value.trim();
     if (!date) return toast('Укажите дату', 'error');
     var dms = parseLocalDate(date);
-    var payload = {
-      classId: classId, subject: subject,
-      teacherId: App.user.uid,
-      date: dms, topic: topic, homework: hw,
-      updatedAt: Date.now()
-    };
-    if (existing) {
-      await db.ref('lessons/' + existing[0]).update(payload);
-      toast('Урок обновлён', 'success');
-    } else {
-      payload.createdAt = Date.now();
-      var id = db.ref('lessons').push().key;
-      await db.ref('lessons/' + id).set(payload);
-      toast('Урок добавлен', 'success');
-    }
-    closeModal();
-    await loadAll(); renderJournal();
+    var payload = { classId:classId, subject:subject, teacherId:App.user.uid, date:dms, topic:topic, homework:hw, updatedAt:Date.now() };
+    if (existing) { await db.ref('lessons/' + existing[0]).update(payload); toast('Урок обновлён', 'success'); }
+    else { payload.createdAt = Date.now(); var id = db.ref('lessons').push().key; await db.ref('lessons/' + id).set(payload); toast('Урок добавлен', 'success'); }
+    closeModal(); await loadAll(); renderJournal();
   }});
 
   showModal(ic('calendar', 20) + ' ' + (existing ? 'Редактировать' : 'Новый') + ' урок',
-    '<div class="form-group"><label>Класс / Предмет</label>' +
-      '<input value="' + cls.name + ' / ' + subject + '" disabled></div>' +
-    '<div class="form-group"><label>Дата</label>' +
-      '<input type="date" id="ls-date" value="' + dateStr + '"></div>' +
-    '<div class="form-group"><label>Тема урока</label>' +
-      '<textarea id="ls-topic" placeholder="Например: Вредные привычки">' + (existing ? (existing[1].topic || '') : '') + '</textarea></div>' +
-    '<div class="form-group"><label>Домашняя работа</label>' +
-      '<textarea id="ls-hw" placeholder="Например: параграф 5">' + (existing ? (existing[1].homework || '') : '') + '</textarea></div>',
+    '<div class="form-group"><label>Класс / Предмет</label><input value="' + cls.name + ' / ' + subject + '" disabled></div>' +
+    '<div class="form-group"><label>Дата</label><input type="date" id="ls-date" value="' + dateStr + '"></div>' +
+    '<div class="form-group"><label>Тема урока</label><textarea id="ls-topic" placeholder="Например: Вредные привычки">' + (existing ? (existing[1].topic || '') : '') + '</textarea></div>' +
+    '<div class="form-group"><label>Домашняя работа</label><textarea id="ls-hw" placeholder="Например: параграф 5">' + (existing ? (existing[1].homework || '') : '') + '</textarea></div>',
     actions
   );
 }
@@ -1640,16 +1564,10 @@ function fillYearDialog(classId, subject) {
   }).join('');
 
   showModal(ic('zap', 20) + ' Заполнить уроки на год',
-    '<div class="form-group"><label>Класс / Предмет</label>' +
-      '<input value="' + App.cache.classes[classId].name + ' / ' + subject + '" disabled></div>' +
-    '<div class="form-group"><label>Дата начала</label>' +
-      '<input type="date" id="fy-start" value="' + start + '"></div>' +
-    '<div class="form-group"><label>Дата окончания</label>' +
-      '<input type="date" id="fy-end" value="' + end + '"></div>' +
-    '<div class="form-group"><label>Дни недели уроков</label>' +
-      '<div class="weekday-picker" id="fy-wd">' + wdHtml + '</div>' +
-      '<div class="hint">' + ic('info', 14) + ' Отметьте дни, когда проходят уроки по этому предмету.</div>' +
-    '</div>',
+    '<div class="form-group"><label>Класс / Предмет</label><input value="' + App.cache.classes[classId].name + ' / ' + subject + '" disabled></div>' +
+    '<div class="form-group"><label>Дата начала</label><input type="date" id="fy-start" value="' + start + '"></div>' +
+    '<div class="form-group"><label>Дата окончания</label><input type="date" id="fy-end" value="' + end + '"></div>' +
+    '<div class="form-group"><label>Дни недели уроков</label><div class="weekday-picker" id="fy-wd">' + wdHtml + '</div><div class="hint">' + ic('info', 14) + ' Отметьте дни, когда проходят уроки.</div></div>',
     [
       { label:'Отмена' },
       { label:'Создать уроки', class:'btn-primary', onClick: async function() {
@@ -1658,7 +1576,6 @@ function fillYearDialog(classId, subject) {
         var checked = [];
         document.querySelectorAll('#fy-wd label.on').forEach(function(l) { checked.push(+l.dataset.wd); });
         if (!s || !e || !checked.length) return toast('Заполните даты и выберите дни', 'error');
-
         var u = {};
         var cur = new Date(parseLocalDate(s));
         var endD = new Date(parseLocalDate(e));
@@ -1668,25 +1585,17 @@ function fillYearDialog(classId, subject) {
           if (checked.indexOf(wdNum) !== -1) {
             var dms = new Date(cur.getFullYear(), cur.getMonth(), cur.getDate()).getTime();
             var exists = Object.values(App.cache.lessons).some(function(l) {
-              return l.classId === classId && l.subject === subject &&
-                new Date(l.date).setHours(0,0,0,0) === dms;
+              return l.classId === classId && l.subject === subject && new Date(l.date).setHours(0,0,0,0) === dms;
             });
             if (!exists) {
               var id = db.ref('lessons').push().key;
-              u['lessons/' + id] = {
-                classId: classId, subject: subject,
-                teacherId: App.user.uid,
-                date: dms, topic:'', homework:'',
-                createdAt: Date.now()
-              };
+              u['lessons/' + id] = { classId:classId, subject:subject, teacherId:App.user.uid, date:dms, topic:'', homework:'', createdAt:Date.now() };
               cnt++;
             }
           }
           cur.setDate(cur.getDate() + 1);
         }
-
         if (!cnt) { closeModal(); return toast('Все уроки уже есть', 'warning'); }
-
         var keys = Object.keys(u);
         var chunks = [];
         for (var i = 0; i < keys.length; i += 200) {
@@ -1699,9 +1608,7 @@ function fillYearDialog(classId, subject) {
           closeModal();
           toast('Создано уроков: <b>' + cnt + '</b>', 'success');
           await loadAll(); renderJournal();
-        } catch (err) {
-          toast('Ошибка: ' + err.message, 'error');
-        }
+        } catch (err) { toast('Ошибка: ' + err.message, 'error'); }
       }}
     ],
     { wide:true }
@@ -1719,28 +1626,47 @@ function fillYearDialog(classId, subject) {
   }, 50);
 }
 
+/* ★ Диалог оценки + посещаемость */
 function openGradeCellDialog(classId, subject, studentId, dateMs, existingGradeId) {
   var student = App.cache.students[studentId];
   var cls = App.cache.classes[classId];
   var existing = existingGradeId ? App.cache.grades[existingGradeId] : null;
   var dateStr = toLocalDateStr(dateMs);
 
-  var wt = Object.entries(App.cache.workTypes).sort(function(a, b) { return (a[1].weight || 0) - (b[1].weight || 0); });
-  if (!wt.length) return toast('Сначала создайте типы работ', 'warning');
+  /* Находим существующую отметку посещаемости */
+  var existingAtt = null, existingAttId = null;
+  Object.entries(App.cache.attendance).forEach(function(e) {
+    var a = e[1];
+    if (a.classId === classId && a.subject === subject && a.studentId === studentId &&
+        new Date(a.date).setHours(0,0,0,0) === dateMs) {
+      existingAtt = a; existingAttId = e[0];
+    }
+  });
 
+  var wt = Object.entries(App.cache.workTypes).sort(function(a, b) { return (a[1].weight || 0) - (b[1].weight || 0); });
   var selectedValue = existing ? existing.value : null;
+  var selectedAtt = existingAtt ? (existingAtt.mark || '') : '';
   var wtOpts = wt.map(function(e) {
     return '<option value="' + e[0] + '"' + (existing && existing.typeId === e[0] ? ' selected' : '') + '>' + e[1].name + ' (вес ' + e[1].weight + ')</option>';
   }).join('');
-
   var btns = [5,4,3,2,1].map(function(v) {
     var a = (existing ? existing.value : null) === v ? 'active' : '';
     return '<button type="button" class="grade-btn gb-' + v + ' ' + a + '" data-value="' + v + '">' + v + '</button>';
   }).join('');
+  var attBtns = [
+    { v:'',  lbl:'Был' },
+    { v:'н', lbl:'Н' },
+    { v:'у', lbl:'У' },
+    { v:'о', lbl:'О' }
+  ].map(function(o) {
+    var cls2 = o.v === 'н' ? 'ab-n' : (o.v === 'у' ? 'ab-u' : (o.v === 'о' ? 'ab-o' : 'ab-ok'));
+    var active = selectedAtt === o.v ? 'active' : '';
+    return '<button type="button" class="att-btn ' + cls2 + ' ' + active + '" data-att="' + o.v + '">' + o.lbl + '</button>';
+  }).join('');
 
   var actions = [];
   if (existing) {
-    actions.push({ label:'Удалить', class:'btn-danger', onClick: async function() {
+    actions.push({ label:'Удалить оценку', class:'btn-danger', onClick: async function() {
       if (await confirmDialog('Удалить оценку?', 'Необратимо.')) {
         await db.ref('grades/' + existingGradeId).remove();
         toast('Оценка удалена', 'success');
@@ -1750,49 +1676,59 @@ function openGradeCellDialog(classId, subject, studentId, dateMs, existingGradeI
   }
   actions.push({ label:'Отмена' });
   actions.push({ label:'Сохранить', class:'btn-primary', onClick: async function() {
-    if (!selectedValue) return toast('Выберите оценку', 'error');
     var date = document.getElementById('gd-date').value;
     var typeId = document.getElementById('gd-type').value;
     var notes = document.getElementById('gd-notes').value.trim();
-    var w = App.cache.workTypes[typeId];
     var gd = parseLocalDate(date);
 
-    if (existing) {
-      var hist = (existing.history || []).slice();
-      if (existing.value !== selectedValue) {
-        hist.push({ changedBy: App.user.uid, changedAt: Date.now(), oldValue: existing.value, newValue: selectedValue });
+    /* Сохраняем посещаемость */
+    if (selectedAtt !== '') {
+      if (existingAtt) {
+        await db.ref('attendance/' + existingAttId).update({ mark:selectedAtt, date:gd });
+      } else {
+        var aid = db.ref('attendance').push().key;
+        await db.ref('attendance/' + aid).set({
+          studentId:studentId, classId:classId, subject:subject, date:gd, mark:selectedAtt, teacherId:App.user.uid
+        });
       }
-      await db.ref('grades/' + existingGradeId).update({
-        value: selectedValue, date: gd, typeId: typeId, weight: w.weight, notes: notes, history: hist
-      });
-      toast('Оценка обновлена', 'success');
     } else {
-      var gid = db.ref('grades').push().key;
-      await db.ref('grades/' + gid).set({
-        studentId: studentId, classId: classId, subject: subject,
-        teacherId: App.user.uid,
-        date: gd, typeId: typeId, weight: w.weight,
-        value: selectedValue, notes: notes, history:[]
-      });
-      toast('Оценка выставлена', 'success');
+      if (existingAtt) await db.ref('attendance/' + existingAttId).remove();
+    }
+
+    /* Сохраняем оценку */
+    if (selectedValue) {
+      var w = App.cache.workTypes[typeId];
+      if (existing) {
+        var hist = (existing.history || []).slice();
+        if (existing.value !== selectedValue) hist.push({ changedBy:App.user.uid, changedAt:Date.now(), oldValue:existing.value, newValue:selectedValue });
+        await db.ref('grades/' + existingGradeId).update({ value:selectedValue, date:gd, typeId:typeId, weight:w.weight, notes:notes, history:hist });
+        toast('Изменения сохранены', 'success');
+      } else {
+        var gid = db.ref('grades').push().key;
+        await db.ref('grades/' + gid).set({
+          studentId:studentId, classId:classId, subject:subject, teacherId:App.user.uid,
+          date:gd, typeId:typeId, weight:w.weight, value:selectedValue, notes:notes, history:[]
+        });
+        toast('Оценка выставлена', 'success');
+      }
+    } else {
+      if (existing) {
+        await db.ref('grades/' + existingGradeId).remove();
+      }
+      toast('Сохранено', 'success');
     }
     closeModal();
     await loadAll(); renderJournal();
   }});
 
-  showModal(ic('pencil', 20) + ' Оценка',
-    '<div class="form-group"><label>Класс / Предмет</label>' +
-      '<input value="' + cls.name + ' / ' + subject + '" disabled></div>' +
-    '<div class="form-group"><label>Ученик</label>' +
-      '<input value="' + student.name + '" disabled></div>' +
-    '<div class="form-group"><label>Дата</label>' +
-      '<input type="date" id="gd-date" value="' + dateStr + '"></div>' +
-    '<div class="form-group"><label>Тип работы</label>' +
-      '<select id="gd-type">' + wtOpts + '</select></div>' +
-    '<div class="form-group"><label>Оценка *</label>' +
-      '<div class="grade-picker" id="gd-picker">' + btns + '</div></div>' +
-    '<div class="form-group"><label>Замечания</label>' +
-      '<textarea id="gd-notes" placeholder="Комментарий…">' + (existing && existing.notes ? existing.notes : '') + '</textarea></div>',
+  showModal(ic('pencil', 20) + ' Оценка и посещаемость',
+    '<div class="form-group"><label>Класс / Предмет</label><input value="' + cls.name + ' / ' + subject + '" disabled></div>' +
+    '<div class="form-group"><label>Ученик</label><input value="' + student.name + '" disabled></div>' +
+    '<div class="form-group"><label>Дата</label><input type="date" id="gd-date" value="' + dateStr + '"></div>' +
+    '<div class="form-group"><label>Посещаемость</label><div class="att-picker" id="gd-att-picker">' + attBtns + '</div><div class="hint" style="margin-top:6px;"><b>Н</b> — не был, <b>У</b> — уважительная, <b>О</b> — опоздал</div></div>' +
+    '<div class="form-group"><label>Тип работы</label><select id="gd-type">' + wtOpts + '</select></div>' +
+    '<div class="form-group"><label>Оценка</label><div class="grade-picker" id="gd-picker">' + btns + '</div><div class="hint" style="margin-top:6px;">Нажмите на оценку ещё раз, чтобы снять выбор</div></div>' +
+    '<div class="form-group"><label>Замечания</label><textarea id="gd-notes" placeholder="Комментарий…">' + (existing && existing.notes ? existing.notes : '') + '</textarea></div>',
     actions
   );
 
@@ -1800,26 +1736,111 @@ function openGradeCellDialog(classId, subject, studentId, dateMs, existingGradeI
     var p = document.getElementById('gd-picker');
     p.querySelectorAll('.grade-btn').forEach(function(b) {
       b.onclick = function() {
-        p.querySelectorAll('.grade-btn').forEach(function(x) { x.classList.remove('active'); });
+        var cur = +b.dataset.value;
+        if (selectedValue === cur) {
+          selectedValue = null;
+          p.querySelectorAll('.grade-btn').forEach(function(x) { x.classList.remove('active'); });
+        } else {
+          p.querySelectorAll('.grade-btn').forEach(function(x) { x.classList.remove('active'); });
+          b.classList.add('active');
+          selectedValue = cur;
+        }
+      };
+    });
+    var ap = document.getElementById('gd-att-picker');
+    ap.querySelectorAll('.att-btn').forEach(function(b) {
+      b.onclick = function() {
+        ap.querySelectorAll('.att-btn').forEach(function(x) { x.classList.remove('active'); });
         b.classList.add('active');
-        selectedValue = +b.dataset.value;
+        selectedAtt = b.dataset.att;
       };
     });
   }, 50);
 }
 
-function exportJournalCSV(classId, subject) {
+/* ★ Экспорт в Excel через HTML-таблицу */
+function exportJournalXLS(classId, subject, quarterId) {
+  var cls = App.cache.classes[classId];
+  var students = Object.entries(App.cache.students).filter(function(e) { return e[1].classId === classId; })
+    .sort(function(a, b) { return a[1].name.localeCompare(b[1].name); });
+  var grades = Object.entries(App.cache.grades)
+    .filter(function(e) { return e[1].classId === classId && e[1].subject === subject; })
+    .map(function(e) { return Object.assign({}, e[1], { id: e[0], dms: new Date(e[1].date).setHours(0,0,0,0) }); })
+    .filter(function(g) { return inQuarter(g.dms, quarterId); });
+  var atts = Object.entries(App.cache.attendance)
+    .filter(function(e) { return e[1].classId === classId && e[1].subject === subject; })
+    .map(function(e) { return Object.assign({}, e[1], { id: e[0], dms: new Date(e[1].date).setHours(0,0,0,0) }); })
+    .filter(function(a) { return inQuarter(a.dms, quarterId); });
+  var dateSet = {};
+  grades.forEach(function(g) { dateSet[g.dms] = true; });
+  atts.forEach(function(a) { dateSet[a.dms] = true; });
+  var ds = Object.keys(dateSet).map(Number).sort(function(a, b) { return a - b; });
+
+  var html = '<html><head><meta charset="UTF-8"><style>' +
+    'table{border-collapse:collapse;font-family:Arial,sans-serif;font-size:11px}' +
+    'th,td{border:1px solid #999;padding:3px 5px;text-align:center}' +
+    'th{background:#0EA5E9;color:#fff;font-weight:bold}' +
+    'td.name{text-align:left;font-weight:bold}' +
+    'td.g5{background:#10B981;color:#fff;font-weight:bold}' +
+    'td.g4{background:#84CC16;color:#fff;font-weight:bold}' +
+    'td.g3{background:#F59E0B;color:#fff;font-weight:bold}' +
+    'td.g2{background:#EF4444;color:#fff;font-weight:bold}' +
+    'td.g1{background:#991B1B;color:#fff;font-weight:bold}' +
+    'td.avg{background:#E0F2FE;font-weight:bold}' +
+    'td.att{background:#FEF3C7;font-weight:bold}' +
+    '</style></head><body>';
+  html += '<h2>Журнал: ' + cls.name + ' / ' + subject + (quarterId !== 'all' ? ' (' + quarterName(quarterId) + ')' : '') + '</h2>';
+  html += '<table><tr><th>№</th><th>Ученик</th>';
+  ds.forEach(function(d) { html += '<th>' + new Date(d).toLocaleDateString('ru-RU') + '</th>'; });
+  html += '<th>Средний</th><th>Итог</th></tr>';
+
+  students.forEach(function(entry, i) {
+    var sid = entry[0], s = entry[1];
+    html += '<tr><td>' + (i + 1) + '</td><td class="name">' + s.name + '</td>';
+    ds.forEach(function(d) {
+      var g = grades.find(function(x) { return x.studentId === sid && x.dms === d; });
+      var a = atts.find(function(x) { return x.studentId === sid && x.dms === d; });
+      var att = a ? (a.mark === 'н' ? 'Н' : (a.mark === 'у' ? 'У' : 'О')) : '';
+      if (g) {
+        var v = String(g.value);
+        if (att) html += '<td class="g' + Math.round(g.value) + '">' + v + ' (' + att + ')</td>';
+        else html += '<td class="g' + Math.round(g.value) + '">' + v + '</td>';
+      } else if (att) {
+        html += '<td class="att">' + att + '</td>';
+      } else {
+        html += '<td></td>';
+      }
+    });
+    var sg = grades.filter(function(x) { return x.studentId === sid; });
+    var avg = weightedAvg(sg);
+    html += '<td class="avg">' + (avg || '—') + '</td>';
+    html += '<td class="avg">' + (avg ? Math.round(avg) : '—') + '</td></tr>';
+  });
+  html += '</table></body></html>';
+
+  var blob = new Blob(['\uFEFF' + html], { type:'application/vnd.ms-excel;charset=utf-8' });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = 'journal_' + cls.name + '_' + subject + (quarterId !== 'all' ? '_' + quarterId : '') + '.xls';
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('Excel-файл скачан', 'success');
+}
+
+function exportJournalCSV(classId, subject, quarterId) {
   var cls = App.cache.classes[classId];
   var st = Object.entries(App.cache.students).filter(function(e) { return e[1].classId === classId; })
     .sort(function(a, b) { return a[1].name.localeCompare(b[1].name); });
   var g = Object.entries(App.cache.grades)
     .filter(function(e) { return e[1].classId === classId && e[1].subject === subject; })
-    .map(function(e) { return Object.assign({}, e[1], { id: e[0], dms: new Date(e[1].date).setHours(0,0,0,0) }); });
+    .map(function(e) { return Object.assign({}, e[1], { id: e[0], dms: new Date(e[1].date).setHours(0,0,0,0) }); })
+    .filter(function(x) { return inQuarter(x.dms, quarterId); });
   var dateSet = {};
   g.forEach(function(x) { dateSet[x.dms] = true; });
   var ds = Object.keys(dateSet).map(Number).sort(function(a, b) { return a - b; });
 
-  var csv = 'Журнал ' + cls.name + ' / ' + subject + '\n';
+  var csv = 'Журнал ' + cls.name + ' / ' + subject + (quarterId !== 'all' ? ' — ' + quarterName(quarterId) : '') + '\n';
   csv += '№;Ученик;' + ds.map(function(d) { return new Date(d).toLocaleDateString('ru-RU'); }).join(';') + ';Средний\n';
 
   st.forEach(function(entry, i) {
@@ -1838,11 +1859,87 @@ function exportJournalCSV(classId, subject) {
   var u = URL.createObjectURL(b);
   var a = document.createElement('a');
   a.href = u;
-  a.download = 'journal_' + cls.name + '_' + subject + '.csv';
+  a.download = 'journal_' + cls.name + '_' + subject + (quarterId !== 'all' ? '_' + quarterId : '') + '.csv';
   a.click();
   URL.revokeObjectURL(u);
 }
 
+/* ★ Импорт учеников из CSV */
+function importCSVDialog(classId) {
+  var input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.csv,.txt,text/csv,text/plain';
+  input.onchange = function(e) {
+    var file = e.target.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = async function(ev) {
+      try {
+        var text = ev.target.result || '';
+        /* Убираем BOM */
+        text = text.replace(/^\uFEFF/, '');
+        /* Разбиваем на строки */
+        var lines = text.split(/\r?\n/);
+        var names = [];
+        lines.forEach(function(line) {
+          var s = (line || '').trim();
+          if (!s) return;
+          /* Разбиваем по ; или , или табуляции */
+          var parts = s.split(/[;\t]|,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(function(p) {
+            return p.trim().replace(/^"+|"+$/g, '').trim();
+          }).filter(Boolean);
+          if (!parts.length) return;
+          /* Отбрасываем явные заголовки */
+          if (/^(№|no|number|фио|имя|ученик|ученики|fio|name)$/i.test(parts[0])) return;
+          /* Ищем подходящее имя — самое длинное из частей */
+          var name = parts.reduce(function(a, b) { return b.length > a.length ? b : a; }, '');
+          if (name && name.length >= 3 && /[А-Яа-яЁёA-Za-z]/.test(name)) {
+            names.push(name);
+          }
+        });
+
+        /* Убираем дубликаты */
+        var seen = {};
+        names = names.filter(function(n) {
+          var key = n.toLowerCase();
+          if (seen[key]) return false;
+          seen[key] = true;
+          return true;
+        });
+
+        if (!names.length) {
+          return toast('Не удалось найти имена в файле. Проверьте формат: одна фамилия в строке или через запятую.', 'error');
+        }
+
+        var ok = await warnDialog('Импорт учеников',
+          'Найдено имён: <b>' + names.length + '</b><br><br>' +
+          'Первые 5:<br>' + names.slice(0, 5).map(function(n) { return '• ' + n; }).join('<br>') +
+          (names.length > 5 ? '<br>…и ещё ' + (names.length - 5) : '') +
+          '<br><br>Добавить их в класс?',
+          'Добавить ' + names.length);
+        if (!ok) return;
+
+        var u = {};
+        var now = Date.now();
+        names.forEach(function(n, i) {
+          var id = db.ref('students').push().key;
+          u['students/' + id] = { name:n, classId:classId, createdAt:now + i };
+        });
+        await db.ref().update(u);
+        toast('Импортировано учеников: <b>' + names.length + '</b>', 'success');
+        await loadAll();
+        if (location.hash.indexOf('#class/') === 0) renderClassDetail(classId);
+        else router();
+      } catch (err) {
+        toast('Ошибка чтения файла: ' + err.message, 'error');
+      }
+    };
+    reader.readAsText(file, 'UTF-8');
+  };
+  input.click();
+}
+
+/* ---- остальные виды ---- */
 async function renderStudents() {
   $('#page-title').textContent = 'Ученики';
   var c = $('#content'); c.innerHTML = '';
@@ -1851,15 +1948,16 @@ async function renderStudents() {
   var card = el('div', { class:'card' });
   card.appendChild(el('div', { class:'card-header' },
     el('div', { class:'card-title' }, 'Все мои ученики'),
-    has ? el('button', { class:'btn btn-primary btn-sm', html: ic('userPlus', 14) + ' Добавить учеников', onclick: addStudentsDialog })
-        : el('span', { class:'hint' }, 'Сначала создайте класс')
+    has ? el('div', { style:'display:flex;gap:6px;flex-wrap:wrap;' },
+      el('button', { class:'btn btn-success btn-sm', html: ic('upload', 14) + ' Импорт CSV', onclick: function() { importCSVWithClassDialog(); } }),
+      el('button', { class:'btn btn-primary btn-sm', html: ic('userPlus', 14) + ' Добавить', onclick: addStudentsDialog })
+    ) : el('span', { class:'hint' }, 'Сначала создайте класс')
   ));
   var ids = Object.keys(cls);
   var st = Object.entries(App.cache.students).filter(function(e) { return ids.indexOf(e[1].classId) !== -1; })
     .sort(function(a, b) { return a[1].name.localeCompare(b[1].name); });
-  if (!st.length) {
-    card.appendChild(el('div', { class:'empty' }, 'Учеников пока нет'));
-  } else {
+  if (!st.length) card.appendChild(el('div', { class:'empty' }, 'Учеников пока нет'));
+  else {
     var t = el('table');
     t.innerHTML = '<thead><tr><th>#</th><th>ФИО</th><th>Класс</th><th>Средний</th></tr></thead>';
     var tb = el('tbody');
@@ -1871,10 +1969,37 @@ async function renderStudents() {
       tr.innerHTML = '<td>' + (i + 1) + '</td><td>' + s.name + '</td><td>' + (cl ? cl.name : '—') + '</td><td><span class="grade ' + gradeClass(a) + '">' + (a || '—') + '</span></td>';
       tb.appendChild(tr);
     });
-    t.appendChild(tb);
-    card.appendChild(t);
+    t.appendChild(tb); card.appendChild(t);
   }
   c.appendChild(card);
+}
+
+/* Выбор класса для импорта CSV */
+function importCSVWithClassDialog() {
+  var cls = myClasses();
+  if (!Object.keys(cls).length) return toast('Сначала создайте класс', 'warning');
+  var opts = Object.entries(cls)
+    .sort(function(a, b) { return a[1].name.localeCompare(b[1].name); })
+    .map(function(e) { return '<option value="' + e[0] + '">' + e[1].name + '</option>'; }).join('');
+  showModal(ic('upload', 20) + ' Импорт из CSV',
+    '<div class="form-group"><label>Класс</label><select id="imp-csv-class">' + opts + '</select></div>' +
+    '<div class="form-group"><label>Как это работает</label>' +
+      '<div class="hint" style="flex-direction:column;align-items:flex-start;line-height:1.7;">' +
+        '<span>• Файл <b>.csv</b> или <b>.txt</b>, кодировка UTF-8</span>' +
+        '<span>• Одна фамилия в строке — например:<br>Иванов Иван Иванович<br>Петров Пётр Петрович</span>' +
+        '<span>• Или через запятую: «Иванов И.И., Петров П.П., Сидорова А.С.»</span>' +
+        '<span>• Первая строка с заголовками «ФИО / № / Name» пропускается</span>' +
+      '</div>' +
+    '</div>',
+    [
+      { label:'Отмена' },
+      { label:'Выбрать файл', class:'btn-primary', onclick: function() {
+        var cid = document.getElementById('imp-csv-class').value;
+        closeModal();
+        setTimeout(function() { importCSVDialog(cid); }, 100);
+      }}
+    ]
+  );
 }
 
 async function renderWorkTypes() {
@@ -1886,9 +2011,8 @@ async function renderWorkTypes() {
     el('button', { class:'btn btn-primary', html: ic('plus', 16) + ' Добавить тип', onclick: addWorkTypeDialog })
   ));
   var it = Object.entries(App.cache.workTypes).sort(function(a, b) { return (a[1].weight || 0) - (b[1].weight || 0); });
-  if (!it.length) {
-    card.appendChild(el('div', { class:'empty' }, 'Типов пока нет'));
-  } else {
+  if (!it.length) card.appendChild(el('div', { class:'empty' }, 'Типов пока нет'));
+  else {
     var t = el('table');
     t.innerHTML = '<thead><tr><th>Название</th><th>Код</th><th>Вес</th><th></th></tr></thead>';
     var tb = el('tbody');
@@ -1903,11 +2027,9 @@ async function renderWorkTypes() {
           await loadAll(); renderWorkTypes();
         }
       }}));
-      tr.appendChild(a);
-      tb.appendChild(tr);
+      tr.appendChild(a); tb.appendChild(tr);
     });
-    t.appendChild(tb);
-    card.appendChild(t);
+    t.appendChild(tb); card.appendChild(t);
   }
   c.appendChild(card);
 }
@@ -1930,12 +2052,20 @@ async function renderProfile() {
     '<div class="form-group" style="max-width:340px;">' +
       '<label>Размер журнала</label>' +
       '<select id="device-select">' +
-        '<option value="auto">🔄 Авто (по ширине экрана)</option>' +
-        '<option value="phone">📱 Телефон — макс. компактно</option>' +
-        '<option value="tablet">💻 Планшет — обычный</option>' +
-        '<option value="desktop">🖥️ Компьютер — просторно</option>' +
+        '<option value="auto">🔄 Авто</option>' +
+        '<option value="phone">📱 Телефон</option>' +
+        '<option value="tablet">💻 Планшет</option>' +
+        '<option value="desktop">🖥️ Компьютер</option>' +
       '</select>' +
-      '<div class="hint" style="margin-top:6px;">Влияет на размер ячеек и шрифт в журнале.</div>' +
+    '</div>' +
+    '<hr style="border:none;border-top:1px solid var(--border);margin:18px 0;">' +
+    '<div style="font-size:14px;font-weight:700;margin-bottom:10px;">Справка по четвертям</div>' +
+    '<div style="font-size:12px;color:var(--text-muted);line-height:1.7;">' +
+      QUARTERS.map(function(q) {
+        var m1 = ['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек'][q.sm];
+        var m2 = ['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек'][q.em];
+        return '<div><b>' + q.name + ':</b> ' + q.sd + ' ' + m1 + ' — ' + q.ed + ' ' + m2 + '</div>';
+      }).join('') +
     '</div>';
   c.appendChild(card);
 
@@ -1946,12 +2076,12 @@ async function renderProfile() {
       var v = devSel.value;
       localStorage.setItem('device', v);
       applyDevice(v);
-      var label = { auto:'авто', phone:'телефон', tablet:'планшет', desktop:'компьютер' }[v];
-      toast('Размер журнала: ' + label, 'success');
+      toast('Размер журнала обновлён', 'success');
     };
   }
 }
 
+/* ---- ДИАЛОГИ ---- */
 function addCityDialog() {
   showModal(ic('city', 20) + ' Новый город',
     '<div class="form-group"><label>Название</label><input id="m-city-name" placeholder="Москва"></div>',
@@ -1959,16 +2089,14 @@ function addCityDialog() {
       var n = document.getElementById('m-city-name').value.trim();
       if (!n) return;
       var id = db.ref('cities').push().key;
-      await db.ref('cities/' + id).set({ name: n, creatorId: App.user.uid, createdAt: Date.now() });
+      await db.ref('cities/' + id).set({ name:n, creatorId:App.user.uid, createdAt:Date.now() });
       closeModal(); toast('Город создан', 'success');
       await loadAll(); renderCities();
     }}]
   );
 }
-
 function addSchoolDialog() {
-  var cities = App.cache.cities;
-  var opts = Object.entries(cities)
+  var opts = Object.entries(App.cache.cities)
     .filter(function(e) { return App.profile.role !== 'city_creator' || e[0] === App.profile.cityId; })
     .map(function(e) { return '<option value="' + e[0] + '">' + e[1].name + '</option>'; }).join('');
   if (!opts) return toast('Сначала создайте город', 'warning');
@@ -1980,13 +2108,12 @@ function addSchoolDialog() {
       var cid = document.getElementById('m-school-city').value;
       if (!n || !cid) return;
       var id = db.ref('schools').push().key;
-      await db.ref('schools/' + id).set({ name: n, cityId: cid, creatorId: App.user.uid, createdAt: Date.now() });
+      await db.ref('schools/' + id).set({ name:n, cityId:cid, creatorId:App.user.uid, createdAt:Date.now() });
       closeModal(); toast('Школа создана', 'success');
       await loadAll(); renderSchools();
     }}]
   );
 }
-
 function createCityCreatorDialog(cityId) {
   showModal(ic('userPlus', 20) + ' Создатель города',
     '<div class="form-group"><label>ФИО</label><input id="cc-name"></div>' +
@@ -2010,7 +2137,6 @@ function createCityCreatorDialog(cityId) {
     }}]
   );
 }
-
 function createSchoolCreatorDialog(schoolId, cityId) {
   showModal(ic('userPlus', 20) + ' Создатель школы',
     '<div class="form-group"><label>ФИО</label><input id="sc-name"></div>' +
@@ -2034,35 +2160,28 @@ function createSchoolCreatorDialog(schoolId, cityId) {
     }}]
   );
 }
-
 function createInvite() {
   var code = Math.random().toString(36).substring(2, 8).toUpperCase();
   var exp = Date.now() + 7 * 24 * 60 * 60 * 1000;
   db.ref('invites/' + code).set({
-    role:'teacher',
-    schoolId: App.profile.schoolId || null,
-    cityId: App.profile.cityId || null,
-    createdBy: App.user.uid,
-    used: false, createdAt: Date.now(), expiresAt: exp
+    role:'teacher', schoolId:App.profile.schoolId || null, cityId:App.profile.cityId || null,
+    createdBy:App.user.uid, used:false, createdAt:Date.now(), expiresAt:exp
   }).then(async function() {
     toast('Код создан: <b>' + code + '</b>', 'success');
     await loadAll(); renderInvites();
   });
 }
-
 function addClassDialog() {
   var gh = POPULAR_SUBJECTS.map(function(g, gi) {
-    var itemsHtml = g.items.map(function(n) {
+    var items = g.items.map(function(n) {
       return '<label class="subject-item" data-name="' + n + '"><input type="checkbox" value="' + n + '"><span>' + n + '</span></label>';
     }).join('');
-    return '<div class="subject-group" data-group="' + gi + '"><div class="subject-group-title">' + ic('list', 12) + ' ' + g.group + '</div>' + itemsHtml + '</div>';
+    return '<div class="subject-group" data-group="' + gi + '"><div class="subject-group-title">' + ic('list', 12) + ' ' + g.group + '</div>' + items + '</div>';
   }).join('');
-
   var d = showModal(ic('cap', 20) + ' Новый класс',
     '<div class="form-group"><label>Название</label><input id="m-cl-name" placeholder="1А"></div>' +
     '<div class="form-group"><label>Год</label><input id="m-cl-year" type="number" value="' + new Date().getFullYear() + '"></div>' +
-    '<div class="form-group">' +
-      '<label>Предметы</label>' +
+    '<div class="form-group"><label>Предметы</label>' +
       '<div class="subjects-toolbar">' +
         '<input type="text" id="m-cl-search" placeholder="Поиск...">' +
         '<button type="button" class="btn btn-sm btn-ghost" id="m-cl-all">Все</button>' +
@@ -2079,37 +2198,25 @@ function addClassDialog() {
       if (!n) return toast('Введите название', 'error');
       if (!subs.length) return toast('Выберите предметы', 'error');
       var id = db.ref('classes').push().key;
-      await db.ref('classes/' + id).set({
-        name: n, year: y, subjects: subs,
-        teacherId: App.user.uid,
-        schoolId: App.profile.schoolId || null,
-        createdAt: Date.now()
-      });
+      await db.ref('classes/' + id).set({ name:n, year:y, subjects:subs, teacherId:App.user.uid, schoolId:App.profile.schoolId || null, createdAt:Date.now() });
       closeModal();
       toast('Класс создан, предметов: <b>' + subs.length + '</b>', 'success');
       await loadAll(); renderClasses();
     }}],
     { wide:true }
   );
-
   setTimeout(function() {
     var search = d.querySelector('#m-cl-search');
     var counter = d.querySelector('#m-cl-counter');
     var items = d.querySelectorAll('.subject-item');
-    var upd = function() {
-      counter.textContent = d.querySelectorAll('.subject-item input:checked').length;
-    };
+    var upd = function() { counter.textContent = d.querySelectorAll('.subject-item input:checked').length; };
     items.forEach(function(it) {
       var cb = it.querySelector('input');
       it.addEventListener('click', function(e) {
         if (e.target !== cb) cb.checked = !cb.checked;
-        it.classList.toggle('checked', cb.checked);
-        upd();
+        it.classList.toggle('checked', cb.checked); upd();
       });
-      cb.addEventListener('change', function() {
-        it.classList.toggle('checked', cb.checked);
-        upd();
-      });
+      cb.addEventListener('change', function() { it.classList.toggle('checked', cb.checked); upd(); });
     });
     search.oninput = function() {
       var q = search.value.toLowerCase().trim();
@@ -2119,66 +2226,45 @@ function addClassDialog() {
       });
       d.querySelectorAll('.subject-group').forEach(function(g) {
         var vis = false;
-        g.querySelectorAll('.subject-item').forEach(function(i) {
-          if (i.style.display !== 'none') vis = true;
-        });
+        g.querySelectorAll('.subject-item').forEach(function(i) { if (i.style.display !== 'none') vis = true; });
         g.style.display = vis ? '' : 'none';
       });
     };
     d.querySelector('#m-cl-all').onclick = function() {
-      items.forEach(function(i) {
-        if (i.style.display !== 'none') {
-          i.querySelector('input').checked = true;
-          i.classList.add('checked');
-        }
-      });
+      items.forEach(function(i) { if (i.style.display !== 'none') { i.querySelector('input').checked = true; i.classList.add('checked'); } });
       upd();
     };
     d.querySelector('#m-cl-clr').onclick = function() {
-      items.forEach(function(i) {
-        i.querySelector('input').checked = false;
-        i.classList.remove('checked');
-      });
+      items.forEach(function(i) { i.querySelector('input').checked = false; i.classList.remove('checked'); });
       upd();
     };
     if (d.querySelector('#m-cl-name')) d.querySelector('#m-cl-name').focus();
     upd();
   }, 50);
 }
-
 function addStudentDialog(classId) {
   showModal(ic('userPlus', 20) + ' Новые ученики',
-    '<div class="form-group">' +
-      '<label>ФИО учеников</label>' +
-      '<textarea id="m-st-names" placeholder="Иванов Иван, Петров Пётр, Сидорова Анна"></textarea>' +
-      '<div class="hint">' + ic('info', 14) + ' Через запятую или с новой строки.</div>' +
-    '</div>',
+    '<div class="form-group"><label>ФИО учеников</label><textarea id="m-st-names" placeholder="Иванов Иван, Петров Пётр, Сидорова Анна"></textarea><div class="hint">' + ic('info', 14) + ' Через запятую или с новой строки.</div></div>',
     [{ label:'Отмена' }, { label:'Добавить', class:'btn-primary', onClick: async function() {
       var raw = document.getElementById('m-st-names').value;
       var ns = raw.split(/[,\n]+/).map(function(s) { return s.trim(); }).filter(Boolean);
       if (!ns.length) return toast('Введите ФИО', 'error');
-      var u = {};
-      var now = Date.now();
+      var u = {}, now = Date.now();
       ns.forEach(function(n, i) {
         var id = db.ref('students').push().key;
-        u['students/' + id] = { name: n, classId: classId, createdAt: now + i };
+        u['students/' + id] = { name:n, classId:classId, createdAt:now + i };
       });
       await db.ref().update(u);
-      closeModal();
-      toast('Добавлено: <b>' + ns.length + '</b>', 'success');
+      closeModal(); toast('Добавлено: <b>' + ns.length + '</b>', 'success');
       await loadAll(); renderClassDetail(classId);
     }}]
   );
-  setTimeout(function() {
-    if (document.getElementById('m-st-names')) document.getElementById('m-st-names').focus();
-  }, 100);
+  setTimeout(function() { if (document.getElementById('m-st-names')) document.getElementById('m-st-names').focus(); }, 100);
 }
-
 function addStudentsDialog() {
   var cls = myClasses();
   if (!Object.keys(cls).length) return toast('Сначала создайте класс', 'warning');
-  var opts = Object.entries(cls)
-    .sort(function(a, b) { return a[1].name.localeCompare(b[1].name); })
+  var opts = Object.entries(cls).sort(function(a, b) { return a[1].name.localeCompare(b[1].name); })
     .map(function(e) { return '<option value="' + e[0] + '">' + e[1].name + '</option>'; }).join('');
   showModal(ic('userPlus', 20) + ' Добавить учеников',
     '<div class="form-group"><label>Класс</label><select id="m-as-class">' + opts + '</select></div>' +
@@ -2188,36 +2274,31 @@ function addStudentsDialog() {
       var raw = document.getElementById('m-as-names').value;
       var ns = raw.split(/[,\n]+/).map(function(s) { return s.trim(); }).filter(Boolean);
       if (!ns.length) return toast('Введите ФИО', 'error');
-      var u = {};
-      var now = Date.now();
+      var u = {}, now = Date.now();
       ns.forEach(function(n, i) {
         var id = db.ref('students').push().key;
-        u['students/' + id] = { name: n, classId: cid, createdAt: now + i };
+        u['students/' + id] = { name:n, classId:cid, createdAt:now + i };
       });
       await db.ref().update(u);
-      closeModal();
-      toast('Добавлено: <b>' + ns.length + '</b>', 'success');
+      closeModal(); toast('Добавлено: <b>' + ns.length + '</b>', 'success');
       await loadAll(); renderStudents();
     }}]
   );
 }
-
 async function deleteStudent(sid, name) {
   if (await confirmDialog('Удалить ученика?', '"' + name + '" будет удалён вместе с оценками.')) {
     var u = {}; u['students/' + sid] = null;
-    Object.entries(App.cache.grades).forEach(function(e) {
-      if (e[1].studentId === sid) u['grades/' + e[0]] = null;
-    });
+    Object.entries(App.cache.grades).forEach(function(e) { if (e[1].studentId === sid) u['grades/' + e[0]] = null; });
+    Object.entries(App.cache.attendance).forEach(function(e) { if (e[1].studentId === sid) u['attendance/' + e[0]] = null; });
     await db.ref().update(u);
     toast('Ученик удалён', 'success');
     await loadAll(); router();
   }
 }
-
 function addWorkTypeDialog() {
   showModal(ic('tag', 20) + ' Новый тип работы',
     '<div class="form-group"><label>Название</label><input id="m-wt-name" placeholder="Контрольная работа"></div>' +
-    '<div class="form-group"><label>Код (короткий, до 5 букв)</label><input id="m-wt-code" placeholder="К/Р" maxlength="5"></div>' +
+    '<div class="form-group"><label>Код</label><input id="m-wt-code" placeholder="К/Р" maxlength="5"></div>' +
     '<div class="form-group"><label>Вес (1–10)</label><input id="m-wt-weight" type="number" min="1" max="10" value="1"></div>',
     [{ label:'Отмена' }, { label:'Создать', class:'btn-primary', onClick: async function() {
       var n = document.getElementById('m-wt-name').value.trim();
@@ -2225,17 +2306,15 @@ function addWorkTypeDialog() {
       var w = +document.getElementById('m-wt-weight').value;
       if (!n || w < 1) return;
       var id = db.ref('workTypes').push().key;
-      await db.ref('workTypes/' + id).set({ name: n, code: c, weight: w, schoolId: App.profile.schoolId || null, createdBy: App.user.uid });
+      await db.ref('workTypes/' + id).set({ name:n, code:c, weight:w, schoolId:App.profile.schoolId || null, createdBy:App.user.uid });
       closeModal(); toast('Тип добавлен', 'success');
       await loadAll(); renderWorkTypes();
     }}]
   );
 }
-
 function resetPasswordDialog(email) {
   if (!email) return toast('Нет email', 'error');
-  showModal(ic('key', 20) + ' Сброс пароля',
-    '<p>Отправить письмо на <b>' + email + '</b>?</p>',
+  showModal(ic('key', 20) + ' Сброс пароля', '<p>Отправить письмо на <b>' + email + '</b>?</p>',
     [{ label:'Отмена' }, { label:'Отправить', class:'btn-primary', onClick: async function() {
       try { await auth.sendPasswordResetEmail(email); toast('Письмо отправлено', 'success'); }
       catch (e) { toast(e.message, 'error'); }
@@ -2243,21 +2322,16 @@ function resetPasswordDialog(email) {
     }}]
   );
 }
-
 function weightedAvg(list) {
   var s = list.reduce(function(a, g) { return a + g.value * g.weight; }, 0);
   var w = list.reduce(function(a, g) { return a + g.weight; }, 0);
   return w ? Math.round(s / w * 100) / 100 : 0;
 }
 function avgForStudent(sid, cid) {
-  return weightedAvg(Object.values(App.cache.grades).filter(function(g) {
-    return g.studentId === sid && (!cid || g.classId === cid);
-  }));
+  return weightedAvg(Object.values(App.cache.grades).filter(function(g) { return g.studentId === sid && (!cid || g.classId === cid); }));
 }
 function countStudentsBySchool() {
-  var ids = Object.entries(App.cache.classes)
-    .filter(function(e) { return e[1].schoolId === App.profile.schoolId; })
-    .map(function(e) { return e[0]; });
+  var ids = Object.entries(App.cache.classes).filter(function(e) { return e[1].schoolId === App.profile.schoolId; }).map(function(e) { return e[0]; });
   return Object.values(App.cache.students).filter(function(s) { return ids.indexOf(s.classId) !== -1; }).length;
 }
 function countStudentsInMyClasses() {
@@ -2284,10 +2358,8 @@ function showApp() {
   $('#auth-screen').style.display = 'none';
   $('#app-screen').style.display = 'flex';
 }
-
 async function startApp(user, profile) {
-  App.user = user;
-  App.profile = profile;
+  App.user = user; App.profile = profile;
   showLoader('Загрузка данных…');
   $('#user-name').textContent = profile.name || profile.login || '';
   $('#user-role').textContent = roleLabel(profile.role);
@@ -2304,14 +2376,12 @@ async function startApp(user, profile) {
     showApp();
   }
 }
-
 $('#logout-btn').onclick = async function() {
   var b = $('#logout-btn');
   b.disabled = true;
   b.innerHTML = ic('logout', 16) + ' Выход…';
   clearSession();
-  App.user = null;
-  App.profile = null;
+  App.user = null; App.profile = null;
   try { await auth.signOut(); } catch (e) {}
   location.reload();
 };
@@ -2320,21 +2390,13 @@ $('#menu-toggle').onclick = function() { $('#sidebar').classList.toggle('open');
 (async function() {
   showLoader('Загрузка…');
   var s = getSession();
-  if (s && s.user && s.profile) {
-    await startApp(s.user, s.profile);
-    return;
-  }
+  if (s && s.user && s.profile) { await startApp(s.user, s.profile); return; }
   auth.onAuthStateChanged(async function(fbUser) {
     if (!fbUser) { showAuth(); return; }
     showLoader('Загрузка профиля…');
     try {
       var snap = await db.ref('users/' + fbUser.uid).once('value');
-      if (!snap.exists()) {
-        toast('Профиль не найден', 'error');
-        await auth.signOut();
-        showAuth();
-        return;
-      }
+      if (!snap.exists()) { toast('Профиль не найден', 'error'); await auth.signOut(); showAuth(); return; }
       var p = snap.val();
       setSession({ uid: fbUser.uid, email: fbUser.email }, p);
       await startApp({ uid: fbUser.uid, email: fbUser.email }, p);
