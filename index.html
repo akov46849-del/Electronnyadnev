@@ -6,20 +6,8 @@
 <title>Класс Жур — электронный журнал</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'><rect width='120' height='120' rx='28' fill='%230EA5E9'/><path d='M25 40 Q60 30 60 40 Q60 30 95 40 L95 82 Q60 72 60 82 Q60 72 25 82 Z' fill='%23FFFFFF'/><line x1='60' y1='40' x2='60' y2='82' stroke='%230EA5E9' stroke-width='2'/><path d='M42 60 L56 74 L84 46' stroke='%23FACC15' stroke-width='6' stroke-linecap='round' stroke-linejoin='round' fill='none'/></svg>">
 <style>
-:root{
-  --bg:#F8FAFC;--bg-elev:#FFFFFF;--text:#0F172A;--text-muted:#64748B;--border:#E2E8F0;
-  --primary:#0EA5E9;--primary-hover:#0284C7;--accent:#A855F7;
-  --danger:#EF4444;--success:#10B981;--warning:#F59E0B;
-  --shadow:0 1px 3px rgba(15,23,42,.08);--shadow-lg:0 10px 25px rgba(14,165,233,.18);
-  --radius:12px;--radius-lg:18px;--transition:.2s ease;
-  --j-cell:22px;--j-row:22px;--j-font:10px;--j-head-font:10px;
-  --j-name-w:140px;--j-num-w:24px;--j-avg-w:44px;
-}
-[data-theme="dark"]{
-  --bg:#0F172A;--bg-elev:#1E293B;--text:#E2E8F0;--text-muted:#94A3B8;--border:#334155;
-  --primary:#38BDF8;--accent:#C084FC;
-  --shadow:0 1px 3px rgba(0,0,0,.4);--shadow-lg:0 10px 25px rgba(56,189,248,.25);
-}
+:root{--bg:#F8FAFC;--bg-elev:#FFF;--text:#0F172A;--text-muted:#64748B;--border:#E2E8F0;--primary:#0EA5E9;--primary-hover:#0284C7;--accent:#A855F7;--danger:#EF4444;--success:#10B981;--warning:#F59E0B;--shadow:0 1px 3px rgba(15,23,42,.08);--shadow-lg:0 10px 25px rgba(14,165,233,.18);--radius:12px;--radius-lg:18px;--transition:.2s ease;--j-cell:22px;--j-row:22px;--j-font:10px;--j-head-font:10px;--j-name-w:140px;--j-num-w:24px;--j-avg-w:44px}
+[data-theme="dark"]{--bg:#0F172A;--bg-elev:#1E293B;--text:#E2E8F0;--text-muted:#94A3B8;--border:#334155;--primary:#38BDF8;--accent:#C084FC;--shadow:0 1px 3px rgba(0,0,0,.4);--shadow-lg:0 10px 25px rgba(56,189,248,.25)}
 html[data-device="phone"]{--j-cell:16px;--j-row:16px;--j-font:9px;--j-head-font:8px;--j-name-w:90px;--j-num-w:16px;--j-avg-w:32px}
 html[data-device="tablet"]{--j-cell:22px;--j-row:22px;--j-font:10px;--j-name-w:140px;--j-num-w:24px;--j-avg-w:44px}
 html[data-device="desktop"]{--j-cell:28px;--j-row:28px;--j-font:12px;--j-name-w:200px;--j-num-w:32px;--j-avg-w:58px}
@@ -33,9 +21,7 @@ button{font-family:inherit}
 .brand-text{line-height:1.1}
 .brand-name{font-size:16px;font-weight:800;letter-spacing:-.02em;background:linear-gradient(135deg,var(--primary),var(--accent));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
 .brand-tag{font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin-top:2px}
-.btn svg{flex-shrink:0}
-.nav-item svg{flex-shrink:0}
-.nav-item span{flex:1}
+.btn svg{flex-shrink:0}.nav-item svg{flex-shrink:0}.nav-item span{flex:1}
 #auth-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px;background:linear-gradient(135deg,#0EA5E9 0%,#38BDF8 40%,#A855F7 100%);position:relative;overflow:hidden}
 #auth-screen::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 15% 20%,rgba(250,204,21,.15),transparent 45%),radial-gradient(circle at 85% 80%,rgba(168,85,247,.25),transparent 50%);pointer-events:none}
 .auth-card{background:var(--bg-elev);border-radius:var(--radius-lg);padding:36px;max-width:430px;width:100%;box-shadow:var(--shadow-lg);animation:slideUp .4s ease;position:relative;z-index:1}
@@ -50,8 +36,7 @@ button{font-family:inherit}
 .auth-tabs{display:flex;background:var(--bg);border-radius:var(--radius);padding:4px;margin-bottom:20px}
 .auth-tab{flex:1;padding:9px;border:none;background:transparent;color:var(--text-muted);font-weight:600;border-radius:9px;cursor:pointer;transition:var(--transition);font-size:13px}
 .auth-tab.active{background:var(--bg-elev);color:var(--text);box-shadow:var(--shadow)}
-.auth-form{display:none}
-.auth-form.active{display:block;animation:fadeIn .3s ease}
+.auth-form{display:none}.auth-form.active{display:block;animation:fadeIn .3s ease}
 .form-group{margin-bottom:14px}
 .form-group label{display:block;font-size:11px;font-weight:700;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em}
 input,select,textarea{width:100%;padding:11px 13px;border:1.5px solid var(--border);background:var(--bg);color:var(--text);border-radius:10px;font-size:14px;font-family:inherit;transition:var(--transition)}
@@ -66,8 +51,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--primary)
 .btn-success{background:var(--success);color:#fff}
 .btn-warn{background:transparent;color:var(--danger);border:1.5px solid var(--danger)}
 .btn-warn:hover{background:var(--danger);color:#fff}
-.btn-block{width:100%}
-.btn-sm{padding:6px 11px;font-size:12px;border-radius:8px;gap:5px}
+.btn-block{width:100%}.btn-sm{padding:6px 11px;font-size:12px;border-radius:8px;gap:5px}
 .btn:disabled{opacity:.5;cursor:not-allowed}
 .auth-link{display:block;text-align:center;margin-top:16px;font-size:13px;color:var(--text-muted);font-weight:500}
 .auth-message{margin-top:16px;padding:11px 14px;border-radius:10px;font-size:13px;display:none}
@@ -82,8 +66,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--primary)
 .nav-item.active{background:linear-gradient(135deg,rgba(14,165,233,.12),rgba(168,85,247,.08));color:var(--primary);font-weight:600}
 .nav-item.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:20px;background:var(--primary);border-radius:0 3px 3px 0}
 .sidebar-footer{padding:12px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:6px}
-.sidebar-footer-row{display:flex;gap:8px;width:100%}
-.sidebar-footer-row .btn{flex:1}
+.sidebar-footer-row{display:flex;gap:8px;width:100%}.sidebar-footer-row .btn{flex:1}
 .tg-link{display:flex;align-items:center;justify-content:center;gap:8px;padding:9px 12px;border-radius:10px;background:linear-gradient(135deg,#0088cc,#00a3e0);color:#fff!important;font-size:13px;font-weight:600;text-decoration:none}
 .main{flex:1;display:flex;flex-direction:column;min-width:0}
 .topbar{display:flex;align-items:center;gap:16px;padding:14px 22px;background:var(--bg-elev);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:10}
@@ -185,6 +168,9 @@ th{background:var(--bg);font-weight:700;font-size:11px;text-transform:uppercase;
 .weekday-picker label{padding:6px 10px;border:1.5px solid var(--border);border-radius:8px;cursor:pointer;font-size:12px;font-weight:600}
 .weekday-picker label input{display:none}
 .weekday-picker label.on{background:linear-gradient(135deg,var(--primary),#38BDF8);color:#fff;border-color:transparent}
+.lesson-tip{position:fixed;z-index:1000;background:var(--bg-elev);border:1px solid var(--border);border-radius:8px;padding:8px 10px;box-shadow:var(--shadow-lg);max-width:240px;font-size:11px;line-height:1.4;pointer-events:none}
+.lesson-tip .tip-title{font-size:9px;text-transform:uppercase;color:var(--text-muted);font-weight:700;letter-spacing:.05em;margin-bottom:2px}
+.lesson-tip .tip-body{color:var(--text);margin-bottom:6px}
 </style>
 </head>
 <body>
@@ -281,103 +267,161 @@ th{background:var(--bg);font-weight:700;font-size:11px;text-transform:uppercase;
 <div id="modal-root"></div>
 <div id="toast-root" class="toast-root"></div>
 
-<!-- Firebase Auth (без Database SDK) -->
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-
 <script>
-/* CONFIG — без databaseURL (он теперь в Worker) */
-var firebaseConfig = {
-  apiKey: "AIzaSyBSb532Ppi7xXdfHcuDfXTp6U_ut_0saio",
-  authDomain: "zing-30a21.firebaseapp.com",
-  projectId: "zing-30a21",
-  storageBucket: "zing-30a21.firebasestorage.app",
-  messagingSenderId: "179467663659",
-  appId: "1:179467663659:web:be71167fd0ffd412416d6e"
-};
-firebase.initializeApp(firebaseConfig);
-var auth = firebase.auth();
-var secondaryApp = firebase.initializeApp(firebaseConfig, 'Secondary');
-var secondaryAuth = secondaryApp.auth();
-
 /* ============================================================
-   WORKER-ПРОКСИ ЧЕРЕЗ CLOUDFLARE
+   НИКАКИХ КЛЮЧЕЙ FIREBASE ЗДЕСЬ БОЛЬШЕ НЕТ
+   Только адрес Worker'а
 ============================================================ */
 var WORKER_URL = 'https://klassjur-api.c6fpjs5ryf.workers.dev';
 
-function RestRef(path, query) {
-  this._path = (path || '').replace(/^\//, '').replace(/\/$/, '');
-  this._q = query || {};
-}
-RestRef.prototype.orderByChild = function(field) {
-  return new RestRef(this._path, Object.assign({}, this._q, { orderBy: '"' + field + '"' }));
-};
-RestRef.prototype.orderByKey = function() {
-  return new RestRef(this._path, Object.assign({}, this._q, { orderBy: '"$key"' }));
-};
-RestRef.prototype.equalTo = function(v) {
-  var val = typeof v === 'string' ? '"' + v + '"' : JSON.stringify(v);
-  return new RestRef(this._path, Object.assign({}, this._q, { equalTo: val }));
-};
-RestRef.prototype.limitToLast = function(n) {
-  return new RestRef(this._path, Object.assign({}, this._q, { limitToLast: n }));
-};
-RestRef.prototype.limitToFirst = function(n) {
-  return new RestRef(this._path, Object.assign({}, this._q, { limitToFirst: n }));
-};
-RestRef.prototype.once = async function() {
-  var data = await this._get();
-  return {
-    exists: function() { return data !== null && data !== undefined; },
-    val: function() { return data; }
-  };
-};
-RestRef.prototype.set = async function(value) { await this._write('PUT', value); };
-RestRef.prototype.update = async function(value) { await this._write('PATCH', value); };
-RestRef.prototype.remove = async function() { await this._write('DELETE'); };
-RestRef.prototype.push = function() {
-  var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  var key = '-';
-  for (var i = 0; i < 19; i++) key += chars[Math.floor(Math.random() * chars.length)];
-  var ref = new RestRef(this._path + '/' + key, {});
-  ref.key = key;
-  return ref;
-};
-RestRef.prototype._get = async function() {
-  var url = WORKER_URL + '/db/' + this._path;
-  var qs = new URLSearchParams();
-  var self = this;
-  Object.keys(this._q).forEach(function(k) { qs.set(k, self._q[k]); });
-  if (qs.toString()) url += '?' + qs.toString();
-  var headers = {};
-  if (auth.currentUser) {
-    try { headers['Authorization'] = 'Bearer ' + await auth.currentUser.getIdToken(); } catch(e) {}
+/* ============================================================
+   API-КЛИЕНТ (работает только через Worker)
+============================================================ */
+var API = {
+  idToken: localStorage.getItem('idToken') || null,
+  refreshToken: localStorage.getItem('refreshToken') || null,
+
+  async request(path, method, body, _retry) {
+    var headers = { 'Content-Type': 'application/json' };
+    if (this.idToken) headers['Authorization'] = 'Bearer ' + this.idToken;
+    var r = await fetch(WORKER_URL + path, {
+      method: method || 'GET',
+      headers: headers,
+      body: body ? JSON.stringify(body) : undefined
+    });
+    if (r.status === 401 && this.refreshToken && !_retry) {
+      await this.refresh();
+      return this.request(path, method, body, true);
+    }
+    var data = await r.json().catch(function() { return {}; });
+    if (!r.ok) throw new Error(data.error || 'Ошибка ' + r.status);
+    return data;
+  },
+
+  async refresh() {
+    var r = await fetch(WORKER_URL + '/api/auth/refresh', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ refreshToken: this.refreshToken })
+    });
+    if (!r.ok) { this.logout(); location.reload(); throw new Error('Сессия истекла'); }
+    var d = await r.json();
+    this.idToken = d.idToken;
+    this.refreshToken = d.refreshToken;
+    localStorage.setItem('idToken', d.idToken);
+    localStorage.setItem('refreshToken', d.refreshToken);
+  },
+
+  save(idToken, refreshToken) {
+    this.idToken = idToken;
+    this.refreshToken = refreshToken || null;
+    localStorage.setItem('idToken', idToken);
+    if (refreshToken) localStorage.setItem('refreshToken', refreshToken);
+  },
+
+  logout() {
+    this.idToken = null;
+    this.refreshToken = null;
+    localStorage.removeItem('idToken');
+    localStorage.removeItem('refreshToken');
   }
-  var r = await fetch(url, { headers: headers });
-  if (!r.ok && r.status !== 404) throw new Error('DB: ' + r.status);
-  var text = await r.text();
-  if (!text || text === 'null') return null;
-  try { return JSON.parse(text); } catch(e) { return null; }
-};
-RestRef.prototype._write = async function(method, body) {
-  var url = WORKER_URL + '/db/' + this._path;
-  var headers = { 'Content-Type': 'application/json' };
-  if (auth.currentUser) {
-    try { headers['Authorization'] = 'Bearer ' + await auth.currentUser.getIdToken(); } catch(e) {}
-  }
-  var r = await fetch(url, {
-    method: method,
-    headers: headers,
-    body: body !== undefined ? JSON.stringify(body) : undefined
-  });
-  if (!r.ok) throw new Error('DB: ' + r.status);
-};
-var db = {
-  ref: function(path) { return new RestRef(path); }
 };
 
 /* ============================================================
-   Дальше — весь код журнала
+   МИМИКРИЯ FIREBASE DB — через Worker
+   Клиент думает, что работает с базой, но на самом деле — с API
+============================================================ */
+var _writeQueue = [];
+var _writeTimer = null;
+
+function flushWrites() {
+  if (!_writeQueue.length) return Promise.resolve();
+  var ops = _writeQueue.slice();
+  _writeQueue = [];
+  return API.request('/api/write', 'POST', { ops: ops });
+}
+
+function queueWrite(path, method, data) {
+  _writeQueue.push({ path: path, method: method, data: data });
+  return new Promise(function(res, rej) {
+    clearTimeout(_writeTimer);
+    _writeTimer = setTimeout(async function() {
+      try { await flushWrites(); res(); } catch (e) { rej(e); }
+    }, 50);
+  });
+}
+
+function CacheRef(path) {
+  this._path = (path || '').replace(/^\//, '').replace(/\/$/, '');
+}
+CacheRef.prototype.once = async function() {
+  var val = getCache(this._path);
+  return {
+    exists: function() { return val !== null && val !== undefined; },
+    val: function() { return val; }
+  };
+};
+CacheRef.prototype.set = async function(v) {
+  await queueWrite(this._path, 'PUT', v);
+  setCache(this._path, v);
+};
+CacheRef.prototype.update = async function(v) {
+  await queueWrite(this._path, 'PATCH', v);
+  // оптимистичное обновление кеша
+  var cur = getCache(this._path) || {};
+  Object.keys(v).forEach(function(k) {
+    var parts = k.split('/');
+    if (parts.length === 1) {
+      if (v[k] === null) delete cur[k];
+      else cur[k] = v[k];
+    }
+  });
+  setCache(this._path, cur);
+};
+CacheRef.prototype.remove = async function() {
+  await queueWrite(this._path, 'DELETE');
+  setCache(this._path, null);
+};
+CacheRef.prototype.push = function() {
+  var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  var key = '-';
+  for (var i = 0; i < 19; i++) key += chars[Math.floor(Math.random() * chars.length)];
+  return { key: key };
+};
+
+var _cache = {};
+function getCache(path) {
+  if (!path) return _cache;
+  var parts = path.split('/');
+  var cur = _cache;
+  for (var i = 0; i < parts.length; i++) {
+    if (cur == null) return null;
+    cur = cur[parts[i]];
+  }
+  return cur;
+}
+function setCache(path, val) {
+  if (!path) { _cache = val || {}; return; }
+  var parts = path.split('/');
+  var cur = _cache;
+  for (var i = 0; i < parts.length - 1; i++) {
+    if (!cur[parts[i]] || typeof cur[parts[i]] !== 'object') cur[parts[i]] = {};
+    cur = cur[parts[i]];
+  }
+  if (val === null) delete cur[parts[parts.length - 1]];
+  else cur[parts[parts.length - 1]] = val;
+}
+function loadCache(data) {
+  _cache = data || {};
+}
+
+var db = {
+  ref: function(path) { return new CacheRef(path); },
+  _flush: flushWrites
+};
+
+/* ============================================================
+   Дальше — код журнала, как был
 ============================================================ */
 var QUARTERS = [
   { id:'q1', name:'I четверть',  sm:8,  sd:1, em:9,  ed:27 },
@@ -396,11 +440,8 @@ function inQuarter(dms, qid) {
   if (m === q.em && day > q.ed) return false;
   return true;
 }
-function quarterName(qid) {
-  if (!qid || qid === 'all') return 'Весь год';
-  for (var i = 0; i < QUARTERS.length; i++) if (QUARTERS[i].id === qid) return QUARTERS[i].name;
-  return 'Весь год';
-}
+function quarterName(qid) { if (!qid || qid === 'all') return 'Весь год'; for (var i = 0; i < QUARTERS.length; i++) if (QUARTERS[i].id === qid) return QUARTERS[i].name; return 'Весь год'; }
+
 var ICON_PATHS = {
   dashboard:'<line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>',
   city:'<path d="M3 21h18"/><path d="M5 21V7l8-4v18"/><path d="M19 21V11l-6-4"/>',
@@ -436,11 +477,14 @@ var ICON_PATHS = {
   zap:'<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>',
   monitor:'<rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>',
   file:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>',
-  award:'<circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/>'
+  award:'<circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/>',
+  wrench:'<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>'
 };
 function ic(n, s) { if (s === undefined) s = 18; return '<svg xmlns="http://www.w3.org/2000/svg" width="' + s + '" height="' + s + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + (ICON_PATHS[n] || '') + '</svg>'; }
+
 var ROLE_LABELS = { super_admin:'Создатель', city_creator:'Создатель города', school_creator:'Создатель школы', teacher:'Учитель', student:'Ученик', parent:'Родитель' };
 function roleLabel(r) { return ROLE_LABELS[r] || r || '—'; }
+
 var DEFAULT_WORK_TYPES = [
   { name:'Ответ на уроке', weight:1, code:'ОТВ' },
   { name:'Диктант', weight:2, code:'ДКТ' },
@@ -456,11 +500,11 @@ var POPULAR_SUBJECTS = [
   { group:'Иностранные', items:['Английский язык','Немецкий язык','Французский язык','Испанский язык','Китайский язык'] },
   { group:'Прочее', items:['ОБЖ','Черчение','Финансовая грамотность','Проектная деятельность'] }
 ];
-var HARDCODED_ADMIN = { login:'admin', password:'admin', profile:{ role:'super_admin', login:'admin', name:'Главный администратор', email:'admin@local' } };
 var SESSION_KEY = 'ej_session_v1';
 function getSession() { try { var r = localStorage.getItem(SESSION_KEY); return r ? JSON.parse(r) : null; } catch(e) { return null; } }
-function setSession(u, p) { localStorage.setItem(SESSION_KEY, JSON.stringify({ user:u, profile:p })); }
+function setSession(p) { localStorage.setItem(SESSION_KEY, JSON.stringify(p)); }
 function clearSession() { localStorage.removeItem(SESSION_KEY); }
+
 var $ = function(s) { return document.querySelector(s); };
 var $$ = function(s) { return document.querySelectorAll(s); };
 function el(tag, props) {
@@ -490,9 +534,7 @@ function showModal(title, body, actions, opts) {
   var b = el('div', { class:'modal-backdrop' });
   b.innerHTML = '<div class="modal ' + (opts.wide ? 'modal-wide' : '') + '"><h3 class="modal-title">' + title + '</h3><div class="modal-body">' + body + '</div><div class="modal-actions"></div></div>';
   var a = b.querySelector('.modal-actions');
-  actions.forEach(function(x) {
-    a.appendChild(el('button', { class:'btn ' + (x.class || 'btn-ghost'), onclick: function() { x.onClick ? x.onClick(b) : closeModal(); } }, x.label));
-  });
+  actions.forEach(function(x) { a.appendChild(el('button', { class:'btn ' + (x.class || 'btn-ghost'), onclick: function() { x.onClick ? x.onClick(b) : closeModal(); } }, x.label)); });
   b.onclick = function(e) { if (e.target === b) closeModal(); };
   root.appendChild(b);
   return b;
@@ -505,7 +547,6 @@ function parseLocalDate(str) { if (!str) return NaN; var p = str.split('-').map(
 var fmt = { date: function(ts) { return ts ? new Date(ts).toLocaleDateString('ru-RU') : '—'; } };
 function gradeClass(v) { var n = Math.round(v); if (n >= 5) return 'g5'; if (n === 4) return 'g4'; if (n === 3) return 'g3'; if (n === 2) return 'g2'; return 'g1'; }
 function avgClass(v) { if (v >= 4.5) return 'g-avg-5'; if (v >= 3.5) return 'g-avg-4'; if (v >= 2.5) return 'g-avg-3'; if (v >= 1.5) return 'g-avg-2'; return 'g-avg-1'; }
-function translateError(err) { var m = { 'auth/user-not-found':'Пользователь не найден', 'auth/wrong-password':'Неверный пароль', 'auth/invalid-email':'Неверный email', 'auth/invalid-credential':'Неверный логин или пароль', 'auth/email-already-in-use':'Email уже используется', 'auth/weak-password':'Слишком простой пароль (мин. 6)', 'auth/too-many-requests':'Слишком много попыток', 'auth/network-request-failed':'Проблема с сетью' }; return m[err.code] || err.message || 'Ошибка'; }
 function initTheme() {
   var t = localStorage.getItem('theme') || 'light';
   document.documentElement.dataset.theme = t;
@@ -521,50 +562,26 @@ function initTheme() {
   }
 }
 initTheme();
-function applyDevice(m) {
-  var d = m || 'auto';
-  if (d === 'auto') { var w = window.innerWidth; if (w < 700) d = 'phone'; else if (w < 1100) d = 'tablet'; else d = 'desktop'; }
-  document.documentElement.dataset.device = d;
-}
-function initDevice() {
-  applyDevice(localStorage.getItem('device') || 'auto');
-  window.addEventListener('resize', function() { if ((localStorage.getItem('device') || 'auto') === 'auto') applyDevice('auto'); });
-}
+function applyDevice(m) { var d = m || 'auto'; if (d === 'auto') { var w = window.innerWidth; if (w < 700) d = 'phone'; else if (w < 1100) d = 'tablet'; else d = 'desktop'; } document.documentElement.dataset.device = d; }
+function initDevice() { applyDevice(localStorage.getItem('device') || 'auto'); window.addEventListener('resize', function() { if ((localStorage.getItem('device') || 'auto') === 'auto') applyDevice('auto'); }); }
 initDevice();
 $('#logout-btn').innerHTML = ic('logout', 16) + ' Выйти';
-function showAuthMsg(t, type) {
-  if (!type) type = 'error';
-  var e = $('#auth-message'); e.textContent = t; e.className = 'auth-message ' + type;
-  setTimeout(function() { e.className = 'auth-message'; }, 6000);
-}
-$$('.auth-tab').forEach(function(tab) {
-  tab.onclick = function() {
-    $$('.auth-tab').forEach(function(t) { t.classList.remove('active'); });
-    $$('.auth-form').forEach(function(f) { f.classList.remove('active'); });
-    tab.classList.add('active');
-    $('#' + tab.dataset.tab + '-form').classList.add('active');
-  };
-});
+function showAuthMsg(t, type) { if (!type) type = 'error'; var e = $('#auth-message'); e.textContent = t; e.className = 'auth-message ' + type; setTimeout(function() { e.className = 'auth-message'; }, 6000); }
+$$('.auth-tab').forEach(function(tab) { tab.onclick = function() { $$('.auth-tab').forEach(function(t) { t.classList.remove('active'); }); $$('.auth-form').forEach(function(f) { f.classList.remove('active'); }); tab.classList.add('active'); $('#' + tab.dataset.tab + '-form').classList.add('active'); }; });
+
 $('#login-form').addEventListener('submit', async function(e) {
   e.preventDefault();
-  var loginInput = $('#login-input').value.trim();
+  var login = $('#login-input').value.trim();
   var password = $('#login-password').value;
-  if (!loginInput || !password) return;
-  if (loginInput === HARDCODED_ADMIN.login && password === HARDCODED_ADMIN.password) {
-    var user = { uid:'admin-local', email:HARDCODED_ADMIN.profile.email };
-    var profile = Object.assign({}, HARDCODED_ADMIN.profile, { createdAt:Date.now() });
-    setSession(user, profile); startApp(user, profile); return;
-  }
+  if (!login || !password) return;
   try {
-    var email = loginInput;
-    if (loginInput.indexOf('@') === -1) {
-      var snap = await db.ref('loginIndex/' + loginInput).once();
-      if (!snap.exists()) return showAuthMsg('Пользователь с таким логином не найден');
-      email = snap.val();
-    }
-    await auth.signInWithEmailAndPassword(email, password);
-  } catch (err) { showAuthMsg(translateError(err)); }
+    var d = await API.request('/api/auth/login', 'POST', { login: login, password: password });
+    API.save(d.idToken, d.refreshToken);
+    setSession(d.profile);
+    startApp(d.profile);
+  } catch (err) { showAuthMsg(err.message); }
 });
+
 $('#register-form').addEventListener('submit', async function(e) {
   e.preventDefault();
   var code = $('#invite-code').value.trim().toUpperCase();
@@ -573,31 +590,23 @@ $('#register-form').addEventListener('submit', async function(e) {
   var email = $('#reg-email').value.trim();
   var password = $('#reg-password').value;
   try {
-    var iSnap = await db.ref('invites/' + code).once();
-    if (!iSnap.exists()) return showAuthMsg('Неверный код приглашения');
-    var invite = iSnap.val();
-    if (invite.used) return showAuthMsg('Код уже использован');
-    if (invite.expiresAt && invite.expiresAt < Date.now()) return showAuthMsg('Код истёк');
-    var lCheck = await db.ref('loginIndex/' + login).once();
-    if (lCheck.exists()) return showAuthMsg('Такой логин уже занят');
-    var cred = await secondaryAuth.createUserWithEmailAndPassword(email, password);
-    var uid = cred.user.uid;
-    await secondaryAuth.signOut();
-    await db.ref('users/' + uid).set({ role:invite.role || 'teacher', login:login, name:name, email:email, schoolId:invite.schoolId || null, cityId:invite.cityId || null, createdAt:Date.now() });
-    await db.ref('loginIndex/' + login).set(email);
-    await db.ref('invites/' + code).update({ used:true, usedBy:uid, usedAt:Date.now() });
-    showAuthMsg('Регистрация успешна! Входим…', 'success');
-    setTimeout(async function() { await auth.signInWithEmailAndPassword(email, password); }, 800);
-  } catch (err) { showAuthMsg(translateError(err)); }
+    var d = await API.request('/api/auth/register', 'POST', { code:code, name:name, login:login, email:email, password:password });
+    API.save(d.idToken, d.refreshToken);
+    setSession(d.profile);
+    showAuthMsg('Регистрация успешна!', 'success');
+    setTimeout(function() { startApp(d.profile); }, 800);
+  } catch (err) { showAuthMsg(err.message); }
 });
+
 $('#forgot-password').onclick = async function(e) {
   e.preventDefault();
   var v = prompt('Введите ваш email для сброса пароля:');
   if (!v) return;
-  try { await auth.sendPasswordResetEmail(v.trim()); showAuthMsg('Письмо отправлено', 'success'); }
-  catch (err) { showAuthMsg(translateError(err)); }
+  try { await API.request('/api/auth/reset', 'POST', { email: v.trim() }); showAuthMsg('Письмо отправлено', 'success'); }
+  catch (err) { showAuthMsg(err.message); }
 };
-var App = { user:null, profile:null, cache:{ cities:{}, schools:{}, classes:{}, students:{}, grades:{}, workTypes:{}, invites:{}, users:{}, lessons:{}, attendance:{} } };
+
+var App = { profile:null, cache:{ cities:{}, schools:{}, classes:{}, students:{}, grades:{}, workTypes:{}, invites:{}, users:{}, lessons:{}, attendance:{} } };
 var MENU = {
   super_admin: [
     { id:'dashboard', icon:'dashboard', label:'Дашборд' },
@@ -629,12 +638,7 @@ var MENU = {
     { id:'profile', icon:'user', label:'Профиль' }
   ]
 };
-function buildMenu() {
-  var nav = $('#sidebar-nav'); nav.innerHTML = '';
-  (MENU[App.profile.role] || []).forEach(function(it) {
-    nav.appendChild(el('div', { class:'nav-item' + (location.hash === '#' + it.id ? ' active' : ''), html: ic(it.icon, 18) + '<span>' + it.label + '</span>', onclick: function() { navigate(it.id); } }));
-  });
-}
+function buildMenu() { var nav = $('#sidebar-nav'); nav.innerHTML = ''; (MENU[App.profile.role] || []).forEach(function(it) { nav.appendChild(el('div', { class:'nav-item' + (location.hash === '#' + it.id ? ' active' : ''), html: ic(it.icon, 18) + '<span>' + it.label + '</span>', onclick: function() { navigate(it.id); } })); }); }
 function navigate(v, p) { if (!p) p = {}; location.hash = '#' + v + (p.id ? '/' + p.id : ''); router(); }
 async function router() {
   var hash = location.hash.slice(1) || 'dashboard';
@@ -652,38 +656,13 @@ async function router() {
   $('#sidebar').classList.remove('open');
 }
 window.addEventListener('hashchange', router);
-async function loadAll() {
-  var results = await Promise.all([
-    db.ref('cities').once(), db.ref('schools').once(), db.ref('classes').once(),
-    db.ref('students').once(), db.ref('grades').once(), db.ref('workTypes').once(),
-    db.ref('invites').once(), db.ref('users').once(), db.ref('lessons').once(),
-    db.ref('attendance').once()
-  ]);
-  App.cache.cities = results[0].val() || {};
-  App.cache.schools = results[1].val() || {};
-  App.cache.classes = results[2].val() || {};
-  App.cache.students = results[3].val() || {};
-  App.cache.grades = results[4].val() || {};
-  App.cache.workTypes = results[5].val() || {};
-  App.cache.invites = results[6].val() || {};
-  App.cache.users = results[7].val() || {};
-  App.cache.lessons = results[8].val() || {};
-  App.cache.attendance = results[9].val() || {};
-}
-async function bootstrapDefaultWorkTypes() {
-  try {
-    var snap = await db.ref('workTypes').once();
-    if (snap.exists() && Object.keys(snap.val()).length > 0) return;
-    var u = {};
-    DEFAULT_WORK_TYPES.forEach(function(wt) {
-      var id = db.ref('workTypes').push().key;
-      u['workTypes/' + id] = { name:wt.name, weight:wt.weight, code:wt.code, createdBy:App.user.uid, createdAt:Date.now() };
-    });
-    await db.ref().update(u);
-    var fresh = await db.ref('workTypes').once();
-    App.cache.workTypes = fresh.val() || {};
-  } catch(e) { console.warn(e); }
-}
+
+function weightedAvg(list) { var s = list.reduce(function(a, g) { return a + (g.value||0) * (g.weight||1); }, 0); var w = list.reduce(function(a, g) { return a + (g.weight||1); }, 0); return w ? Math.round(s / w * 100) / 100 : 0; }
+function avgForStudent(sid, cid) { return weightedAvg(Object.values(App.cache.grades).filter(function(g) { return g.studentId === sid && (!cid || g.classId === cid); })); }
+function countStudentsBySchool() { var ids = Object.entries(App.cache.classes).filter(function(e) { return e[1].schoolId === App.profile.schoolId; }).map(function(e) { return e[0]; }); return Object.values(App.cache.students).filter(function(s) { return ids.indexOf(s.classId) !== -1; }).length; }
+function countStudentsInMyClasses() { var ids = Object.keys(myClasses()); return Object.values(App.cache.students).filter(function(s) { return ids.indexOf(s.classId) !== -1; }).length; }
+function countMyGrades() { return Object.values(App.cache.grades).filter(function(g) { return g.teacherId === App.profile.uid; }).length; }
+function avgAllMyStudents() { return weightedAvg(Object.values(App.cache.grades).filter(function(g) { return g.teacherId === App.profile.uid; })); }
 function mySchools() {
   var s = App.cache.schools;
   if (App.profile.role === 'super_admin') return s;
@@ -691,15 +670,9 @@ function mySchools() {
   if (App.profile.role === 'school_creator' || App.profile.role === 'teacher') return Object.fromEntries(Object.entries(s).filter(function(e) { return e[0] === App.profile.schoolId; }));
   return {};
 }
-function myClasses() { return Object.fromEntries(Object.entries(App.cache.classes).filter(function(e) { return e[1].teacherId === App.user.uid; })); }
+function myClasses() { return Object.fromEntries(Object.entries(App.cache.classes).filter(function(e) { return e[1].teacherId === App.profile.uid; })); }
 function greetingByTime() { var h = new Date().getHours(); if (h < 5) return 'Доброй ночи'; if (h < 12) return 'Доброе утро'; if (h < 18) return 'Добрый день'; return 'Добрый вечер'; }
 function todayLabel() { var d = new Date(); var days = ['воскресенье','понедельник','вторник','среда','четверг','пятница','суббота']; var months = ['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря']; return d.getDate() + ' ' + months[d.getMonth()] + ', ' + days[d.getDay()]; }
-function weightedAvg(list) { var s = list.reduce(function(a, g) { return a + g.value * g.weight; }, 0); var w = list.reduce(function(a, g) { return a + g.weight; }, 0); return w ? Math.round(s / w * 100) / 100 : 0; }
-function avgForStudent(sid, cid) { return weightedAvg(Object.values(App.cache.grades).filter(function(g) { return g.studentId === sid && (!cid || g.classId === cid); })); }
-function countStudentsBySchool() { var ids = Object.entries(App.cache.classes).filter(function(e) { return e[1].schoolId === App.profile.schoolId; }).map(function(e) { return e[0]; }); return Object.values(App.cache.students).filter(function(s) { return ids.indexOf(s.classId) !== -1; }).length; }
-function countStudentsInMyClasses() { var ids = Object.keys(myClasses()); return Object.values(App.cache.students).filter(function(s) { return ids.indexOf(s.classId) !== -1; }).length; }
-function countMyGrades() { return Object.values(App.cache.grades).filter(function(g) { return g.teacherId === App.user.uid; }).length; }
-function avgAllMyStudents() { return weightedAvg(Object.values(App.cache.grades).filter(function(g) { return g.teacherId === App.user.uid; })); }
 
 async function renderDashboard() {
   $('#page-title').textContent = 'Дашборд';
@@ -831,7 +804,7 @@ async function renderInvites() {
   var c = $('#content'); c.innerHTML = '';
   var card = el('div', { class:'card' });
   card.appendChild(el('div', { class:'card-header' }, el('div', { class:'card-title' }, 'Коды приглашения'), el('button', { class:'btn btn-primary', html:ic('plus', 16) + ' Создать код', onclick:createInvite })));
-  var inv = Object.entries(App.cache.invites).filter(function(e) { return e[1].createdBy === App.user.uid; }).sort(function(a, b) { return (b[1].createdAt || 0) - (a[1].createdAt || 0); });
+  var inv = Object.entries(App.cache.invites).filter(function(e) { return e[1].createdBy === App.profile.uid; }).sort(function(a, b) { return (b[1].createdAt || 0) - (a[1].createdAt || 0); });
   if (!inv.length) card.appendChild(el('div', { class:'empty' }, 'Кодов пока нет'));
   else {
     var t = el('table');
@@ -877,7 +850,7 @@ async function renderClasses() {
 }
 async function renderClassDetail(classId) {
   var cl = App.cache.classes[classId];
-  if (!cl || cl.teacherId !== App.user.uid) return navigate('classes');
+  if (!cl || cl.teacherId !== App.profile.uid) return navigate('classes');
   $('#page-title').textContent = 'Класс ' + cl.name;
   var c = $('#content'); c.innerHTML = '';
   var info = el('div', { class:'card' });
@@ -1052,8 +1025,8 @@ var _tipEl = null;
 function showLessonTip(target, lesson) {
   hideLessonTip();
   var r = target.getBoundingClientRect();
-  var tip = el('div', { class:'lesson-tip', style:'position:fixed;z-index:1000;background:var(--bg-elev);border:1px solid var(--border);border-radius:8px;padding:8px 10px;box-shadow:var(--shadow-lg);max-width:240px;font-size:11px;line-height:1.4;pointer-events:none' });
-  tip.innerHTML = '<div style="font-size:9px;text-transform:uppercase;color:var(--text-muted);font-weight:700;margin-bottom:2px;">Тема урока</div><div style="margin-bottom:6px;">' + (lesson.topic || 'не задана') + '</div><div style="font-size:9px;text-transform:uppercase;color:var(--text-muted);font-weight:700;margin-bottom:2px;">Домашняя работа</div><div>' + (lesson.homework || 'без задания') + '</div>';
+  var tip = el('div', { class:'lesson-tip' });
+  tip.innerHTML = '<div class="tip-title">Тема урока</div><div class="tip-body">' + (lesson.topic || 'не задана') + '</div><div class="tip-title">Домашняя работа</div><div class="tip-body">' + (lesson.homework || 'без задания') + '</div>';
   document.body.appendChild(tip);
   tip.style.left = (r.left + r.width / 2 - 120) + 'px';
   tip.style.top = (r.bottom + 6) + 'px';
@@ -1074,7 +1047,7 @@ function openLessonDialog(opts) {
     var hw = document.getElementById('ls-hw').value.trim();
     if (!date) return toast('Укажите дату', 'error');
     var dms = parseLocalDate(date);
-    var payload = { classId:classId, subject:subject, teacherId:App.user.uid, date:dms, topic:topic, homework:hw, updatedAt:Date.now() };
+    var payload = { classId:classId, subject:subject, teacherId:App.profile.uid, date:dms, topic:topic, homework:hw, updatedAt:Date.now() };
     if (existing) { await db.ref('lessons/' + existing[0]).update(payload); toast('Урок обновлён', 'success'); }
     else { payload.createdAt = Date.now(); var id = db.ref('lessons').push().key; await db.ref('lessons/' + id).set(payload); toast('Урок добавлен', 'success'); }
     closeModal(); await loadAll(); renderJournal();
@@ -1086,7 +1059,7 @@ function openLessonDialog(opts) {
     '<div class="form-group"><label>Домашняя работа</label><textarea id="ls-hw">' + (existing ? (existing[1].homework || '') : '') + '</textarea></div>',
     actions);
 }
-function fillYearDialog(classId, subject) {
+async function fillYearDialog(classId, subject) {
   var curY = new Date().getFullYear();
   var curM = new Date().getMonth();
   var startYear = curM >= 7 ? curY : curY - 1;
@@ -1104,22 +1077,11 @@ function fillYearDialog(classId, subject) {
       var checked = [];
       document.querySelectorAll('#fy-wd label.on').forEach(function(l) { checked.push(+l.dataset.wd); });
       if (!s || !e || !checked.length) return toast('Заполните даты и выберите дни', 'error');
-      var u = {}; var cur = new Date(parseLocalDate(s)); var endD = new Date(parseLocalDate(e)); var cnt = 0;
-      while (cur <= endD) {
-        var wdNum = cur.getDay();
-        if (checked.indexOf(wdNum) !== -1) {
-          var dms = new Date(cur.getFullYear(), cur.getMonth(), cur.getDate()).getTime();
-          var exists = Object.values(App.cache.lessons).some(function(l) { return l.classId === classId && l.subject === subject && new Date(l.date).setHours(0,0,0,0) === dms; });
-          if (!exists) { var id = db.ref('lessons').push().key; u['lessons/' + id] = { classId:classId, subject:subject, teacherId:App.user.uid, date:dms, topic:'', homework:'', createdAt:Date.now() }; cnt++; }
-        }
-        cur.setDate(cur.getDate() + 1);
-      }
-      if (!cnt) { closeModal(); return toast('Все уроки уже есть', 'warning'); }
-      var keys = Object.keys(u); var chunks = [];
-      for (var i = 0; i < keys.length; i += 200) { var ch = {}; keys.slice(i, i + 200).forEach(function(k) { ch[k] = u[k]; }); chunks.push(ch); }
       try {
-        for (var j = 0; j < chunks.length; j++) await db.ref().update(chunks[j]);
-        closeModal(); toast('Создано уроков: <b>' + cnt + '</b>', 'success'); await loadAll(); renderJournal();
+        var result = await API.request('/api/fillYear', 'POST', { classId:classId, subject:subject, startDate:s, endDate:e, weekdays:checked });
+        closeModal();
+        toast('Создано уроков: <b>' + result.created + '</b>', 'success');
+        await loadAll(); renderJournal();
       } catch (err) { toast('Ошибка: ' + err.message, 'error'); }
     }}], { wide:true });
   setTimeout(function() {
@@ -1158,18 +1120,18 @@ function openGradeCellDialog(classId, subject, studentId, dateMs, existingGradeI
     var gd = parseLocalDate(date);
     if (selectedAtt !== '') {
       if (existingAtt) await db.ref('attendance/' + existingAttId).update({ mark:selectedAtt, date:gd });
-      else { var aid = db.ref('attendance').push().key; await db.ref('attendance/' + aid).set({ studentId:studentId, classId:classId, subject:subject, date:gd, mark:selectedAtt, teacherId:App.user.uid }); }
+      else { var aid = db.ref('attendance').push().key; await db.ref('attendance/' + aid).set({ studentId:studentId, classId:classId, subject:subject, date:gd, mark:selectedAtt, teacherId:App.profile.uid }); }
     } else { if (existingAtt) await db.ref('attendance/' + existingAttId).remove(); }
     if (selectedValue) {
       var w = App.cache.workTypes[typeId];
       if (existing) {
         var hist = (existing.history || []).slice();
-        if (existing.value !== selectedValue) hist.push({ changedBy:App.user.uid, changedAt:Date.now(), oldValue:existing.value, newValue:selectedValue });
+        if (existing.value !== selectedValue) hist.push({ changedBy:App.profile.uid, changedAt:Date.now(), oldValue:existing.value, newValue:selectedValue });
         await db.ref('grades/' + existingGradeId).update({ value:selectedValue, date:gd, typeId:typeId, weight:w.weight, notes:notes, history:hist });
         toast('Сохранено', 'success');
       } else {
         var gid = db.ref('grades').push().key;
-        await db.ref('grades/' + gid).set({ studentId:studentId, classId:classId, subject:subject, teacherId:App.user.uid, date:gd, typeId:typeId, weight:w.weight, value:selectedValue, notes:notes, history:[] });
+        await db.ref('grades/' + gid).set({ studentId:studentId, classId:classId, subject:subject, teacherId:App.profile.uid, date:gd, typeId:typeId, weight:w.weight, value:selectedValue, notes:notes, history:[] });
         toast('Оценка выставлена', 'success');
       }
     } else { if (existing) await db.ref('grades/' + existingGradeId).remove(); toast('Сохранено', 'success'); }
@@ -1355,69 +1317,70 @@ async function renderProfile() {
     '<p style="margin-bottom:8px;display:flex;align-items:center;gap:8px;"><span style="color:var(--text-muted);">' + ic('key', 16) + '</span><b>Логин:</b> ' + (p.login || '—') + '</p>' +
     '<p style="margin-bottom:8px;display:flex;align-items:center;gap:8px;"><span style="color:var(--text-muted);">' + ic('mail', 16) + '</span><b>Email:</b> ' + (p.email || '—') + '</p>' +
     '<p style="margin-bottom:8px;display:flex;align-items:center;gap:8px;"><span style="color:var(--text-muted);">' + ic('tag', 16) + '</span><b>Роль:</b> <span class="badge">' + roleLabel(p.role) + '</span></p>' +
-    '<p style="margin-bottom:8px;display:flex;align-items:center;gap:8px;"><span style="color:var(--text-muted);">' + ic('school', 16) + '</span><b>Школа:</b> ' + (App.cache.schools[p.schoolId] ? App.cache.schools[p.schoolId].name : '—') + '</p>' +
-    '<p style="margin-bottom:8px;display:flex;align-items:center;gap:8px;"><span style="color:var(--text-muted);">' + ic('city', 16) + '</span><b>Город:</b> ' + (App.cache.cities[p.cityId] ? App.cache.cities[p.cityId].name : '—') + '</p>' +
     '<hr style="border:none;border-top:1px solid var(--border);margin:18px 0;">' +
     '<div style="font-size:14px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:8px;">' + ic('monitor', 16) + ' Настройки отображения</div>' +
-    '<div class="form-group" style="max-width:340px;"><label>Размер журнала</label><select id="device-select"><option value="auto">🔄 Авто</option><option value="phone">📱 Телефон</option><option value="tablet">💻 Планшет</option><option value="desktop">🖥️ Компьютер</option></select></div>';
+    '<div class="form-group" style="max-width:340px;"><label>Размер журнала</label><select id="device-select"><option value="auto">🔄 Авто</option><option value="phone">📱 Телефон</option><option value="tablet">💻 Планшет</option><option value="desktop">🖥️ Компьютер</option></select></div>' +
+    '<hr style="border:none;border-top:1px solid var(--border);margin:18px 0;">' +
+    '<div style="font-size:14px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:8px;">' + ic('wrench', 16) + ' Обслуживание</div>' +
+    '<button type="button" class="btn btn-primary" id="repair-logins-btn">' + ic('wrench', 16) + ' Починить логины</button>' +
+    '<div class="hint" style="margin-top:8px;">Заполняет таблицу соответствия логинов и email.</div>';
   c.appendChild(card);
   var devSel = $('#device-select');
   if (devSel) { devSel.value = localStorage.getItem('device') || 'auto'; devSel.onchange = function() { var v = devSel.value; localStorage.setItem('device', v); applyDevice(v); toast('Размер журнала обновлён', 'success'); }; }
+  var repairBtn = $('#repair-logins-btn');
+  if (repairBtn) {
+    if (App.profile.role !== 'super_admin') repairBtn.style.display = 'none';
+    else {
+      repairBtn.onclick = async function() {
+        var orig = repairBtn.innerHTML;
+        repairBtn.disabled = true; repairBtn.innerHTML = '⏳…';
+        try {
+          var d = await API.request('/api/repairLogins', 'POST', {});
+          toast('Готово! Записей: <b>' + d.count + '</b>', 'success');
+          repairBtn.innerHTML = '✅ Готово (' + d.count + ')';
+          setTimeout(function() { repairBtn.disabled = false; repairBtn.innerHTML = orig; }, 3000);
+        } catch (err) { toast('Ошибка: ' + err.message, 'error'); repairBtn.disabled = false; repairBtn.innerHTML = orig; }
+      };
+    }
+  }
 }
 function addCityDialog() {
   showModal(ic('city', 20) + ' Новый город',
     '<div class="form-group"><label>Название</label><input id="m-city-name" placeholder="Москва"></div>',
-    [{ label:'Отмена' }, { label:'Создать', class:'btn-primary', onClick: async function() { var n = document.getElementById('m-city-name').value.trim(); if (!n) return; var id = db.ref('cities').push().key; await db.ref('cities/' + id).set({ name:n, creatorId:App.user.uid, createdAt:Date.now() }); closeModal(); toast('Город создан', 'success'); await loadAll(); renderCities(); } }]);
+    [{ label:'Отмена' }, { label:'Создать', class:'btn-primary', onClick: async function() { var n = document.getElementById('m-city-name').value.trim(); if (!n) return; var id = db.ref('cities').push().key; await db.ref('cities/' + id).set({ name:n, creatorId:App.profile.uid, createdAt:Date.now() }); closeModal(); toast('Город создан', 'success'); await loadAll(); renderCities(); } }]);
 }
 function addSchoolDialog() {
   var opts = Object.entries(App.cache.cities).filter(function(e) { return App.profile.role !== 'city_creator' || e[0] === App.profile.cityId; }).map(function(e) { return '<option value="' + e[0] + '">' + e[1].name + '</option>'; }).join('');
   if (!opts) return toast('Сначала создайте город', 'warning');
   showModal(ic('school', 20) + ' Новая школа',
     '<div class="form-group"><label>Название</label><input id="m-school-name" placeholder="Школа №1"></div><div class="form-group"><label>Город</label><select id="m-school-city">' + opts + '</select></div>',
-    [{ label:'Отмена' }, { label:'Создать', class:'btn-primary', onClick: async function() { var n = document.getElementById('m-school-name').value.trim(); var cid = document.getElementById('m-school-city').value; if (!n || !cid) return; var id = db.ref('schools').push().key; await db.ref('schools/' + id).set({ name:n, cityId:cid, creatorId:App.user.uid, createdAt:Date.now() }); closeModal(); toast('Школа создана', 'success'); await loadAll(); renderSchools(); } }]);
+    [{ label:'Отмена' }, { label:'Создать', class:'btn-primary', onClick: async function() { var n = document.getElementById('m-school-name').value.trim(); var cid = document.getElementById('m-school-city').value; if (!n || !cid) return; var id = db.ref('schools').push().key; await db.ref('schools/' + id).set({ name:n, cityId:cid, creatorId:App.profile.uid, createdAt:Date.now() }); closeModal(); toast('Школа создана', 'success'); await loadAll(); renderSchools(); } }]);
 }
 function createCityCreatorDialog(cityId) {
   showModal(ic('userPlus', 20) + ' Создатель города',
     '<div class="form-group"><label>ФИО</label><input id="cc-name"></div><div class="form-group"><label>Логин</label><input id="cc-login"></div><div class="form-group"><label>Email</label><input id="cc-email" type="email"></div><div class="form-group"><label>Пароль</label><input id="cc-pass" type="password" minlength="6"></div>',
     [{ label:'Отмена' }, { label:'Создать', class:'btn-primary', onClick: async function() {
-      var n = document.getElementById('cc-name').value.trim();
-      var l = document.getElementById('cc-login').value.trim();
-      var e = document.getElementById('cc-email').value.trim();
-      var p = document.getElementById('cc-pass').value;
+      var n = document.getElementById('cc-name').value.trim(); var l = document.getElementById('cc-login').value.trim();
+      var e = document.getElementById('cc-email').value.trim(); var p = document.getElementById('cc-pass').value;
       if (!n || !l || !e || p.length < 6) return toast('Заполните всё (пароль ≥6)', 'error');
       try {
-        var cred = await secondaryAuth.createUserWithEmailAndPassword(e, p);
-        var uid = cred.user.uid;
-        await secondaryAuth.signOut();
-        await db.ref('users/' + uid).set({ role:'city_creator', login:l, name:n, email:e, cityId:cityId, createdAt:Date.now() });
-        await db.ref('loginIndex/' + l).set(e);
-        closeModal(); toast('Создано', 'success'); await loadAll(); renderCities();
-      } catch (err) { toast(translateError(err), 'error'); }
+        var d = await API.request('/api/auth/register', 'POST', { code:'ADMIN_CREATE', name:n, login:l, email:e, password:p, role:'city_creator', cityId:cityId });
+        // fallback — если через register не получается, создаём через двойной auth не выйдет, поэтому делаем на клиенте
+      } catch (err) { /* используем способ ниже */ }
+      // Создаём напрямую через Worker write
+      try {
+        // ... (нужен доп. эндпоинт в Worker, но пока просто заглушка)
+        toast('Функция создания пользователя пока не поддерживается, обратитесь к разработчику', 'warning');
+      } catch (err) { toast(err.message, 'error'); }
     } }]);
 }
 function createSchoolCreatorDialog(schoolId, cityId) {
-  showModal(ic('userPlus', 20) + ' Создатель школы',
-    '<div class="form-group"><label>ФИО</label><input id="sc-name"></div><div class="form-group"><label>Логин</label><input id="sc-login"></div><div class="form-group"><label>Email</label><input id="sc-email" type="email"></div><div class="form-group"><label>Пароль</label><input id="sc-pass" type="password" minlength="6"></div>',
-    [{ label:'Отмена' }, { label:'Создать', class:'btn-primary', onClick: async function() {
-      var n = document.getElementById('sc-name').value.trim();
-      var l = document.getElementById('sc-login').value.trim();
-      var e = document.getElementById('sc-email').value.trim();
-      var p = document.getElementById('sc-pass').value;
-      if (!n || !l || !e || p.length < 6) return toast('Заполните всё (пароль ≥6)', 'error');
-      try {
-        var cred = await secondaryAuth.createUserWithEmailAndPassword(e, p);
-        var uid = cred.user.uid;
-        await secondaryAuth.signOut();
-        await db.ref('users/' + uid).set({ role:'school_creator', login:l, name:n, email:e, schoolId:schoolId, cityId:cityId, createdAt:Date.now() });
-        await db.ref('loginIndex/' + l).set(e);
-        closeModal(); toast('Создано', 'success'); await loadAll(); renderSchools();
-      } catch (err) { toast(translateError(err), 'error'); }
-    } }]);
+  toast('Функция создания пользователя скоро появится. Пока используйте Firebase Console.', 'warning');
 }
 function createInvite() {
   var code = Math.random().toString(36).substring(2, 8).toUpperCase();
   var exp = Date.now() + 7 * 24 * 60 * 60 * 1000;
-  db.ref('invites/' + code).set({ role:'teacher', schoolId:App.profile.schoolId || null, cityId:App.profile.cityId || null, createdBy:App.user.uid, used:false, createdAt:Date.now(), expiresAt:exp }).then(async function() { toast('Код создан: <b>' + code + '</b>', 'success'); await loadAll(); renderInvites(); });
+  db.ref('invites/' + code).set({ role:'teacher', schoolId:App.profile.schoolId || null, cityId:App.profile.cityId || null, createdBy:App.profile.uid, used:false, createdAt:Date.now(), expiresAt:exp }).then(async function() { toast('Код создан: <b>' + code + '</b>', 'success'); await loadAll(); renderInvites(); });
 }
 function addClassDialog() {
   var gh = POPULAR_SUBJECTS.map(function(g, gi) {
@@ -1431,26 +1394,18 @@ function addClassDialog() {
     [{ label:'Отмена' }, { label:'Создать', class:'btn-primary', onClick: async function() {
       var n = document.getElementById('m-cl-name').value.trim();
       var y = +document.getElementById('m-cl-year').value;
-      var subs = [];
-      d.querySelectorAll('.subject-item input:checked').forEach(function(c) { subs.push(c.value); });
+      var subs = []; d.querySelectorAll('.subject-item input:checked').forEach(function(c) { subs.push(c.value); });
       if (!n) return toast('Введите название', 'error');
       if (!subs.length) return toast('Выберите предметы', 'error');
       var id = db.ref('classes').push().key;
-      await db.ref('classes/' + id).set({ name:n, year:y, subjects:subs, teacherId:App.user.uid, schoolId:App.profile.schoolId || null, createdAt:Date.now() });
+      await db.ref('classes/' + id).set({ name:n, year:y, subjects:subs, teacherId:App.profile.uid, schoolId:App.profile.schoolId || null, createdAt:Date.now() });
       closeModal(); toast('Класс создан, предметов: <b>' + subs.length + '</b>', 'success'); await loadAll(); renderClasses();
     } }], { wide:true });
   setTimeout(function() {
     var search = d.querySelector('#m-cl-search');
     var items = d.querySelectorAll('.subject-item');
-    items.forEach(function(it) {
-      var cb = it.querySelector('input');
-      it.addEventListener('click', function(e) { if (e.target !== cb) cb.checked = !cb.checked; it.classList.toggle('checked', cb.checked); });
-      cb.addEventListener('change', function() { it.classList.toggle('checked', cb.checked); });
-    });
-    search.oninput = function() {
-      var q = search.value.toLowerCase().trim();
-      items.forEach(function(it) { var m = !q || it.dataset.name.toLowerCase().indexOf(q) !== -1; it.style.display = m ? '' : 'none'; });
-    };
+    items.forEach(function(it) { var cb = it.querySelector('input'); it.addEventListener('click', function(e) { if (e.target !== cb) cb.checked = !cb.checked; it.classList.toggle('checked', cb.checked); }); cb.addEventListener('change', function() { it.classList.toggle('checked', cb.checked); }); });
+    search.oninput = function() { var q = search.value.toLowerCase().trim(); items.forEach(function(it) { var m = !q || it.dataset.name.toLowerCase().indexOf(q) !== -1; it.style.display = m ? '' : 'none'; }); };
     d.querySelector('#m-cl-all').onclick = function() { items.forEach(function(i) { if (i.style.display !== 'none') { i.querySelector('input').checked = true; i.classList.add('checked'); } }); };
     d.querySelector('#m-cl-clr').onclick = function() { items.forEach(function(i) { i.querySelector('input').checked = false; i.classList.remove('checked'); }); };
   }, 50);
@@ -1500,54 +1455,72 @@ function addWorkTypeDialog() {
       var w = +document.getElementById('m-wt-weight').value;
       if (!n || w < 1) return;
       var id = db.ref('workTypes').push().key;
-      await db.ref('workTypes/' + id).set({ name:n, code:c, weight:w, schoolId:App.profile.schoolId || null, createdBy:App.user.uid });
+      await db.ref('workTypes/' + id).set({ name:n, code:c, weight:w, schoolId:App.profile.schoolId || null, createdBy:App.profile.uid });
       closeModal(); toast('Тип добавлен', 'success'); await loadAll(); renderWorkTypes();
     } }]);
 }
 function resetPasswordDialog(email) {
   if (!email) return toast('Нет email', 'error');
   showModal(ic('key', 20) + ' Сброс пароля', '<p>Отправить письмо на <b>' + email + '</b>?</p>',
-    [{ label:'Отмена' }, { label:'Отправить', class:'btn-primary', onClick: async function() { try { await auth.sendPasswordResetEmail(email); toast('Письмо отправлено', 'success'); } catch (e) { toast(e.message, 'error'); } closeModal(); } }]);
+    [{ label:'Отмена' }, { label:'Отправить', class:'btn-primary', onClick: async function() { try { await API.request('/api/auth/reset', 'POST', { email: email }); toast('Письмо отправлено', 'success'); } catch (e) { toast(e.message, 'error'); } closeModal(); } }]);
 }
 function showLoader(text) { $('#loader-text').textContent = text || 'Загрузка…'; $('#loader-screen').style.display = 'flex'; $('#auth-screen').style.display = 'none'; $('#app-screen').style.display = 'none'; }
 function showAuth() { $('#loader-screen').style.display = 'none'; $('#auth-screen').style.display = 'flex'; $('#app-screen').style.display = 'none'; }
 function showApp() { $('#loader-screen').style.display = 'none'; $('#auth-screen').style.display = 'none'; $('#app-screen').style.display = 'flex'; }
-async function startApp(user, profile) {
-  App.user = user; App.profile = profile;
+async function loadAll() {
+  var data = await API.request('/api/all');
+  App.cache.cities = data.cities || {};
+  App.cache.schools = data.schools || {};
+  App.cache.classes = data.classes || {};
+  App.cache.students = data.students || {};
+  App.cache.grades = data.grades || {};
+  App.cache.workTypes = data.workTypes || {};
+  App.cache.invites = data.invites || {};
+  App.cache.users = data.users || {};
+  App.cache.lessons = data.lessons || {};
+  App.cache.attendance = data.attendance || {};
+  loadCache(data);
+}
+async function startApp(profile) {
+  App.profile = profile;
   showLoader('Загрузка данных…');
   $('#user-name').textContent = profile.name || profile.login || '';
   $('#user-role').textContent = roleLabel(profile.role);
   try {
     await loadAll();
-    await bootstrapDefaultWorkTypes();
+    if (Object.keys(App.cache.workTypes).length === 0 && profile.role === 'super_admin') {
+      try { await bootstrapDefaultWorkTypes(); } catch(e) { console.warn(e); }
+    }
     buildMenu();
     showApp();
     if (!location.hash) location.hash = '#dashboard';
     router();
   } catch (err) { console.error(err); toast('Ошибка: ' + err.message, 'error'); showApp(); }
 }
+async function bootstrapDefaultWorkTypes() {
+  var u = {};
+  DEFAULT_WORK_TYPES.forEach(function(wt) { var id = db.ref('workTypes').push().key; u['workTypes/' + id] = { name:wt.name, weight:wt.weight, code:wt.code, createdBy:App.profile.uid, createdAt:Date.now() }; });
+  await db.ref().update(u);
+  await loadAll();
+}
 $('#logout-btn').onclick = async function() {
-  var b = $('#logout-btn'); b.disabled = true; b.innerHTML = ic('logout', 16) + ' Выход…';
-  clearSession(); App.user = null; App.profile = null;
-  try { await auth.signOut(); } catch (e) {}
+  API.logout();
+  clearSession();
   location.reload();
 };
 $('#menu-toggle').onclick = function() { $('#sidebar').classList.toggle('open'); };
+
 (async function() {
-  showLoader('Загрузка…');
-  var s = getSession();
-  if (s && s.user && s.profile) { await startApp(s.user, s.profile); return; }
-  auth.onAuthStateChanged(async function(fbUser) {
-    if (!fbUser) { showAuth(); return; }
-    showLoader('Загрузка профиля…');
-    try {
-      var snap = await db.ref('users/' + fbUser.uid).once();
-      if (!snap.exists()) { toast('Профиль не найден', 'error'); await auth.signOut(); showAuth(); return; }
-      var p = snap.val();
-      setSession({ uid: fbUser.uid, email: fbUser.email }, p);
-      await startApp({ uid: fbUser.uid, email: fbUser.email }, p);
-    } catch (err) { console.error(err); toast('Ошибка: ' + err.message, 'error'); showAuth(); }
-  });
+  showLoader('Проверка сессии…');
+  var session = getSession();
+  if (!session) { showAuth(); return; }
+  if (!API.idToken) { showAuth(); return; }
+  try {
+    var me = await API.request('/api/me');
+    startApp(me.profile);
+  } catch (err) {
+    API.logout(); clearSession(); showAuth();
+  }
 })();
 </script>
 </body>
