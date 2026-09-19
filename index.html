@@ -194,6 +194,15 @@ th{background:var(--bg);font-weight:700;font-size:11px;text-transform:uppercase;
 .today-lesson .tl-body{flex:1;min-width:0}
 .today-lesson .tl-title{font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .today-lesson .tl-sub{font-size:11px;color:var(--text-muted);margin-top:2px}
+/* ---------- Cookie Banner ---------- */
+.cookie-banner{position:fixed;left:20px;right:20px;bottom:20px;background:var(--bg-elev);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-lg);padding:18px 22px;display:flex;align-items:center;gap:16px;z-index:1500;animation:slideUp .4s ease;flex-wrap:wrap}
+.cookie-banner p{margin:0;font-size:13px;color:var(--text-muted);flex:1;min-width:200px;line-height:1.5}
+.cookie-banner a{color:var(--primary);text-decoration:underline;font-weight:600}
+@media (max-width:600px){.cookie-banner{left:10px;right:10px;bottom:10px;padding:14px;flex-direction:column;align-items:stretch}.cookie-banner p{min-width:0}}
+/* ---------- Consent Checkbox ---------- */
+.consent-group{display:flex;align-items:flex-start;gap:10px;margin:16px 0;padding:12px 14px;background:var(--bg);border-radius:10px;border:1.5px solid var(--border)}
+.consent-group input[type="checkbox"]{width:18px;height:18px;margin-top:1px;accent-color:var(--primary);cursor:pointer;flex-shrink:0}
+.consent-group label{font-size:12px;color:var(--text-muted);line-height:1.5;cursor:pointer;margin:0;text-transform:none;letter-spacing:normal;font-weight:400}
 </style>
 </head>
 <body>
@@ -240,6 +249,10 @@ th{background:var(--bg);font-weight:700;font-size:11px;text-transform:uppercase;
       <div class="form-group"><label>Логин</label><input type="text" id="reg-login" required placeholder="ivanov"></div>
       <div class="form-group"><label>Email</label><input type="email" id="reg-email" required placeholder="ivanov@mail.ru"></div>
       <div class="form-group"><label>Пароль</label><input type="password" id="reg-password" required minlength="6" placeholder="минимум 6 символов"></div>
+      <div class="consent-group" id="consent-group-register">
+        <input type="checkbox" id="consent-register">
+        <label for="consent-register">Я согласен на обработку моих персональных данных в соответствии с <a href="#" target="_blank" onclick="showPrivacyPolicy(); return false;">Политикой конфиденциальности</a></label>
+      </div>
       <button type="submit" class="btn btn-primary btn-block">Зарегистрироваться</button>
     </form>
     <div id="auth-message" class="auth-message"></div>
@@ -287,10 +300,89 @@ th{background:var(--bg);font-weight:700;font-size:11px;text-transform:uppercase;
   </main>
 </div>
 
+<!-- Cookie Banner -->
+<div id="cookie-banner" class="cookie-banner" style="display:none;">
+  <p>
+    Мы используем файлы cookie, чтобы улучшить работу сайта и проанализировать его посещаемость. 
+    Продолжая использовать сайт, вы соглашаетесь с нашей <a href="#" onclick="showPrivacyPolicy(); return false;">Политикой конфиденциальности</a> и даёте согласие на обработку файлов cookie.
+  </p>
+  <button id="cookie-accept-btn" class="btn btn-primary">Принять</button>
+</div>
+
+<!-- Модальное окно политики конфиденциальности -->
+<div id="privacy-policy-modal" style="display:none; position:fixed; inset:0; background:rgba(15,23,42,.75); z-index:2000; align-items:center; justify-content:center; padding:20px;">
+  <div style="background:#fff; border-radius:18px; padding:28px; max-width:720px; width:100%; max-height:85vh; overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,.3);">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+      <h2 style="font-size:20px; font-weight:800; margin:0;">Политика конфиденциальности</h2>
+      <button onclick="closePrivacyPolicy()" style="background:none; border:none; font-size:28px; cursor:pointer; color:#64748B; line-height:1;">&times;</button>
+    </div>
+    <div style="font-size:14px; line-height:1.7; color:#334155;">
+      <p><b>1. Общие положения</b></p>
+      <p>Настоящая Политика конфиденциальности (далее — Политика) действует в отношении всей информации, которую сайт «Класс Жур» (далее — Сайт) может получить о Пользователе во время использования Сайта.</p>
+      <p><b>2. Какие данные мы собираем</b></p>
+      <p>2.1. Мы собираем следующие категории данных:</p>
+      <ul style="padding-left:20px;">
+        <li>ФИО, адрес электронной почты, логин — при регистрации;</li>
+        <li>Данные об успеваемости учеников — при использовании журнала;</li>
+        <li>Файлы cookie и данные о посещении (IP-адрес, тип браузера, страницы) — автоматически.</li>
+      </ul>
+      <p><b>3. Цели обработки</b></p>
+      <p>3.1. Данные используются исключительно для обеспечения работы журнала, авторизации пользователей, ведения успеваемости и улучшения качества сервиса.</p>
+      <p><b>4. Передача данных третьим лицам</b></p>
+      <p>4.1. Мы не передаём персональные данные третьим лицам, за исключением случаев, предусмотренных законодательством РФ.</p>
+      <p><b>5. Согласие на обработку</b></p>
+      <p>5.1. Используя Сайт, Пользователь даёт согласие на обработку персональных данных в соответствии с Федеральным законом №152-ФЗ «О персональных данных».</p>
+      <p>5.2. Согласие может быть отозвано Пользователем путём направления письменного уведомления администрации Сайта.</p>
+      <p><b>6. Cookie</b></p>
+      <p>6.1. Сайт использует файлы cookie для аутентификации и аналитики. Пользователь может отключить cookie в настройках браузера, однако это может повлиять на работу Сайта.</p>
+      <p><b>7. Контакты</b></p>
+      <p>7.1. По всем вопросам, связанным с обработкой персональных данных, обращайтесь: <a href="mailto:privacy@klassjur.ru" style="color:#0EA5E9;">privacy@klassjur.ru</a></p>
+      <p style="margin-top:20px; font-size:12px; color:#94A3B8;">Редакция от 19.09.2026</p>
+    </div>
+    <button onclick="closePrivacyPolicy()" class="btn btn-primary" style="margin-top:20px; width:100%;">Закрыть</button>
+  </div>
+</div>
+
 <div id="modal-root"></div>
 <div id="toast-root" class="toast-root"></div>
 
 <script>
+/* ============================================================
+   Cookie consent
+============================================================ */
+function initCookieBanner() {
+  var accepted = localStorage.getItem('cookie_consent');
+  if (accepted === 'accepted') return;
+  var banner = document.getElementById('cookie-banner');
+  if (banner) banner.style.display = 'flex';
+  var btn = document.getElementById('cookie-accept-btn');
+  if (btn) {
+    btn.onclick = function() {
+      localStorage.setItem('cookie_consent', 'accepted');
+      banner.style.display = 'none';
+    };
+  }
+}
+
+function showPrivacyPolicy() {
+  var modal = document.getElementById('privacy-policy-modal');
+  if (modal) modal.style.display = 'flex';
+}
+
+function closePrivacyPolicy() {
+  var modal = document.getElementById('privacy-policy-modal');
+  if (modal) modal.style.display = 'none';
+}
+
+/* Закрытие по клику вне окна */
+window.addEventListener('click', function(e) {
+  var modal = document.getElementById('privacy-policy-modal');
+  if (e.target === modal) closePrivacyPolicy();
+});
+
+/* ============================================================
+   API-КЛИЕНТ
+============================================================ */
 var WORKER_URL = 'https://klassjur-api.c6fpjs5ryf.workers.dev';
 
 var API = {
@@ -343,6 +435,9 @@ var API = {
   }
 };
 
+/* ============================================================
+   МИМИКРИЯ FIREBASE — через Worker
+============================================================ */
 var _writeQueue = [];
 var _writeTimer = null;
 
@@ -431,6 +526,9 @@ var db = {
   _flush: flushWrites
 };
 
+/* ============================================================
+   Константы
+============================================================ */
 var QUARTERS = [
   { id:'q1', name:'I четверть',  sm:8,  sd:1, em:9,  ed:27 },
   { id:'q2', name:'II четверть', sm:10, sd:5, em:11, ed:28 },
@@ -612,6 +710,13 @@ $('#register-form').addEventListener('submit', async function(e) {
   var login = $('#reg-login').value.trim();
   var email = $('#reg-email').value.trim();
   var password = $('#reg-password').value;
+
+  var consent = document.getElementById('consent-register');
+  if (!consent || !consent.checked) {
+    showAuthMsg('Необходимо согласие на обработку персональных данных');
+    return;
+  }
+
   try {
     var d = await API.request('/api/auth/register', 'POST', { code:code, name:name, login:login, email:email, password:password });
     API.save(d.idToken, d.refreshToken);
@@ -760,13 +865,11 @@ async function renderDashboard() {
   });
   c.appendChild(grid);
 
-  /* Telegram-баннер — теперь всегда наверху, сразу после статистики */
   var tg = el('a', { class:'tg-banner dash-anim', href:'https://t.me/klassjur', target:'_blank', rel:'noopener' });
   tg.style.animationDelay = '400ms';
   tg.innerHTML = '<div style="width:52px;height:52px;border-radius:14px;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;"><svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg></div><div style="flex:1;"><div style="font-size:16px;font-weight:800;">Мы в Telegram</div><div style="font-size:13px;opacity:.92;">Новости и обновления журнала</div></div>';
   c.appendChild(tg);
 
-  /* Расширенные виджеты по ролям */
   if (role === 'teacher') {
     await renderTeacherWidgets(c);
   } else if (role === 'school_creator') {
@@ -1779,6 +1882,11 @@ $('#logout-btn').onclick = async function() {
   location.reload();
 };
 $('#menu-toggle').onclick = function() { $('#sidebar').classList.toggle('open'); };
+
+/* ============================================================
+   ИНИЦИАЛИЗАЦИЯ
+============================================================ */
+initCookieBanner();
 
 (async function() {
   showLoader('Проверка сессии…');
