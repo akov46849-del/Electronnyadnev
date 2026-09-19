@@ -1,1 +1,2289 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Класс Жур — электронный журнал</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'><rect width='120' height='120' rx='28' fill='%230EA5E9'/><path d='M25 40 Q60 30 60 40 Q60 30 95 40 L95 82 Q60 72 60 82 Q60 72 25 82 Z' fill='%23FFFFFF'/><line x1='60' y1='40' x2='60' y2='82' stroke='%230EA5E9' stroke-width='2'/><path d='M42 60 L56 74 L84 46' stroke='%23FACC15' stroke-width='6' stroke-linecap='round' stroke-linejoin='round' fill='none'/></svg>">
+<style>
+:root{
+  --bg:#F8FAFC;--bg-elev:#FFFFFF;--text:#0F172A;--text-muted:#64748B;--border:#E2E8F0;
+  --primary:#0EA5E9;--primary-hover:#0284C7;--accent:#A855F7;--brand-yellow:#FACC15;
+  --danger:#EF4444;--success:#10B981;--warning:#F59E0B;
+  --shadow:0 1px 3px rgba(15,23,42,.08),0 1px 2px rgba(15,23,42,.04);
+  --shadow-lg:0 10px 25px rgba(14,165,233,.18);
+  --radius:12px;--radius-lg:18px;--transition:.2s ease;
+  --j-cell:22px;--j-row:22px;--j-font:10px;--j-head-font:10px;
+  --j-name-w:140px;--j-num-w:24px;--j-avg-w:44px;
+}
+[data-theme="dark"]{
+  --bg:#0F172A;--bg-elev:#1E293B;--text:#E2E8F0;--text-muted:#94A3B8;--border:#334155;
+  --primary:#38BDF8;--primary-hover:#7DD3FC;--accent:#C084FC;--brand-yellow:#FDE047;
+  --shadow:0 1px 3px rgba(0,0,0,.4);--shadow-lg:0 10px 25px rgba(56,189,248,.25);
+}
+html[data-device="phone"]{--j-cell:16px;--j-row:16px;--j-font:9px;--j-head-font:8px;--j-name-w:90px;--j-num-w:16px;--j-avg-w:32px}
+html[data-device="tablet"]{--j-cell:22px;--j-row:22px;--j-font:10px;--j-head-font:10px;--j-name-w:140px;--j-num-w:24px;--j-avg-w:44px}
+html[data-device="desktop"]{--j-cell:28px;--j-row:28px;--j-font:12px;--j-head-font:11px;--j-name-w:200px;--j-num-w:32px;--j-avg-w:58px}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--text);font-size:14px;transition:background var(--transition),color var(--transition)}
+a{color:var(--primary);text-decoration:none}
+button{font-family:inherit}
+.brand{display:flex;align-items:center;gap:12px}
+.brand-logo{flex-shrink:0;filter:drop-shadow(0 4px 10px rgba(14,165,233,.25))}
+.brand-text{line-height:1.1}
+.brand-name{font-size:16px;font-weight:800;letter-spacing:-.02em;background:linear-gradient(135deg,var(--primary),var(--accent));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
+.brand-tag{font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin-top:2px}
+.btn svg{flex-shrink:0}
+.nav-item svg{flex-shrink:0}
+.nav-item span{flex:1}
+#auth-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px;background:linear-gradient(135deg,#0EA5E9 0%,#38BDF8 40%,#A855F7 100%);position:relative;overflow:hidden}
+#auth-screen::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 15% 20%,rgba(250,204,21,.15),transparent 45%),radial-gradient(circle at 85% 80%,rgba(168,85,247,.25),transparent 50%);pointer-events:none}
+.auth-card{background:var(--bg-elev);border-radius:var(--radius-lg);padding:36px;max-width:430px;width:100%;box-shadow:var(--shadow-lg);animation:slideUp .4s ease;position:relative;z-index:1}
+@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.auth-logo{text-align:center;margin-bottom:28px}
+.auth-logo .brand-logo{margin:0 auto 14px;display:block}
+.auth-logo h1{font-size:26px;margin-bottom:6px;letter-spacing:-.03em;background:linear-gradient(135deg,var(--primary),var(--accent));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
+.auth-subtitle{color:var(--text-muted);font-size:13px;font-weight:500}
+.auth-slogan{display:inline-flex;align-items:center;gap:6px;margin-top:12px;padding:5px 14px;background:linear-gradient(135deg,rgba(14,165,233,.12),rgba(168,85,247,.12));color:var(--primary);font-size:11px;font-weight:700;border-radius:20px}
+.auth-slogan svg{color:var(--brand-yellow)}
+.auth-tabs{display:flex;background:var(--bg);border-radius:var(--radius);padding:4px;margin-bottom:20px}
+.auth-tab{flex:1;padding:9px;border:none;background:transparent;color:var(--text-muted);font-weight:600;border-radius:9px;cursor:pointer;transition:var(--transition);font-size:13px}
+.auth-tab.active{background:var(--bg-elev);color:var(--text);box-shadow:var(--shadow)}
+.auth-form{display:none}
+.auth-form.active{display:block;animation:fadeIn .3s ease}
+.form-group{margin-bottom:14px}
+.form-group label{display:block;font-size:11px;font-weight:700;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em}
+input,select,textarea{width:100%;padding:11px 13px;border:1.5px solid var(--border);background:var(--bg);color:var(--text);border-radius:10px;font-size:14px;font-family:inherit;transition:var(--transition)}
+textarea{resize:vertical;min-height:80px}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--primary);background:var(--bg-elev);box-shadow:0 0 0 4px rgba(14,165,233,.15)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:10px 18px;border:1px solid transparent;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;transition:var(--transition);white-space:nowrap}
+.btn-primary{background:linear-gradient(135deg,var(--primary),#38BDF8);color:#fff;box-shadow:0 4px 12px rgba(14,165,233,.28)}
+.btn-primary:hover{background:linear-gradient(135deg,var(--primary-hover),var(--primary));transform:translateY(-1px);box-shadow:0 6px 18px rgba(14,165,233,.4)}
+.btn-danger{background:var(--danger);color:#fff}
+.btn-danger:hover{background:#DC2626;transform:translateY(-1px)}
+.btn-ghost{background:transparent;color:var(--text);border:1.5px solid var(--border)}
+.btn-ghost:hover{background:var(--bg);border-color:var(--primary);color:var(--primary)}
+.btn-success{background:var(--success);color:#fff}
+.btn-success:hover{background:#059669}
+.btn-warn{background:transparent;color:var(--danger);border:1.5px solid var(--danger)}
+.btn-warn:hover{background:var(--danger);color:#fff}
+.btn-block{width:100%}
+.btn-sm{padding:6px 11px;font-size:12px;border-radius:8px;gap:5px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.auth-link{display:block;text-align:center;margin-top:16px;font-size:13px;color:var(--text-muted);font-weight:500}
+.auth-link:hover{color:var(--primary)}
+.auth-message{margin-top:16px;padding:11px 14px;border-radius:10px;font-size:13px;display:none}
+.auth-message.error{display:block;background:rgba(239,68,68,.1);color:var(--danger)}
+.auth-message.success{display:block;background:rgba(16,185,129,.1);color:var(--success)}
+#app-screen{display:flex;min-height:100vh}
+.sidebar{width:240px;background:var(--bg-elev);border-right:1px solid var(--border);display:flex;flex-direction:column;transition:transform var(--transition)}
+.sidebar-header{padding:20px 18px;border-bottom:1px solid var(--border)}
+.sidebar-nav{flex:1;padding:12px;overflow-y:auto}
+.nav-item{display:flex;align-items:center;gap:11px;padding:11px 13px;border-radius:10px;color:var(--text-muted);cursor:pointer;font-size:14px;font-weight:500;margin-bottom:2px;transition:var(--transition);position:relative}
+.nav-item:hover{background:var(--bg);color:var(--text)}
+.nav-item.active{background:linear-gradient(135deg,rgba(14,165,233,.12),rgba(168,85,247,.08));color:var(--primary);font-weight:600}
+.nav-item.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:20px;background:var(--primary);border-radius:0 3px 3px 0}
+.sidebar-footer{padding:12px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:6px}
+.sidebar-footer-row{display:flex;gap:8px;width:100%}
+.sidebar-footer-row .btn{flex:1}
+.tg-link{display:flex;align-items:center;justify-content:center;gap:8px;padding:9px 12px;border-radius:10px;background:linear-gradient(135deg,#0088cc,#00a3e0);color:#fff!important;font-size:13px;font-weight:600;transition:var(--transition);text-decoration:none}
+.tg-link:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,136,204,.4);color:#fff!important}
+.main{flex:1;display:flex;flex-direction:column;min-width:0}
+.topbar{display:flex;align-items:center;gap:16px;padding:14px 22px;background:var(--bg-elev);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:10}
+.topbar h1{font-size:18px;flex:1;font-weight:700;letter-spacing:-.01em}
+.user-info{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:500}
+.badge{padding:4px 10px;background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff;border-radius:20px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em}
+.content{padding:18px;flex:1}
+.only-mobile{display:none}
+@media (max-width:768px){.only-mobile{display:inline-flex}.sidebar{position:fixed;z-index:100;height:100%;transform:translateX(-100%)}.sidebar.open{transform:translateX(0);box-shadow:var(--shadow-lg)}.content{padding:12px}}
+.card{background:var(--bg-elev);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);margin-bottom:14px;border:1px solid var(--border)}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:12px;flex-wrap:wrap}
+.card-title{font-size:15px;font-weight:700;letter-spacing:-.01em}
+.grid{display:grid;gap:14px}
+.grid-3{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+.grid-4{grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}
+.stat-card{background:var(--bg-elev);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);transition:var(--transition);border:1px solid var(--border);position:relative;overflow:hidden}
+.stat-card::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--primary),var(--accent));opacity:0;transition:var(--transition)}
+.stat-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg);border-color:transparent}
+.stat-card:hover::after{opacity:1}
+.stat-label{font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;font-weight:700}
+.stat-value{font-size:26px;font-weight:800;letter-spacing:-.02em}
+table{width:100%;border-collapse:collapse;font-size:13px;background:var(--bg-elev);border-radius:var(--radius);overflow:hidden}
+th,td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--border)}
+th{background:var(--bg);font-weight:700;font-size:11px;text-transform:uppercase;color:var(--text-muted);letter-spacing:.05em}
+tbody tr:hover{background:rgba(14,165,233,.04)}
+tbody tr:last-child td{border-bottom:none}
+.empty{padding:38px;text-align:center;color:var(--text-muted)}
+.grade{display:inline-flex;align-items:center;justify-content:center;min-width:28px;height:28px;padding:0 8px;border-radius:8px;font-weight:800;color:#fff;cursor:pointer;transition:var(--transition)}
+.g-5{background:#10B981}.g-4{background:#84CC16}.g-3{background:#F59E0B}.g-2{background:#EF4444}.g-1{background:#991B1B}
+.modal-backdrop{position:fixed;inset:0;background:rgba(15,23,42,.55);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;z-index:200;padding:20px;animation:fadeIn .2s ease}
+.modal{background:var(--bg-elev);border-radius:var(--radius-lg);padding:22px;max-width:520px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow-lg);animation:slideUp .25s ease}
+.modal-wide{max-width:680px}
+.modal-title{font-size:17px;margin-bottom:16px;font-weight:800;letter-spacing:-.01em;display:flex;align-items:center;gap:10px}
+.modal-title svg{color:var(--primary);flex-shrink:0}
+.modal-body{font-size:14px;line-height:1.65;color:var(--text)}
+.modal-body b{color:var(--text);font-weight:700}
+.modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:20px;flex-wrap:wrap}
+.toast-root{position:fixed;top:20px;right:20px;z-index:300;display:flex;flex-direction:column;gap:10px;pointer-events:none}
+.toast{background:var(--bg-elev);color:var(--text);padding:12px 16px;border-radius:12px;box-shadow:var(--shadow-lg);font-size:13px;animation:slideIn .3s ease;pointer-events:auto;max-width:340px;border-left:4px solid var(--primary);font-weight:500;display:flex;align-items:flex-start;gap:10px}
+.toast svg{flex-shrink:0;margin-top:1px}
+.toast.success{border-left-color:var(--success)}.toast.success svg{color:var(--success)}
+.toast.error{border-left-color:var(--danger)}.toast.error svg{color:var(--danger)}
+.toast.warning{border-left-color:var(--warning)}.toast.warning svg{color:var(--warning)}
+.toast.info svg{color:var(--primary)}
+@keyframes slideIn{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:translateX(0)}}
+.invite-code{display:inline-flex;align-items:center;gap:8px;font-family:"Courier New",monospace;background:var(--bg);padding:7px 12px;border-radius:8px;font-weight:800;font-size:15px;letter-spacing:.12em;color:var(--primary);border:1.5px dashed rgba(14,165,233,.3)}
+.invite-code.used{opacity:.45;text-decoration:line-through;color:var(--text-muted)}
+.loader{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;z-index:999}
+.spinner{width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.hint{font-size:12px;color:var(--text-muted);margin-top:6px;line-height:1.5;display:flex;align-items:center;gap:6px}
+.hint svg{flex-shrink:0}
+.brand-logo{animation:pulse 3s ease-in-out infinite}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+.subjects-toolbar{display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap}
+.subjects-toolbar input{flex:1;min-width:140px}
+.subjects-box{max-height:300px;overflow-y:auto;border:1.5px solid var(--border);border-radius:10px;padding:10px;background:var(--bg)}
+.subject-group{margin-bottom:12px}
+.subject-group:last-child{margin-bottom:0}
+.subject-group-title{font-size:11px;text-transform:uppercase;color:var(--text-muted);font-weight:700;letter-spacing:.05em;margin-bottom:5px;display:flex;align-items:center;gap:6px}
+.subject-item{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:7px;cursor:pointer;transition:var(--transition);font-size:13px;user-select:none}
+.subject-item:hover{background:var(--bg-elev)}
+.subject-item.checked{background:linear-gradient(135deg,rgba(14,165,233,.12),rgba(168,85,247,.08));color:var(--primary);font-weight:600}
+.subject-item input[type="checkbox"]{width:16px;height:16px;margin:0;flex-shrink:0;accent-color:var(--primary);cursor:pointer}
+.subject-counter{margin-top:8px;font-size:12px;color:var(--text-muted)}
+.subject-counter b{color:var(--primary);font-weight:700}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes progressFill{from{width:0}to{width:var(--target-width, 0%)}}
+.dash-anim{animation:fadeInUp .55s cubic-bezier(.16,1,.3,1) both}
+.dash-greet{background:linear-gradient(135deg,#0EA5E9 0%,#38BDF8 40%,#A855F7 100%);color:#fff;border-radius:var(--radius-lg);padding:26px 28px;margin-bottom:18px;position:relative;overflow:hidden;box-shadow:0 8px 32px rgba(14,165,233,.3)}
+.dash-greet::before{content:'';position:absolute;top:-60px;right:-60px;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,rgba(250,204,21,.35),transparent 70%);pointer-events:none}
+.dash-greet::after{content:'';position:absolute;bottom:-70px;left:-40px;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.15),transparent 70%);pointer-events:none}
+.dash-greet-content{position:relative;z-index:1}
+.dash-greet h2{font-size:24px;font-weight:800;letter-spacing:-.02em;margin-bottom:6px;color:#fff}
+.dash-greet p{font-size:14px;opacity:.92}
+.dash-greet-date{display:inline-flex;align-items:center;gap:8px;margin-top:14px;padding:6px 14px;background:rgba(255,255,255,.18);backdrop-filter:blur(10px);border-radius:20px;font-size:12px;font-weight:600}
+.grade-dist{display:flex;flex-direction:column;gap:10px}
+.grade-dist-row{display:flex;align-items:center;gap:12px}
+.grade-dist-label{min-width:32px;font-weight:800;font-size:14px;text-align:center}
+.grade-dist-bar{flex:1;height:24px;background:var(--bg);border-radius:8px;overflow:hidden;position:relative}
+.grade-dist-fill{height:100%;border-radius:8px;display:flex;align-items:center;padding-left:10px;color:#fff;font-size:11px;font-weight:700;animation:progressFill 1s cubic-bezier(.16,1,.3,1) both}
+.grade-dist-5{background:linear-gradient(90deg,#10B981,#059669)}
+.grade-dist-4{background:linear-gradient(90deg,#84CC16,#65A30D)}
+.grade-dist-3{background:linear-gradient(90deg,#F59E0B,#D97706)}
+.grade-dist-2{background:linear-gradient(90deg,#EF4444,#DC2626)}
+.grade-dist-count{margin-left:auto;font-size:12px;color:var(--text-muted);font-weight:600;min-width:50px;text-align:right}
+.grade-dist-pct{min-width:50px;text-align:right;font-weight:700;font-size:13px}
+.class-progress-list{display:flex;flex-direction:column;gap:10px}
+.class-progress-item{padding:14px 16px;background:var(--bg);border-radius:12px;border:1px solid var(--border);transition:var(--transition);cursor:pointer}
+.class-progress-item:hover{transform:translateX(4px);border-color:var(--primary);background:var(--bg-elev)}
+.class-progress-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.class-progress-name{font-weight:700;font-size:14px}
+.class-progress-meta{font-size:12px;color:var(--text-muted)}
+.class-progress-bar{height:8px;background:var(--bg-elev);border-radius:4px;overflow:hidden}
+.class-progress-fill{height:100%;border-radius:4px;transition:width .8s cubic-bezier(.16,1,.3,1)}
+.tg-banner{display:flex;align-items:center;gap:16px;padding:18px 22px;background:linear-gradient(135deg,#0088cc 0%,#00a3e0 100%);border-radius:var(--radius);color:#fff;text-decoration:none;box-shadow:0 6px 20px rgba(0,136,204,.3);transition:var(--transition);margin-bottom:16px}
+.tg-banner:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(0,136,204,.4);color:#fff}
+.tg-banner-icon{width:52px;height:52px;border-radius:14px;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.tg-banner-text{flex:1}
+.tg-banner-title{font-size:16px;font-weight:800;margin-bottom:3px}
+.tg-banner-sub{font-size:13px;opacity:.92}
+.tg-banner-arrow{opacity:.8;flex-shrink:0}
+.journal-shell{display:flex;flex-direction:column;height:calc(100vh - 100px);background:var(--bg-elev);border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--shadow);overflow:hidden;animation:fadeIn .3s ease}
+@media (max-width:768px){.journal-shell{height:calc(100vh - 110px)}}
+.journal-top{display:flex;gap:6px;flex-wrap:wrap;align-items:flex-end;padding:8px 12px;background:var(--bg-elev);border-bottom:1px solid var(--border)}
+.journal-top .filter{display:flex;flex-direction:column;gap:2px;min-width:100px}
+.journal-top .filter label{font-size:9px;text-transform:uppercase;color:var(--text-muted);font-weight:700;letter-spacing:.05em}
+.journal-top select{padding:5px 8px;font-size:11px;min-width:100px}
+.journal-top .btn{padding:5px 10px;font-size:11px}
+.journal-sub{padding:5px 12px;background:var(--bg);border-bottom:1px solid var(--border);font-size:10px;color:var(--text-muted);display:flex;gap:10px;flex-wrap:wrap}
+.journal-sub b{color:var(--text);font-weight:700}
+.journal-scroll{flex:1;overflow:auto}
+.j-table{border-collapse:separate;border-spacing:0;font-size:var(--j-font);width:max-content;min-width:100%;font-variant-numeric:tabular-nums}
+.j-table th,.j-table td{border-right:1px solid var(--border);border-bottom:1px solid var(--border);padding:0;text-align:center;background:var(--bg-elev);white-space:nowrap;height:var(--j-row)}
+.j-table thead th{background:var(--bg);font-weight:700;font-size:var(--j-head-font);color:var(--text-muted);position:-webkit-sticky;position:sticky;z-index:2;padding:0 2px}
+.j-table thead tr:nth-child(1) th{top:0;height:20px}
+.j-table thead tr:nth-child(2) th{top:20px;height:var(--j-row)}
+.j-table thead tr:nth-child(3) th{top:calc(20px + var(--j-row));height:16px;font-size:calc(var(--j-font) - 1px)}
+.j-table .col-num{position:-webkit-sticky;position:sticky;left:0;z-index:5;width:var(--j-num-w);min-width:var(--j-num-w);max-width:var(--j-num-w);font-size:calc(var(--j-font) - 1px);color:var(--text-muted);font-weight:600;background:var(--bg-elev)}
+.j-table .col-name{position:-webkit-sticky;position:sticky;left:var(--j-num-w);z-index:5;width:var(--j-name-w);min-width:var(--j-name-w);max-width:var(--j-name-w);text-align:left;padding:0 6px;font-size:var(--j-font);font-weight:500;background:var(--bg-elev);overflow:hidden;text-overflow:ellipsis;box-shadow:3px 0 6px -3px rgba(15,23,42,.15)}
+.j-table thead .col-num,.j-table thead .col-name{z-index:7;background:var(--bg)}
+.j-table .col-avg,.j-table .col-final{position:-webkit-sticky !important;position:sticky !important;background:var(--bg-elev) !important}
+.j-table .col-avg{right:var(--j-avg-w);z-index:5;width:var(--j-avg-w);min-width:var(--j-avg-w);max-width:var(--j-avg-w);font-weight:800;font-size:var(--j-font);border-left:2px solid var(--border) !important}
+.j-table .col-final{right:0;z-index:5;width:var(--j-avg-w);min-width:var(--j-avg-w);max-width:var(--j-avg-w);font-weight:800;font-size:var(--j-font);box-shadow:-3px 0 8px -3px rgba(15,23,42,.15)}
+.j-table thead .col-avg,.j-table thead .col-final{z-index:7;background:var(--bg) !important}
+.j-table td.date-cell{padding:0 !important;position:relative;width:var(--j-cell);min-width:var(--j-cell);max-width:var(--j-cell);height:var(--j-row);max-height:var(--j-row);vertical-align:middle;line-height:normal;overflow:hidden}
+.j-cell{position:absolute;top:1px;left:1px;right:1px;bottom:1px;display:flex;align-items:center;justify-content:center;border-radius:4px;font-weight:800;color:#fff;font-size:var(--j-font);cursor:pointer;transition:filter .12s ease, box-shadow .12s ease;line-height:1;overflow:hidden;max-height:calc(var(--j-row) - 2px)}
+.j-cell:hover{filter:brightness(1.15);box-shadow:0 0 0 2px var(--primary);z-index:6}
+.j-cell.empty{background:transparent;border:1px dashed rgba(148,163,184,.4);color:transparent}
+.j-cell.empty::after{content:'+';font-size:var(--j-font);font-weight:600;opacity:0;color:var(--text-muted)}
+.j-cell.empty:hover{border-color:var(--primary);background:rgba(14,165,233,.1);color:var(--primary);filter:none}
+.j-cell.empty:hover::after{opacity:1;color:var(--primary)}
+.g5{background:#10B981}.g4{background:#84CC16}.g3{background:#F59E0B}.g2{background:#EF4444}.g1{background:#991B1B}
+.j-att-badge{position:absolute;top:0;right:0;width:9px;height:9px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:800;color:#fff;border:1px solid var(--bg-elev);z-index:3;line-height:1;pointer-events:none;box-sizing:border-box}
+.j-att-badge.n{background:#EF4444}
+.j-att-badge.u{background:#F59E0B}
+.j-att-badge.o{background:#64748B}
+.j-cell.has-att{position:relative}
+.j-table .date-h{cursor:pointer;transition:background var(--transition);padding:0 1px;min-width:var(--j-cell)}
+.j-table .date-h:hover{background:rgba(14,165,233,.15);color:var(--primary)}
+.j-table .date-h.weekend{color:#EF4444}
+.j-table .date-h.today{background:linear-gradient(135deg,rgba(14,165,233,.18),rgba(168,85,247,.12));color:var(--primary);font-weight:800}
+.j-table .month-h{background:linear-gradient(180deg,var(--bg) 0%,rgba(14,165,233,.06) 100%) !important;font-weight:800;color:var(--text) !important;font-size:var(--j-head-font) !important;letter-spacing:.03em;padding:0 2px}
+.g-avg-5{color:#10B981}.g-avg-4{color:#65A30D}.g-avg-3{color:#D97706}.g-avg-2{color:#DC2626}.g-avg-1{color:#991B1B}
+.lesson-tip{position:fixed;z-index:1000;background:var(--bg-elev);border:1px solid var(--border);border-radius:8px;padding:8px 10px;box-shadow:var(--shadow-lg);max-width:240px;font-size:11px;line-height:1.4;pointer-events:none;animation:fadeIn .15s ease}
+.lesson-tip .tip-title{font-size:9px;text-transform:uppercase;color:var(--text-muted);font-weight:700;letter-spacing:.05em;margin-bottom:2px}
+.lesson-tip .tip-body{color:var(--text);margin-bottom:6px}
+.lesson-tip .tip-body:last-child{margin-bottom:0}
+.grade-picker{display:flex;gap:8px;flex-wrap:wrap}
+.grade-btn{width:44px;height:44px;border-radius:10px;border:2px solid var(--border);background:var(--bg);color:var(--text);font-size:16px;font-weight:800;cursor:pointer;transition:var(--transition);display:inline-flex;align-items:center;justify-content:center}
+.grade-btn:hover{transform:translateY(-2px);border-color:var(--primary)}
+.grade-btn.active{color:#fff;border-color:transparent;box-shadow:0 4px 12px rgba(0,0,0,.15)}
+.grade-btn.active.gb-5{background:#10B981}
+.grade-btn.active.gb-4{background:#84CC16}
+.grade-btn.active.gb-3{background:#F59E0B}
+.grade-btn.active.gb-2{background:#EF4444}
+.grade-btn.active.gb-1{background:#991B1B}
+.att-picker{display:flex;gap:8px;flex-wrap:wrap}
+.att-btn{min-width:44px;height:44px;padding:0 14px;border-radius:10px;border:2px solid var(--border);background:var(--bg);color:var(--text);font-size:14px;font-weight:800;cursor:pointer;transition:var(--transition);display:inline-flex;align-items:center;justify-content:center;gap:4px}
+.att-btn:hover{transform:translateY(-2px);border-color:var(--primary)}
+.att-btn.active{color:#fff;border-color:transparent;box-shadow:0 4px 12px rgba(0,0,0,.15)}
+.att-btn.active.ab-n{background:#EF4444}
+.att-btn.active.ab-u{background:#F59E0B}
+.att-btn.active.ab-o{background:#64748B}
+.att-btn.active.ab-ok{background:#10B981}
+.weekday-picker{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+.weekday-picker label{padding:6px 10px;border:1.5px solid var(--border);border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;transition:var(--transition)}
+.weekday-picker label input{display:none}
+.weekday-picker label.on{background:linear-gradient(135deg,var(--primary),#38BDF8);color:#fff;border-color:transparent}
+</style>
+</head>
+<body>
 
+<div id="loader-screen" class="loader">
+  <svg width="80" height="80" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+    <rect width="120" height="120" rx="28" fill="#0EA5E9"/>
+    <path d="M25 40 Q60 30 60 40 Q60 30 95 40 L95 82 Q60 72 60 82 Q60 72 25 82 Z" fill="#FFFFFF"/>
+    <line x1="60" y1="40" x2="60" y2="82" stroke="#0EA5E9" stroke-width="2"/>
+    <path d="M42 60 L56 74 L84 46" stroke="#FACC15" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </svg>
+  <div id="loader-text" style="color:var(--text-muted);font-size:13px;font-weight:600;">Загрузка…</div>
+</div>
+
+<div id="auth-screen" style="display:none">
+  <div class="auth-card">
+    <div class="auth-logo">
+      <svg class="brand-logo" width="88" height="88" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+        <rect width="120" height="120" rx="28" fill="#0EA5E9"/>
+        <path d="M25 40 Q60 30 60 40 Q60 30 95 40 L95 82 Q60 72 60 82 Q60 72 25 82 Z" fill="#FFFFFF"/>
+        <line x1="60" y1="40" x2="60" y2="82" stroke="#0EA5E9" stroke-width="2"/>
+        <path d="M42 60 L56 74 L84 46" stroke="#FACC15" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      </svg>
+      <h1>Класс Жур</h1>
+      <p class="auth-subtitle">Электронный журнал для школ</p>
+      <span class="auth-slogan">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4-6.2-4.6-6.2 4.6 2.4-7.4L2 9.4h7.6z"/></svg>
+        Оценки — под контролем
+      </span>
+    </div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" data-tab="login">Вход</button>
+      <button class="auth-tab" data-tab="register">Регистрация</button>
+    </div>
+    <form id="login-form" class="auth-form active">
+      <div class="form-group"><label>Логин или Email</label><input type="text" id="login-input" required placeholder="admin"></div>
+      <div class="form-group"><label>Пароль</label><input type="password" id="login-password" required placeholder="••••••"></div>
+      <button type="submit" class="btn btn-primary btn-block">Войти</button>
+      <a href="#" id="forgot-password" class="auth-link">Забыли пароль?</a>
+    </form>
+    <form id="register-form" class="auth-form">
+      <div class="form-group"><label>Код приглашения</label><input type="text" id="invite-code" required placeholder="ABC123"></div>
+      <div class="form-group"><label>ФИО</label><input type="text" id="reg-name" required placeholder="Иванов Иван Иванович"></div>
+      <div class="form-group"><label>Логин</label><input type="text" id="reg-login" required placeholder="ivanov"></div>
+      <div class="form-group"><label>Email</label><input type="email" id="reg-email" required placeholder="ivanov@mail.ru"></div>
+      <div class="form-group"><label>Пароль</label><input type="password" id="reg-password" required minlength="6" placeholder="минимум 6 символов"></div>
+      <button type="submit" class="btn btn-primary btn-block">Зарегистрироваться</button>
+    </form>
+    <div id="auth-message" class="auth-message"></div>
+  </div>
+</div>
+
+<div id="app-screen" style="display:none">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="brand">
+        <svg class="brand-logo" width="42" height="42" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+          <rect width="120" height="120" rx="28" fill="#0EA5E9"/>
+          <path d="M25 40 Q60 30 60 40 Q60 30 95 40 L95 82 Q60 72 60 82 Q60 72 25 82 Z" fill="#FFFFFF"/>
+          <line x1="60" y1="40" x2="60" y2="82" stroke="#0EA5E9" stroke-width="2"/>
+          <path d="M42 60 L56 74 L84 46" stroke="#FACC15" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        </svg>
+        <div class="brand-text">
+          <div class="brand-name">Класс Жур</div>
+          <div class="brand-tag">электронный журнал</div>
+        </div>
+      </div>
+    </div>
+    <nav class="sidebar-nav" id="sidebar-nav"></nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-footer-row">
+        <button id="theme-toggle" class="btn btn-ghost" title="Сменить тему"></button>
+        <button id="logout-btn" class="btn btn-ghost"></button>
+      </div>
+      <a href="https://t.me/klassjur" target="_blank" rel="noopener" class="tg-link">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+          <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
+        </svg>
+        Telegram-канал
+      </a>
+    </div>
+  </aside>
+  <main class="main">
+    <header class="topbar">
+      <button id="menu-toggle" class="btn btn-ghost only-mobile">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+      </button>
+      <h1 id="page-title">Дашборд</h1>
+      <div class="user-info">
+        <span id="user-name"></span>
+        <span class="badge" id="user-role"></span>
+      </div>
+    </header>
+    <div id="content" class="content"></div>
+  </main>
+</div>
+
+<div id="modal-root"></div>
+<div id="toast-root" class="toast-root"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+
+<script>
+var firebaseConfig = {
+  apiKey: "AIzaSyBSb532Ppi7xXdfHcuDfXTp6U_ut_0saio",
+  authDomain: "zing-30a21.firebaseapp.com",
+  databaseURL: "https://zing-30a21-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "zing-30a21",
+  storageBucket: "zing-30a21.firebasestorage.app",
+  messagingSenderId: "179467663659",
+  appId: "1:179467663659:web:be71167fd0ffd412416d6e"
+};
+firebase.initializeApp(firebaseConfig);
+var auth = firebase.auth();
+var db = firebase.database();
+var secondaryApp = firebase.initializeApp(firebaseConfig, 'Secondary');
+var secondaryAuth = secondaryApp.auth();
+
+var QUARTERS = [
+  { id:'q1', name:'I четверть',  sm:8,  sd:1, em:9,  ed:27, short:'I' },
+  { id:'q2', name:'II четверть', sm:10, sd:5, em:11, ed:28, short:'II' },
+  { id:'q3', name:'III четверть',sm:0,  sd:9, em:2,  ed:22, short:'III' },
+  { id:'q4', name:'IV четверть', sm:3,  sd:1, em:4,  ed:31, short:'IV' }
+];
+
+function inQuarter(dms, qid) {
+  if (!qid || qid === 'all') return true;
+  var q = null;
+  for (var i = 0; i < QUARTERS.length; i++) if (QUARTERS[i].id === qid) { q = QUARTERS[i]; break; }
+  if (!q) return true;
+  var d = new Date(dms);
+  var m = d.getMonth(), day = d.getDate();
+  if (m < q.sm || m > q.em) return false;
+  if (m === q.sm && day < q.sd) return false;
+  if (m === q.em && day > q.ed) return false;
+  return true;
+}
+
+function quarterName(qid) {
+  if (!qid || qid === 'all') return 'Весь год';
+  for (var i = 0; i < QUARTERS.length; i++) if (QUARTERS[i].id === qid) return QUARTERS[i].name;
+  return 'Весь год';
+}
+
+var ICON_PATHS = {
+  dashboard:'<line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>',
+  city:'<path d="M3 21h18"/><path d="M5 21V7l8-4v18"/><path d="M19 21V11l-6-4"/>',
+  school:'<path d="M14 22v-4a2 2 0 1 0-4 0v4"/><path d="M18 10l4 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-8l4-2"/><path d="M18 5v17M6 5v17"/><rect x="4" y="2" width="16" height="4" rx="1"/>',
+  users:'<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>',
+  tag:'<path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/>',
+  cap:'<path d="M22 10l-10-5L2 10l10 5 10-5z"/><path d="M6 12v5c3 3 9 3 12 0v-5M22 10v6"/>',
+  book:'<path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>',
+  student:'<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+  mail:'<path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>',
+  user:'<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+  sun:'<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>',
+  moon:'<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>',
+  logout:'<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>',
+  plus:'<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>',
+  trash:'<polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/>',
+  key:'<circle cx="7.5" cy="15.5" r="5.5"/><path d="M21 2l-10 10"/><path d="M15.5 7.5l3 3L22 7l-3-3"/>',
+  download:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>',
+  upload:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>',
+  arrowLeft:'<line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>',
+  pencil:'<path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/>',
+  check:'<polyline points="20 6 9 17 4 12"/>',
+  clock:'<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>',
+  circle:'<circle cx="12" cy="12" r="6" fill="currentColor" stroke="none"/>',
+  info:'<circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>',
+  checkCircle:'<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>',
+  alertCircle:'<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>',
+  xCircle:'<circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>',
+  userPlus:'<path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/>',
+  search:'<circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>',
+  list:'<line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>',
+  calendar:'<rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>',
+  zap:'<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>',
+  monitor:'<rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>',
+  file:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>',
+  award:'<circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/>'
+};
+
+function ic(name, size) {
+  if (size === undefined) size = 18;
+  return '<svg xmlns="http://www.w3.org/2000/svg" width="' + size + '" height="' + size + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + (ICON_PATHS[name] || '') + '</svg>';
+}
+
+var ROLE_LABELS = { super_admin:'Создатель', city_creator:'Создатель города', school_creator:'Создатель школы', teacher:'Учитель', student:'Ученик', parent:'Родитель' };
+function roleLabel(r) { return ROLE_LABELS[r] || r || '—'; }
+
+var DEFAULT_WORK_TYPES = [
+  { name:'Ответ на уроке', weight:1, code:'ОТВ' },
+  { name:'Диктант', weight:2, code:'ДКТ' },
+  { name:'Проверочная работа', weight:3, code:'П/Р' },
+  { name:'Контрольная работа', weight:5, code:'К/Р' },
+  { name:'Итоговая контрольная работа', weight:7, code:'ИКР' }
+];
+
+var POPULAR_SUBJECTS = [
+  { group:'Начальная школа', items:['Русский язык','Литературное чтение','Математика','Окружающий мир','Технология','Изобразительное искусство','Музыка','Физическая культура','ОРКСЭ','Шахматы'] },
+  { group:'Точные науки', items:['Алгебра','Геометрия','Физика','Химия','Информатика','Астрономия','Вероятность и статистика'] },
+  { group:'Естественные науки', items:['Биология','География','Экология','Природоведение'] },
+  { group:'Гуманитарные', items:['Литература','История','Обществознание','Экономика','Право','Родной язык','МХК'] },
+  { group:'Иностранные', items:['Английский язык','Немецкий язык','Французский язык','Испанский язык','Китайский язык'] },
+  { group:'Прочее', items:['ОБЖ','Черчение','Финансовая грамотность','Проектная деятельность'] }
+];
+
+var HARDCODED_ADMIN = { login:'admin', password:'admin', profile:{ role:'super_admin', login:'admin', name:'Главный администратор', email:'admin@local' } };
+var SESSION_KEY = 'ej_session_v1';
+
+function getSession() {
+  try { var r = localStorage.getItem(SESSION_KEY); return r ? JSON.parse(r) : null; }
+  catch (e) { return null; }
+}
+function setSession(u, p) { localStorage.setItem(SESSION_KEY, JSON.stringify({ user:u, profile:p })); }
+function clearSession() { localStorage.removeItem(SESSION_KEY); }
+
+var $ = function(s) { return document.querySelector(s); };
+var $$ = function(s) { return document.querySelectorAll(s); };
+
+function el(tag, props) {
+  var children = Array.prototype.slice.call(arguments, 2);
+  var n = document.createElement(tag);
+  if (props) {
+    Object.keys(props).forEach(function(k) {
+      var v = props[k];
+      if (k === 'class') n.className = v;
+      else if (k === 'html') n.innerHTML = v;
+      else if (k.indexOf('on') === 0) n.addEventListener(k.slice(2).toLowerCase(), v);
+      else n.setAttribute(k, v);
+    });
+  }
+  children.flat().forEach(function(c) {
+    n.append(c && c.nodeType ? c : document.createTextNode(c === undefined || c === null ? '' : c));
+  });
+  return n;
+}
+
+var TOAST_ICONS = { success:'checkCircle', error:'xCircle', warning:'alertCircle', info:'info' };
+
+function toast(msg, type) {
+  if (!type) type = 'info';
+  var t = el('div', { class:'toast ' + type, html: ic(TOAST_ICONS[type] || 'info', 18) + '<div>' + msg + '</div>' });
+  $('#toast-root').appendChild(t);
+  setTimeout(function() { t.remove(); }, 4000);
+}
+
+function showModal(title, bodyHtml, actions, opts) {
+  if (!actions) actions = [];
+  if (!opts) opts = {};
+  var root = $('#modal-root');
+  root.innerHTML = '';
+  var backdrop = el('div', { class:'modal-backdrop' });
+  backdrop.innerHTML = '<div class="modal ' + (opts.wide ? 'modal-wide' : '') + '"><h3 class="modal-title">' + title + '</h3><div class="modal-body">' + bodyHtml + '</div><div class="modal-actions"></div></div>';
+  var actionsEl = backdrop.querySelector('.modal-actions');
+  actions.forEach(function(a) {
+    var b = el('button', { class:'btn ' + (a.class || 'btn-ghost'), onclick: function() { a.onClick ? a.onClick(backdrop) : closeModal(); } }, a.label);
+    actionsEl.appendChild(b);
+  });
+  backdrop.onclick = function(e) { if (e.target === backdrop) closeModal(); };
+  root.appendChild(backdrop);
+  return backdrop;
+}
+
+function closeModal() { $('#modal-root').innerHTML = ''; }
+
+function confirmDialog(title, message) {
+  return new Promise(function(res) {
+    showModal(ic('alertCircle', 20) + ' ' + title, '<div>' + message + '</div>', [
+      { label:'Отмена', onClick: function() { closeModal(); res(false); } },
+      { label:'Подтвердить', class:'btn-danger', onClick: function() { closeModal(); res(true); } }
+    ]);
+  });
+}
+
+function warnDialog(title, message, confirmLabel) {
+  return new Promise(function(res) {
+    showModal(ic('alertCircle', 20) + ' ' + title, '<div>' + message + '</div>', [
+      { label:'Отмена', onClick: function() { closeModal(); res(false); } },
+      { label: confirmLabel || 'Подтвердить', class:'btn-danger', onClick: function() { closeModal(); res(true); } }
+    ]);
+  });
+}
+
+function toLocalDateStr(dms) {
+  var d = new Date(dms);
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
+function parseLocalDate(str) {
+  if (!str) return NaN;
+  var parts = str.split('-').map(Number);
+  return new Date(parts[0], parts[1] - 1, parts[2]).getTime();
+}
+
+var fmt = {
+  date: function(ts) { return ts ? new Date(ts).toLocaleDateString('ru-RU') : '—'; },
+  dt: function(ts) { return ts ? new Date(ts).toLocaleString('ru-RU') : '—'; }
+};
+
+function gradeClass(v) { var n = Math.round(v); if (n >= 5) return 'g5'; if (n === 4) return 'g4'; if (n === 3) return 'g3'; if (n === 2) return 'g2'; return 'g1'; }
+function avgClass(v) { if (v >= 4.5) return 'g-avg-5'; if (v >= 3.5) return 'g-avg-4'; if (v >= 2.5) return 'g-avg-3'; if (v >= 1.5) return 'g-avg-2'; return 'g-avg-1'; }
+
+function translateError(err) {
+  var m = { 'auth/user-not-found':'Пользователь не найден', 'auth/wrong-password':'Неверный пароль', 'auth/invalid-email':'Неверный email', 'auth/invalid-credential':'Неверный логин или пароль', 'auth/email-already-in-use':'Email уже используется', 'auth/weak-password':'Слишком простой пароль (мин. 6)', 'auth/too-many-requests':'Слишком много попыток', 'auth/network-request-failed':'Проблема с сетью', 'auth/operation-not-allowed':'Email/Password выключен' };
+  return m[err.code] || err.message || 'Ошибка';
+}
+
+function initTheme() {
+  var t = localStorage.getItem('theme') || 'light';
+  document.documentElement.dataset.theme = t;
+  var btn = $('#theme-toggle');
+  if (btn) {
+    btn.innerHTML = t === 'dark' ? ic('sun', 16) : ic('moon', 16);
+    btn.title = t === 'dark' ? 'Светлая тема' : 'Тёмная тема';
+    btn.onclick = function() {
+      var cur = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+      document.documentElement.dataset.theme = cur;
+      localStorage.setItem('theme', cur);
+      btn.innerHTML = cur === 'dark' ? ic('sun', 16) : ic('moon', 16);
+      btn.title = cur === 'dark' ? 'Светлая тема' : 'Тёмная тема';
+    };
+  }
+}
+initTheme();
+
+function applyDevice(mode) {
+  var d = mode || 'auto';
+  if (d === 'auto') { var w = window.innerWidth; if (w < 700) d = 'phone'; else if (w < 1100) d = 'tablet'; else d = 'desktop'; }
+  document.documentElement.dataset.device = d;
+}
+function initDevice() {
+  applyDevice(localStorage.getItem('device') || 'auto');
+  window.addEventListener('resize', function() { if ((localStorage.getItem('device') || 'auto') === 'auto') applyDevice('auto'); });
+}
+initDevice();
+$('#logout-btn').innerHTML = ic('logout', 16) + ' Выйти';
+
+function showAuthMsg(text, type) {
+  if (!type) type = 'error';
+  var e = $('#auth-message');
+  e.textContent = text;
+  e.className = 'auth-message ' + type;
+  setTimeout(function() { e.className = 'auth-message'; }, 6000);
+}
+
+$$('.auth-tab').forEach(function(tab) {
+  tab.onclick = function() {
+    $$('.auth-tab').forEach(function(t) { t.classList.remove('active'); });
+    $$('.auth-form').forEach(function(f) { f.classList.remove('active'); });
+    tab.classList.add('active');
+    $('#' + tab.dataset.tab + '-form').classList.add('active');
+  };
+});
+
+$('#login-form').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  var loginInput = $('#login-input').value.trim();
+  var password = $('#login-password').value;
+  if (!loginInput || !password) return;
+  if (loginInput === HARDCODED_ADMIN.login && password === HARDCODED_ADMIN.password) {
+    var user = { uid:'admin-local', email:HARDCODED_ADMIN.profile.email };
+    var profile = Object.assign({}, HARDCODED_ADMIN.profile, { createdAt:Date.now() });
+    setSession(user, profile);
+    startApp(user, profile);
+    return;
+  }
+  try {
+    var email = loginInput;
+    if (loginInput.indexOf('@') === -1) {
+      var snap = await db.ref('users').orderByChild('login').equalTo(loginInput).once('value');
+      if (!snap.exists()) return showAuthMsg('Пользователь с таким логином не найден');
+      email = Object.values(snap.val())[0].email;
+    }
+    await auth.signInWithEmailAndPassword(email, password);
+  } catch (err) { showAuthMsg(translateError(err)); }
+});
+
+$('#register-form').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  var code = $('#invite-code').value.trim().toUpperCase();
+  var name = $('#reg-name').value.trim();
+  var login = $('#reg-login').value.trim();
+  var email = $('#reg-email').value.trim();
+  var password = $('#reg-password').value;
+  try {
+    var iSnap = await db.ref('invites/' + code).once('value');
+    if (!iSnap.exists()) return showAuthMsg('Неверный код приглашения');
+    var invite = iSnap.val();
+    if (invite.used) return showAuthMsg('Код уже использован');
+    if (invite.expiresAt && invite.expiresAt < Date.now()) return showAuthMsg('Код истёк');
+    var lCheck = await db.ref('users').orderByChild('login').equalTo(login).once('value');
+    if (lCheck.exists()) return showAuthMsg('Такой логин уже занят');
+    var cred = await secondaryAuth.createUserWithEmailAndPassword(email, password);
+    var uid = cred.user.uid;
+    await secondaryAuth.signOut();
+    await db.ref('users/' + uid).set({ role: invite.role || 'teacher', login: login, name: name, email: email, schoolId: invite.schoolId || null, cityId: invite.cityId || null, createdAt: Date.now() });
+    await db.ref('invites/' + code).update({ used:true, usedBy:uid, usedAt:Date.now() });
+    showAuthMsg('Регистрация успешна! Входим…', 'success');
+    setTimeout(async function() { await auth.signInWithEmailAndPassword(email, password); }, 800);
+  } catch (err) { showAuthMsg(translateError(err)); }
+});
+
+$('#forgot-password').onclick = async function(e) {
+  e.preventDefault();
+  var v = prompt('Введите ваш email для сброса пароля:');
+  if (!v) return;
+  try { await auth.sendPasswordResetEmail(v.trim()); showAuthMsg('Письмо отправлено. Проверьте почту.', 'success'); }
+  catch (err) { showAuthMsg(translateError(err)); }
+};
+
+var App = {
+  user: null,
+  profile: null,
+  cache: { cities:{}, schools:{}, classes:{}, students:{}, grades:{}, workTypes:{}, invites:{}, users:{}, lessons:{}, attendance:{} }
+};
+
+var MENU = {
+  super_admin: [
+    { id:'dashboard', icon:'dashboard', label:'Дашборд' },
+    { id:'cities', icon:'city', label:'Города' },
+    { id:'schools', icon:'school', label:'Школы' },
+    { id:'users', icon:'users', label:'Пользователи' },
+    { id:'worktypes', icon:'tag', label:'Типы работ' },
+    { id:'profile', icon:'user', label:'Профиль' }
+  ],
+  city_creator: [
+    { id:'dashboard', icon:'dashboard', label:'Дашборд' },
+    { id:'schools', icon:'school', label:'Школы города' },
+    { id:'users', icon:'users', label:'Пользователи' },
+    { id:'profile', icon:'user', label:'Профиль' }
+  ],
+  school_creator: [
+    { id:'dashboard', icon:'dashboard', label:'Дашборд' },
+    { id:'invites', icon:'mail', label:'Приглашения' },
+    { id:'users', icon:'users', label:'Учителя' },
+    { id:'worktypes', icon:'tag', label:'Типы работ' },
+    { id:'profile', icon:'user', label:'Профиль' }
+  ],
+  teacher: [
+    { id:'dashboard', icon:'dashboard', label:'Дашборд' },
+    { id:'classes', icon:'cap', label:'Классы' },
+    { id:'journal', icon:'book', label:'Журнал' },
+    { id:'students', icon:'student', label:'Ученики' },
+    { id:'worktypes', icon:'tag', label:'Типы работ' },
+    { id:'profile', icon:'user', label:'Профиль' }
+  ]
+};
+
+function buildMenu() {
+  var nav = $('#sidebar-nav');
+  nav.innerHTML = '';
+  (MENU[App.profile.role] || []).forEach(function(it) {
+    nav.appendChild(el('div', {
+      class:'nav-item' + (location.hash === '#' + it.id ? ' active' : ''),
+      html: ic(it.icon, 18) + '<span>' + it.label + '</span>',
+      onclick: function() { navigate(it.id); }
+    }));
+  });
+}
+
+function navigate(view, params) {
+  if (!params) params = {};
+  location.hash = '#' + view + (params.id ? '/' + params.id : '');
+  router();
+}
+
+async function router() {
+  var hash = location.hash.slice(1) || 'dashboard';
+  var parts = hash.split('/');
+  var view = parts[0], id = parts[1];
+  if (!App.profile) return;
+  var items = MENU[App.profile.role] || [];
+  var allowed = items.map(function(i) { return i.id; });
+  ['class'].forEach(function(v) { if (allowed.indexOf(v) === -1) allowed.push(v); });
+  if (allowed.indexOf(view) === -1) return navigate('dashboard');
+  $$('.nav-item').forEach(function(n) { n.classList.remove('active'); });
+  var idx = items.findIndex(function(i) { return i.id === view; });
+  if (idx >= 0 && $$('.nav-item')[idx]) $$('.nav-item')[idx].classList.add('active');
+  var renderers = {
+    dashboard: renderDashboard,
+    cities: renderCities,
+    schools: renderSchools,
+    users: renderUsers,
+    invites: renderInvites,
+    classes: renderClasses,
+    class: function() { return renderClassDetail(id); },
+    journal: renderJournal,
+    students: renderStudents,
+    worktypes: renderWorkTypes,
+    profile: renderProfile
+  };
+  var fn = renderers[view];
+  if (fn) await fn();
+  $('#sidebar').classList.remove('open');
+}
+window.addEventListener('hashchange', router);
+
+async function loadAll() {
+  var results = await Promise.all([
+    db.ref('cities').once('value'),
+    db.ref('schools').once('value'),
+    db.ref('classes').once('value'),
+    db.ref('students').once('value'),
+    db.ref('grades').once('value'),
+    db.ref('workTypes').once('value'),
+    db.ref('invites').once('value'),
+    db.ref('users').once('value'),
+    db.ref('lessons').once('value'),
+    db.ref('attendance').once('value')
+  ]);
+  App.cache.cities = results[0].val() || {};
+  App.cache.schools = results[1].val() || {};
+  App.cache.classes = results[2].val() || {};
+  App.cache.students = results[3].val() || {};
+  App.cache.grades = results[4].val() || {};
+  App.cache.workTypes = results[5].val() || {};
+  App.cache.invites = results[6].val() || {};
+  App.cache.users = results[7].val() || {};
+  App.cache.lessons = results[8].val() || {};
+  App.cache.attendance = results[9].val() || {};
+}
+
+async function bootstrapDefaultWorkTypes() {
+  try {
+    var snap = await db.ref('workTypes').once('value');
+    if (snap.exists() && Object.keys(snap.val()).length > 0) return;
+    var updates = {};
+    DEFAULT_WORK_TYPES.forEach(function(wt) {
+      var id = db.ref('workTypes').push().key;
+      updates['workTypes/' + id] = { name:wt.name, weight:wt.weight, code:wt.code, createdBy:App.user.uid, createdAt:Date.now() };
+    });
+    await db.ref().update(updates);
+    var fresh = await db.ref('workTypes').once('value');
+    App.cache.workTypes = fresh.val() || {};
+  } catch (e) { console.warn(e); }
+}
+
+function mySchools() {
+  var s = App.cache.schools;
+  if (App.profile.role === 'super_admin') return s;
+  if (App.profile.role === 'city_creator') return Object.fromEntries(Object.entries(s).filter(function(e) { return e[1].cityId === App.profile.cityId; }));
+  if (App.profile.role === 'school_creator' || App.profile.role === 'teacher') return Object.fromEntries(Object.entries(s).filter(function(e) { return e[0] === App.profile.schoolId; }));
+  return {};
+}
+
+function myClasses() {
+  return Object.fromEntries(Object.entries(App.cache.classes).filter(function(e) { return e[1].teacherId === App.user.uid; }));
+}
+
+function greetingByTime() {
+  var h = new Date().getHours();
+  if (h < 5) return 'Доброй ночи';
+  if (h < 12) return 'Доброе утро';
+  if (h < 18) return 'Добрый день';
+  return 'Добрый вечер';
+}
+
+function todayLabel() {
+  var d = new Date();
+  var days = ['воскресенье','понедельник','вторник','среда','четверг','пятница','суббота'];
+  var months = ['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
+  return d.getDate() + ' ' + months[d.getMonth()] + ', ' + days[d.getDay()];
+}
+
+async function renderDashboard() {
+  $('#page-title').textContent = 'Дашборд';
+  var c = $('#content');
+  c.innerHTML = '';
+  var role = App.profile.role;
+  var userName = (App.profile.name || App.profile.login || '').split(' ')[0] || 'друг';
+
+  var greet = el('div', { class:'dash-greet dash-anim' });
+  greet.style.animationDelay = '0ms';
+  greet.innerHTML =
+    '<div class="dash-greet-content">' +
+      '<h2>' + greetingByTime() + ', ' + userName + '! 👋</h2>' +
+      '<p>' + (role === 'teacher' ? 'Вот обзор вашей работы' : 'Панель управления') + '</p>' +
+      '<div class="dash-greet-date">' + ic('calendar', 14) + ' ' + todayLabel() + '</div>' +
+    '</div>';
+  c.appendChild(greet);
+
+  var stats = [];
+  if (role === 'super_admin') {
+    stats = [
+      { label:'Городов', value:Object.keys(App.cache.cities).length, icon:'city', color:'#0EA5E9' },
+      { label:'Школ', value:Object.keys(App.cache.schools).length, icon:'school', color:'#A855F7' },
+      { label:'Пользователей', value:Object.keys(App.cache.users).length, icon:'users', color:'#10B981' }
+    ];
+  } else if (role === 'city_creator') {
+    stats = [
+      { label:'Школ в городе', value:Object.keys(mySchools()).length, icon:'school', color:'#0EA5E9' },
+      { label:'Пользователей', value:Object.values(App.cache.users).filter(function(u) { return u.cityId === App.profile.cityId; }).length, icon:'users', color:'#A855F7' }
+    ];
+  } else if (role === 'school_creator') {
+    var su = Object.values(App.cache.users).filter(function(u) { return u.schoolId === App.profile.schoolId; });
+    stats = [
+      { label:'Учителей', value:su.filter(function(u) { return u.role === 'teacher'; }).length, icon:'users', color:'#0EA5E9' },
+      { label:'Классов', value:Object.values(App.cache.classes).filter(function(cl) { return cl.schoolId === App.profile.schoolId; }).length, icon:'cap', color:'#A855F7' },
+      { label:'Учеников', value:countStudentsBySchool(), icon:'student', color:'#10B981' }
+    ];
+  } else if (role === 'teacher') {
+    var avgAll = avgAllMyStudents();
+    stats = [
+      { label:'Моих классов', value:Object.keys(myClasses()).length, icon:'cap', color:'#0EA5E9' },
+      { label:'Моих учеников', value:countStudentsInMyClasses(), icon:'student', color:'#A855F7' },
+      { label:'Оценок выставлено', value:countMyGrades(), icon:'check', color:'#10B981' },
+      { label:'Средний балл', value:(avgAll || '—'), icon:'award', color:'#F59E0B', isAvg:true }
+    ];
+  }
+
+  var grid = el('div', { class:'grid grid-4' });
+  grid.style.marginBottom = '16px';
+  stats.forEach(function(s, i) {
+    var card = el('div', { class:'stat-card dash-anim' });
+    card.style.animationDelay = (100 + i * 80) + 'ms';
+    card.innerHTML =
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;">' +
+        '<div class="stat-label">' + s.label + '</div>' +
+        '<div style="width:38px;height:38px;border-radius:12px;background:' + s.color + '22;color:' + s.color + ';display:flex;align-items:center;justify-content:center;">' + ic(s.icon, 20) + '</div>' +
+      '</div>' +
+      '<div class="stat-value' + (s.isAvg ? ' ' + avgClass(parseFloat(s.value)) : '') + '">' + String(s.value) + '</div>';
+    grid.appendChild(card);
+  });
+  c.appendChild(grid);
+
+  if (role === 'teacher') {
+    var distBlock = buildGradeDistribution();
+    if (distBlock) {
+      distBlock.style.animationDelay = '420ms';
+      distBlock.classList.add('dash-anim');
+      c.appendChild(distBlock);
+    }
+
+    var classBlock = buildClassesProgress();
+    if (classBlock) {
+      classBlock.style.animationDelay = '500ms';
+      classBlock.classList.add('dash-anim');
+      c.appendChild(classBlock);
+    }
+
+    var recent = Object.entries(App.cache.grades)
+      .filter(function(e) { return e[1].teacherId === App.user.uid; })
+      .sort(function(a, b) { return (b[1].date || 0) - (a[1].date || 0); })
+      .slice(0, 8);
+    var rc = el('div', { class:'card dash-anim' });
+    rc.style.animationDelay = '580ms';
+    rc.appendChild(el('div', { class:'card-header' },
+      el('div', { class:'card-title' }, 'Последние оценки'),
+      el('button', { class:'btn btn-sm btn-ghost', html: ic('arrowLeft', 14) + ' В журнал', onclick: function() { navigate('journal'); } })
+    ));
+    if (!recent.length) {
+      rc.appendChild(el('div', { class:'empty' }, 'Пока нет оценок'));
+    } else {
+      var t = el('table');
+      t.innerHTML = '<thead><tr><th>Дата</th><th>Ученик</th><th>Предмет</th><th>Оценка</th></tr></thead>';
+      var tb = el('tbody');
+      recent.forEach(function(e, i) {
+        var g = e[1];
+        var st = App.cache.students[g.studentId];
+        var tr = el('tr');
+        tr.style.animation = 'fadeIn .3s ease both';
+        tr.style.animationDelay = (620 + i * 30) + 'ms';
+        tr.innerHTML = '<td>' + fmt.date(g.date) + '</td><td>' + (st ? st.name : '—') + '</td><td>' + (g.subject || '—') + '</td><td><span class="grade ' + gradeClass(g.value) + '">' + g.value + '</span></td>';
+        tb.appendChild(tr);
+      });
+      t.appendChild(tb);
+      rc.appendChild(t);
+    }
+    c.appendChild(rc);
+  }
+
+  var tg = el('a', { class:'tg-banner dash-anim', href:'https://t.me/klassjur', target:'_blank', rel:'noopener' });
+  tg.style.animationDelay = '660ms';
+  tg.innerHTML =
+    '<div class="tg-banner-icon">' +
+      '<svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>' +
+    '</div>' +
+    '<div class="tg-banner-text">' +
+      '<div class="tg-banner-title">Мы в Telegram</div>' +
+      '<div class="tg-banner-sub">Новости, обновления и советы по работе с журналом</div>' +
+    '</div>' +
+    '<div class="tg-banner-arrow">' +
+      '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>' +
+    '</div>';
+  c.appendChild(tg);
+}
+
+function buildGradeDistribution() {
+  var myGrades = Object.values(App.cache.grades).filter(function(g) { return g.teacherId === App.user.uid; });
+  if (!myGrades.length) return null;
+  var counts = { 5:0, 4:0, 3:0, 2:0 };
+  myGrades.forEach(function(g) {
+    var k = Math.round(g.value);
+    if (k >= 5) counts[5]++;
+    else if (k === 4) counts[4]++;
+    else if (k === 3) counts[3]++;
+    else if (k === 2) counts[2]++;
+  });
+  var total = myGrades.length;
+  var card = el('div', { class:'card' });
+  card.appendChild(el('div', { class:'card-header' },
+    el('div', { class:'card-title' }, 'Распределение оценок'),
+    el('div', { style:'font-size:12px;color:var(--text-muted);' }, 'Всего: ' + total)
+  ));
+  var wrap = el('div', { class:'grade-dist' });
+  [5,4,3,2].forEach(function(v) {
+    var pct = total ? Math.round(counts[v] / total * 100) : 0;
+    var color = v === 5 ? '#10B981' : v === 4 ? '#84CC16' : v === 3 ? '#F59E0B' : '#EF4444';
+    var row = el('div', { class:'grade-dist-row' });
+    row.innerHTML =
+      '<div class="grade-dist-label" style="color:' + color + ';">' + v + '</div>' +
+      '<div class="grade-dist-bar">' +
+        '<div class="grade-dist-fill grade-dist-' + v + '" style="--target-width:' + pct + '%;width:' + pct + '%;animation-delay:.6s;">' +
+          (pct >= 15 ? pct + '%' : '') +
+        '</div>' +
+      '</div>' +
+      '<div class="grade-dist-count">' + counts[v] + '</div>' +
+      '<div class="grade-dist-pct" style="color:' + color + ';">' + pct + '%</div>';
+    wrap.appendChild(row);
+  });
+  card.appendChild(wrap);
+  return card;
+}
+
+function buildClassesProgress() {
+  var classes = myClasses();
+  var ids = Object.keys(classes);
+  if (!ids.length) return null;
+  var card = el('div', { class:'card' });
+  card.appendChild(el('div', { class:'card-header' },
+    el('div', { class:'card-title' }, 'Мои классы'),
+    el('button', { class:'btn btn-sm btn-ghost', html: ic('plus', 14) + ' Все классы', onclick: function() { navigate('classes'); } })
+  ));
+  var list = el('div', { class:'class-progress-list' });
+  var items = ids.map(function(id) {
+    var cl = classes[id];
+    var studentsInClass = Object.values(App.cache.students).filter(function(s) { return s.classId === id; });
+    var gradesInClass = Object.values(App.cache.grades).filter(function(g) { return g.classId === id; });
+    var avg = weightedAvg(gradesInClass);
+    return { id: id, cl: cl, count: studentsInClass.length, avg: avg, grades: gradesInClass.length };
+  });
+  items.sort(function(a, b) { return (b.avg || 0) - (a.avg || 0); });
+  items.forEach(function(it, i) {
+    var pct = it.avg ? Math.round(it.avg / 5 * 100) : 0;
+    var color = it.avg >= 4.5 ? '#10B981' : it.avg >= 3.5 ? '#84CC16' : it.avg >= 2.5 ? '#F59E0B' : it.avg >= 1.5 ? '#EF4444' : '#CBD5E1';
+    var item = el('div', { class:'class-progress-item', onclick: function() { navigate('class', { id: it.id }); } });
+    item.innerHTML =
+      '<div class="class-progress-head">' +
+        '<div class="class-progress-name">' + it.cl.name + (it.cl.year ? ' • ' + it.cl.year + ' год' : '') + '</div>' +
+        '<div class="class-progress-meta">' + ic('student', 12) + ' ' + it.count + ' • ' + ic('check', 12) + ' ' + it.grades + '</div>' +
+      '</div>' +
+      '<div style="display:flex;align-items:center;gap:10px;">' +
+        '<div class="class-progress-bar" style="flex:1;">' +
+          '<div class="class-progress-fill" style="width:' + pct + '%;background:' + color + ';animation-delay:' + (0.7 + i * 0.1) + 's;"></div>' +
+        '</div>' +
+        '<div style="font-weight:800;font-size:14px;color:' + color + ';min-width:36px;text-align:right;">' + (it.avg || '—') + '</div>' +
+      '</div>';
+    list.appendChild(item);
+  });
+  card.appendChild(list);
+  return card;
+}
+
+function avgAllMyStudents() {
+  var myGrades = Object.values(App.cache.grades).filter(function(g) { return g.teacherId === App.user.uid; });
+  return weightedAvg(myGrades);
+}
+
+async function renderCities() {
+  $('#page-title').textContent = 'Города';
+  var c = $('#content');
+  c.innerHTML = '';
+  var card = el('div', { class:'card' });
+  card.appendChild(el('div', { class:'card-header' },
+    el('div', { class:'card-title' }, 'Список городов'),
+    el('button', { class:'btn btn-primary', html: ic('plus', 16) + ' Добавить город', onclick: addCityDialog })
+  ));
+  var cities = Object.entries(App.cache.cities);
+  if (!cities.length) {
+    card.appendChild(el('div', { class:'empty' }, 'Городов пока нет'));
+  } else {
+    var t = el('table');
+    t.innerHTML = '<thead><tr><th>Название</th><th>Создан</th><th></th></tr></thead>';
+    var tb = el('tbody');
+    cities.forEach(function(entry) {
+      var id = entry[0], city = entry[1];
+      var tr = el('tr');
+      tr.innerHTML = '<td>' + city.name + '</td><td>' + fmt.date(city.createdAt) + '</td>';
+      var a = el('td');
+      a.style.cssText = 'display:flex;gap:6px;';
+      a.appendChild(el('button', { class:'btn btn-sm btn-ghost', html: ic('userPlus', 14) + ' Создателя', onclick: function() { createCityCreatorDialog(id); } }));
+      a.appendChild(el('button', { class:'btn btn-sm btn-ghost', html: ic('trash', 14), onclick: async function() {
+        if (await confirmDialog('Удалить город?', 'Город "' + city.name + '" будет удалён.')) {
+          await db.ref('cities/' + id).remove();
+          toast('Город удалён', 'success');
+          await loadAll();
+          renderCities();
+        }
+      }}));
+      tr.appendChild(a);
+      tb.appendChild(tr);
+    });
+    t.appendChild(tb);
+    card.appendChild(t);
+  }
+  c.appendChild(card);
+}
+
+async function renderSchools() {
+  $('#page-title').textContent = 'Школы';
+  var c = $('#content');
+  c.innerHTML = '';
+  var card = el('div', { class:'card' });
+  var canCreate = ['super_admin','city_creator'].indexOf(App.profile.role) !== -1;
+  card.appendChild(el('div', { class:'card-header' },
+    el('div', { class:'card-title' }, 'Список школ'),
+    canCreate ? el('button', { class:'btn btn-primary', html: ic('plus', 16) + ' Добавить школу', onclick: addSchoolDialog }) : el('span')
+  ));
+  var schools = Object.entries(mySchools());
+  if (!schools.length) {
+    card.appendChild(el('div', { class:'empty' }, 'Школ пока нет'));
+  } else {
+    var t = el('table');
+    t.innerHTML = '<thead><tr><th>Название</th><th>Город</th><th>Создана</th><th></th></tr></thead>';
+    var tb = el('tbody');
+    schools.forEach(function(entry) {
+      var id = entry[0], s = entry[1];
+      var city = App.cache.cities[s.cityId];
+      var tr = el('tr');
+      tr.innerHTML = '<td>' + s.name + '</td><td>' + (city ? city.name : '—') + '</td><td>' + fmt.date(s.createdAt) + '</td>';
+      var a = el('td');
+      a.style.cssText = 'display:flex;gap:6px;';
+      a.appendChild(el('button', { class:'btn btn-sm btn-ghost', html: ic('userPlus', 14) + ' Создателя', onclick: function() { createSchoolCreatorDialog(id, s.cityId); } }));
+      a.appendChild(el('button', { class:'btn btn-sm btn-ghost', html: ic('trash', 14), onclick: async function() {
+        if (await confirmDialog('Удалить школу?', 'Школа "' + s.name + '" будет удалена.')) {
+          await db.ref('schools/' + id).remove();
+          toast('Школа удалена', 'success');
+          await loadAll();
+          renderSchools();
+        }
+      }}));
+      tr.appendChild(a);
+      tb.appendChild(tr);
+    });
+    t.appendChild(tb);
+    card.appendChild(t);
+  }
+  c.appendChild(card);
+}
+
+async function renderUsers() {
+  $('#page-title').textContent = 'Пользователи';
+  var c = $('#content');
+  c.innerHTML = '';
+  var users = Object.entries(App.cache.users);
+  if (App.profile.role === 'city_creator') users = users.filter(function(e) { return e[1].cityId === App.profile.cityId; });
+  else if (App.profile.role === 'school_creator') users = users.filter(function(e) { return e[1].schoolId === App.profile.schoolId; });
+  var card = el('div', { class:'card' });
+  card.appendChild(el('div', { class:'card-header' }, el('div', { class:'card-title' }, 'Пользователи')));
+  if (!users.length) {
+    card.appendChild(el('div', { class:'empty' }, 'Нет пользователей'));
+  } else {
+    var t = el('table');
+    t.innerHTML = '<thead><tr><th>ФИО</th><th>Логин</th><th>Email</th><th>Роль</th><th></th></tr></thead>';
+    var tb = el('tbody');
+    users.forEach(function(entry) {
+      var u = entry[1];
+      var tr = el('tr');
+      tr.innerHTML = '<td>' + (u.name || '—') + '</td><td>' + (u.login || '—') + '</td><td>' + (u.email || '—') + '</td><td><span class="badge">' + roleLabel(u.role) + '</span></td>';
+      var a = el('td');
+      a.appendChild(el('button', { class:'btn btn-sm btn-ghost', html: ic('key', 14) + ' Пароль', onclick: function() { resetPasswordDialog(u.email); } }));
+      tr.appendChild(a);
+      tb.appendChild(tr);
+    });
+    t.appendChild(tb);
+    card.appendChild(t);
+  }
+  c.appendChild(card);
+}
+
+async function renderInvites() {
+  $('#page-title').textContent = 'Приглашения';
+  var c = $('#content');
+  c.innerHTML = '';
+  var card = el('div', { class:'card' });
+  card.appendChild(el('div', { class:'card-header' },
+    el('div', { class:'card-title' }, 'Коды приглашения'),
+    el('button', { class:'btn btn-primary', html: ic('plus', 16) + ' Создать код', onclick: createInvite })
+  ));
+  var inv = Object.entries(App.cache.invites).filter(function(e) { return e[1].createdBy === App.user.uid; })
+    .sort(function(a, b) { return (b[1].createdAt || 0) - (a[1].createdAt || 0); });
+  if (!inv.length) {
+    card.appendChild(el('div', { class:'empty' }, 'Кодов пока нет'));
+  } else {
+    var t = el('table');
+    t.innerHTML = '<thead><tr><th>Код</th><th>Статус</th><th>Создан</th><th>Истекает</th></tr></thead>';
+    var tb = el('tbody');
+    inv.forEach(function(entry) {
+      var code = entry[0], i = entry[1];
+      var st;
+      if (i.used) st = '<span style="display:inline-flex;align-items:center;gap:6px;color:var(--success);font-weight:600;">' + ic('check', 14) + ' Использован</span>';
+      else if (i.expiresAt < Date.now()) st = '<span style="color:var(--text-muted);font-weight:600;">' + ic('clock', 14) + ' Истёк</span>';
+      else st = '<span style="color:var(--primary);font-weight:600;">' + ic('circle', 14) + ' Активен</span>';
+      var tr = el('tr');
+      tr.innerHTML = '<td><span class="invite-code ' + (i.used ? 'used' : '') + '">' + code + '</span></td><td>' + st + '</td><td>' + fmt.date(i.createdAt) + '</td><td>' + fmt.date(i.expiresAt) + '</td>';
+      tb.appendChild(tr);
+    });
+    t.appendChild(tb);
+    card.appendChild(t);
+  }
+  c.appendChild(card);
+}
+
+async function renderClasses() {
+  $('#page-title').textContent = 'Мои классы';
+  var c = $('#content');
+  c.innerHTML = '';
+  var card = el('div', { class:'card' });
+  card.appendChild(el('div', { class:'card-header' },
+    el('div', { class:'card-title' }, 'Классы'),
+    el('button', { class:'btn btn-primary', html: ic('plus', 16) + ' Создать класс', onclick: addClassDialog })
+  ));
+  var cls = Object.entries(myClasses());
+  if (!cls.length) {
+    card.appendChild(el('div', { class:'empty' }, 'У вас пока нет классов'));
+  } else {
+    var g = el('div', { class:'grid grid-3' });
+    cls.forEach(function(entry, i) {
+      var id = entry[0], cl = entry[1];
+      var n = Object.values(App.cache.students).filter(function(s) { return s.classId === id; }).length;
+      var cc = el('div', { class:'stat-card' });
+      cc.style.animation = 'fadeInUp .5s ease both';
+      cc.style.animationDelay = (i * 60) + 'ms';
+      cc.innerHTML = '<div class="stat-label">' + (cl.year || '—') + ' год</div><div class="stat-value" style="font-size:20px;">' + cl.name + '</div><div style="display:flex;gap:14px;margin-top:10px;font-size:12px;color:var(--text-muted);"><span>' + ic('student', 14) + ' ' + n + ' учеников</span><span>' + ic('book', 14) + ' ' + ((cl.subjects || []).length) + ' предметов</span></div>';
+      var a = el('div', { style:'margin-top:14px;display:flex;gap:6px;' });
+      a.appendChild(el('button', { class:'btn btn-sm btn-primary', html: ic('arrowLeft', 14) + ' Открыть', style:'flex:1;', onclick: function() { navigate('class', { id: id }); } }));
+      a.appendChild(el('button', { class:'btn btn-sm btn-ghost', html: ic('trash', 14), onclick: async function() {
+        if (await confirmDialog('Удалить класс?', 'Класс "' + cl.name + '" и его ученики будут удалены.')) {
+          var u = {};
+          u['classes/' + id] = null;
+          Object.entries(App.cache.students).forEach(function(e2) { if (e2[1].classId === id) u['students/' + e2[0]] = null; });
+          Object.entries(App.cache.grades).forEach(function(e2) { if (e2[1].classId === id) u['grades/' + e2[0]] = null; });
+          Object.entries(App.cache.lessons).forEach(function(e2) { if (e2[1].classId === id) u['lessons/' + e2[0]] = null; });
+          Object.entries(App.cache.attendance).forEach(function(e2) { if (e2[1].classId === id) u['attendance/' + e2[0]] = null; });
+          await db.ref().update(u);
+          toast('Класс удалён', 'success');
+          await loadAll();
+          renderClasses();
+        }
+      }}));
+      cc.appendChild(a);
+      g.appendChild(cc);
+    });
+    card.appendChild(g);
+  }
+  c.appendChild(card);
+}
+
+async function renderClassDetail(classId) {
+  var cl = App.cache.classes[classId];
+  if (!cl || cl.teacherId !== App.user.uid) return navigate('classes');
+  $('#page-title').textContent = 'Класс ' + cl.name;
+  var c = $('#content');
+  c.innerHTML = '';
+  var info = el('div', { class:'card' });
+  info.innerHTML = '<div class="card-header"><div class="card-title">' + cl.name + ' • ' + (cl.year || '') + ' год</div></div><div style="font-size:13px;color:var(--text-muted);display:flex;gap:10px;"><span>' + ic('book', 16) + '</span><span><b>Предметы:</b> ' + ((cl.subjects || []).join(', ') || '—') + '</span></div>';
+  c.appendChild(info);
+  var card = el('div', { class:'card' });
+  card.appendChild(el('div', { class:'card-header' },
+    el('div', { class:'card-title' }, 'Ученики класса'),
+    el('div', { style:'display:flex;gap:6px;flex-wrap:wrap;' },
+      el('button', { class:'btn btn-success btn-sm', html: ic('upload', 14) + ' Импорт CSV', onclick: function() { importCSVDialog(classId); } }),
+      el('button', { class:'btn btn-primary btn-sm', html: ic('userPlus', 14) + ' Добавить', onclick: function() { addStudentDialog(classId); } })
+    )
+  ));
+  var st = Object.entries(App.cache.students).filter(function(e) { return e[1].classId === classId; });
+  if (!st.length) {
+    card.appendChild(el('div', { class:'empty' }, 'Учеников пока нет'));
+  } else {
+    var t = el('table');
+    t.innerHTML = '<thead><tr><th>#</th><th>ФИО</th><th></th></tr></thead>';
+    var tb = el('tbody');
+    st.sort(function(a, b) { return a[1].name.localeCompare(b[1].name); }).forEach(function(e, i) {
+      var sid = e[0], s = e[1];
+      var tr = el('tr');
+      tr.innerHTML = '<td>' + (i + 1) + '</td><td>' + s.name + '</td>';
+      var a = el('td');
+      a.appendChild(el('button', { class:'btn btn-sm btn-ghost', html: ic('trash', 14), onclick: function() { deleteStudent(sid, s.name); } }));
+      tr.appendChild(a);
+      tb.appendChild(tr);
+    });
+    t.appendChild(tb);
+    card.appendChild(t);
+  }
+  c.appendChild(card);
+  c.appendChild(el('button', { class:'btn btn-ghost', html: ic('arrowLeft', 16) + ' Назад', onclick: function() { navigate('classes'); } }));
+}
+
+async function renderJournal() {
+  $('#page-title').textContent = 'Журнал';
+  var c = $('#content');
+  c.innerHTML = '';
+  var classes = myClasses();
+  if (!Object.keys(classes).length) {
+    c.appendChild(el('div', { class:'card empty' }, 'Сначала создайте класс'));
+    return;
+  }
+  var state = App._journalState = App._journalState || { classId: Object.keys(classes)[0], subject: null, quarterId: 'all' };
+  if (!classes[state.classId]) state.classId = Object.keys(classes)[0];
+  var curCls = classes[state.classId];
+  var subs = curCls.subjects || [];
+  if (!state.subject || subs.indexOf(state.subject) === -1) state.subject = subs[0] || null;
+  if (!state.quarterId) state.quarterId = 'all';
+  var shell = el('div', { class:'journal-shell' });
+  var top = el('div', { class:'journal-top' });
+  var classFilter = el('div', { class:'filter' });
+  classFilter.appendChild(el('label', {}, 'Класс'));
+  (function() {
+    var s = el('select');
+    Object.entries(classes).forEach(function(e) { s.appendChild(new Option(e[1].name, e[0])); });
+    s.value = state.classId;
+    s.onchange = function() { state.classId = s.value; state.subject = null; renderJournal(); };
+    classFilter.appendChild(s);
+  })();
+  top.appendChild(classFilter);
+  var subjectFilter = el('div', { class:'filter' });
+  subjectFilter.appendChild(el('label', {}, 'Предмет'));
+  (function() {
+    var s = el('select');
+    subs.forEach(function(x) { s.appendChild(new Option(x, x)); });
+    s.value = state.subject || '';
+    s.onchange = function() { state.subject = s.value; renderJournal(); };
+    subjectFilter.appendChild(s);
+  })();
+  top.appendChild(subjectFilter);
+  var quarterFilter = el('div', { class:'filter' });
+  quarterFilter.appendChild(el('label', {}, 'Период'));
+  (function() {
+    var s = el('select');
+    s.appendChild(new Option('Весь год', 'all'));
+    QUARTERS.forEach(function(q) { s.appendChild(new Option(q.name, q.id)); });
+    s.value = state.quarterId;
+    s.onchange = function() { state.quarterId = s.value; renderJournal(); };
+    quarterFilter.appendChild(s);
+  })();
+  top.appendChild(quarterFilter);
+  top.appendChild(el('button', { class:'btn btn-primary', html: ic('zap', 14) + ' Год', onclick: function() { fillYearDialog(state.classId, state.subject); } }));
+  top.appendChild(el('button', { class:'btn btn-primary', html: ic('plus', 14) + ' Урок', onclick: function() { openLessonDialog({ classId: state.classId, subject: state.subject }); } }));
+  top.appendChild(el('button', { class:'btn btn-success', html: ic('file', 14) + ' Excel', onclick: function() { exportJournalXLS(state.classId, state.subject, state.quarterId); } }));
+  top.appendChild(el('button', { class:'btn btn-ghost', html: ic('download', 14) + ' CSV', onclick: function() { exportJournalCSV(state.classId, state.subject, state.quarterId); } }));
+  top.appendChild(el('button', { class:'btn btn-warn', html: ic('trash', 14) + ' Сбросить', onclick: function() { resetSubjectDialog(state.classId, state.subject); } }));
+  shell.appendChild(top);
+  var tname = App.profile.name || App.profile.login || '—';
+  var sub = el('div', { class:'journal-sub' });
+  sub.innerHTML = '<span><b>Класс:</b> ' + curCls.name + '</span><span><b>Предмет:</b> ' + (state.subject || '—') + '</span><span><b>Период:</b> ' + quarterName(state.quarterId) + '</span><span><b>Учитель:</b> ' + tname + '</span>';
+  shell.appendChild(sub);
+  var scroll = el('div', { class:'journal-scroll' });
+  var table = buildJournalTable(state.classId, state.subject, state.quarterId);
+  if (table) scroll.appendChild(table);
+  else scroll.appendChild(el('div', { class:'empty' }, 'Нет данных — добавьте учеников или уроки'));
+  shell.appendChild(scroll);
+  c.appendChild(shell);
+}
+
+async function resetSubjectDialog(classId, subject) {
+  var cls = App.cache.classes[classId];
+  if (!cls || !subject) return toast('Предмет не выбран', 'warning');
+  var lc = 0, gc = 0, ac = 0;
+  Object.values(App.cache.lessons).forEach(function(l) { if (l.classId === classId && l.subject === subject) lc++; });
+  Object.values(App.cache.grades).forEach(function(g) { if (g.classId === classId && g.subject === subject) gc++; });
+  Object.values(App.cache.attendance).forEach(function(a) { if (a.classId === classId && a.subject === subject) ac++; });
+  var ok1 = await warnDialog('Сбросить предмет?', 'Полный сброс предмета <b>«' + subject + '»</b> в классе <b>' + cls.name + '</b>.<br><br>Уроков: <b>' + lc + '</b><br>Оценок: <b>' + gc + '</b><br>Отметок посещаемости: <b>' + ac + '</b><br><br>Продолжить?', 'Да, продолжить');
+  if (!ok1) return;
+  var ok2 = await warnDialog('Точно уверены?', 'Это <b>необратимое действие</b>.<br><br>Продолжить?', 'Да, я уверен');
+  if (!ok2) return;
+  var ok3 = await warnDialog('Последнее предупреждение!', '<b>Восстановить данные будет невозможно.</b><br><br>Нажмите «Удалить навсегда».', 'Удалить навсегда');
+  if (!ok3) return;
+  var u = {};
+  Object.entries(App.cache.lessons).forEach(function(e) { if (e[1].classId === classId && e[1].subject === subject) u['lessons/' + e[0]] = null; });
+  Object.entries(App.cache.grades).forEach(function(e) { if (e[1].classId === classId && e[1].subject === subject) u['grades/' + e[0]] = null; });
+  Object.entries(App.cache.attendance).forEach(function(e) { if (e[1].classId === classId && e[1].subject === subject) u['attendance/' + e[0]] = null; });
+  try {
+    if (Object.keys(u).length) await db.ref().update(u);
+    toast('Сброшено: ' + lc + ' уроков, ' + gc + ' оценок, ' + ac + ' отметок', 'success');
+    await loadAll();
+    renderJournal();
+  } catch (err) { toast('Ошибка: ' + err.message, 'error'); }
+}
+
+function buildJournalTable(classId, subject, quarterId) {
+  var students = Object.entries(App.cache.students).filter(function(e) { return e[1].classId === classId; }).sort(function(a, b) { return a[1].name.localeCompare(b[1].name); });
+  if (!students.length) return null;
+  var lessons = Object.entries(App.cache.lessons).filter(function(e) { return e[1].classId === classId && e[1].subject === subject; }).map(function(e) { return Object.assign({}, e[1], { id:e[0], dms:new Date(e[1].date).setHours(0,0,0,0) }); }).sort(function(a, b) { return a.dms - b.dms; });
+  var grades = Object.entries(App.cache.grades).filter(function(e) { return e[1].classId === classId && e[1].subject === subject; }).map(function(e) { return Object.assign({}, e[1], { id:e[0], dms:new Date(e[1].date).setHours(0,0,0,0) }); });
+  var atts = Object.entries(App.cache.attendance).filter(function(e) { return e[1].classId === classId && e[1].subject === subject; }).map(function(e) { return Object.assign({}, e[1], { id:e[0], dms:new Date(e[1].date).setHours(0,0,0,0) }); });
+  var dateSet = {};
+  lessons.forEach(function(l) { if (inQuarter(l.dms, quarterId)) dateSet[l.dms] = true; });
+  grades.forEach(function(g) { if (inQuarter(g.dms, quarterId)) dateSet[g.dms] = true; });
+  atts.forEach(function(a) { if (inQuarter(a.dms, quarterId)) dateSet[a.dms] = true; });
+  var allDates = Object.keys(dateSet).map(Number).sort(function(a, b) { return a - b; });
+  if (!allDates.length) {
+    var w = el('div');
+    w.innerHTML = '<div class="empty" style="padding:60px;"><div style="font-size:14px;margin-bottom:6px;">Журнал пуст' + (quarterId !== 'all' ? ' в этой четверти' : '') + '</div><div style="font-size:12px;">Нажмите «Год» или «+ Урок»</div></div>';
+    return w;
+  }
+  var mm = new Map();
+  allDates.forEach(function(dms) {
+    var d = new Date(dms);
+    var k = d.getFullYear() + '-' + d.getMonth();
+    if (!mm.has(k)) mm.set(k, { name:d.toLocaleDateString('ru-RU', { month:'long' }), dates:[] });
+    mm.get(k).dates.push(dms);
+  });
+  var gIdx = new Map();
+  grades.forEach(function(g) { gIdx.set(g.studentId + '_' + g.dms, g); });
+  var lIdx = new Map();
+  lessons.forEach(function(l) { lIdx.set(l.dms, l); });
+  var aIdx = new Map();
+  atts.forEach(function(a) { aIdx.set(a.studentId + '_' + a.dms, a); });
+  var table = el('table', { class:'j-table' });
+  var thead = el('thead');
+  var tr1 = el('tr');
+  tr1.appendChild(el('th', { class:'col-num', rowspan:'3' }, '№'));
+  tr1.appendChild(el('th', { class:'col-name', rowspan:'3' }, 'Ф.И. ученика'));
+  mm.forEach(function(m) { tr1.appendChild(el('th', { class:'month-h', colspan:String(m.dates.length) }, m.name)); });
+  tr1.appendChild(el('th', { class:'col-avg', rowspan:'3' }, 'Средний'));
+  tr1.appendChild(el('th', { class:'col-final', rowspan:'3' }, 'Итог'));
+  thead.appendChild(tr1);
+  var tr2 = el('tr');
+  var today = new Date().setHours(0,0,0,0);
+  allDates.forEach(function(dms) {
+    var d = new Date(dms);
+    var we = d.getDay() === 0 || d.getDay() === 6;
+    var isT = dms === today;
+    var cls = 'date-h' + (we ? ' weekend' : '') + (isT ? ' today' : '');
+    var th = el('th', { class:cls });
+    th.textContent = String(d.getDate());
+    th.onclick = function() { openLessonDialog({ classId:classId, subject:subject, dateMs:dms }); };
+    var l = lIdx.get(dms);
+    if (l && (l.topic || l.homework)) {
+      th.onmouseenter = function(e) { showLessonTip(e.target, l); };
+      th.onmouseleave = hideLessonTip;
+    }
+    tr2.appendChild(th);
+  });
+  thead.appendChild(tr2);
+  var tr3 = el('tr');
+  allDates.forEach(function(dms) {
+    var dayG = grades.filter(function(g) { return g.dms === dms; });
+    var code = '—';
+    if (dayG.length) {
+      var wt = App.cache.workTypes[dayG[0].typeId];
+      code = (wt && wt.code) || (wt && wt.name ? wt.name.substring(0, 3).toUpperCase() : '—');
+    }
+    tr3.appendChild(el('th', {}, code));
+  });
+  thead.appendChild(tr3);
+  table.appendChild(thead);
+  var tbody = el('tbody');
+  students.forEach(function(entry, idx) {
+    var sid = entry[0], s = entry[1];
+    var tr = el('tr');
+    tr.appendChild(el('td', { class:'col-num' }, String(idx + 1)));
+    tr.appendChild(el('td', { class:'col-name', title:s.name }, s.name));
+    allDates.forEach(function(dms) {
+      var td = el('td', { class:'date-cell' });
+      var g = gIdx.get(sid + '_' + dms);
+      var a = aIdx.get(sid + '_' + dms);
+      var attHtml = '';
+      if (a) {
+        var mark = (a.mark || 'н').toLowerCase();
+        var letter = mark === 'н' ? 'Н' : (mark === 'у' ? 'У' : 'О');
+        attHtml = '<span class="j-att-badge ' + mark + '">' + letter + '</span>';
+      }
+      if (g) {
+        var cell = el('div', { class:'j-cell ' + gradeClass(g.value) + (a ? ' has-att' : ''), html:String(g.value) + attHtml });
+        cell.onclick = function() { openGradeCellDialog(classId, subject, sid, dms, g.id); };
+        td.appendChild(cell);
+      } else {
+        var cell2 = el('div', { class:'j-cell empty' + (a ? ' has-att' : ''), html:attHtml });
+        cell2.onclick = function() { openGradeCellDialog(classId, subject, sid, dms); };
+        td.appendChild(cell2);
+      }
+      tr.appendChild(td);
+    });
+    var sg = Object.values(App.cache.grades).filter(function(g) {
+      return g.studentId === sid && g.classId === classId && g.subject === subject && inQuarter(new Date(g.date).setHours(0,0,0,0), quarterId);
+    });
+    var avg = weightedAvg(sg);
+    tr.appendChild(el('td', { class:'col-avg ' + avgClass(avg) }, avg ? String(avg) : '—'));
+    tr.appendChild(el('td', { class:'col-final ' + avgClass(avg) }, avg ? String(Math.round(avg)) : '—'));
+    tbody.appendChild(tr);
+  });
+  table.appendChild(tbody);
+  return table;
+}
+
+var _tipEl = null;
+function showLessonTip(target, lesson) {
+  hideLessonTip();
+  var r = target.getBoundingClientRect();
+  var tip = el('div', { class:'lesson-tip' });
+  tip.innerHTML = '<div class="tip-title">Тема урока</div><div class="tip-body">' + (lesson.topic || 'не задана') + '</div><div class="tip-title">Домашняя работа</div><div class="tip-body">' + (lesson.homework || 'без задания') + '</div>';
+  document.body.appendChild(tip);
+  tip.style.left = (r.left + r.width / 2 - 120) + 'px';
+  tip.style.top = (r.bottom + 6) + 'px';
+  _tipEl = tip;
+}
+function hideLessonTip() { if (_tipEl) { _tipEl.remove(); _tipEl = null; } }
+
+function openLessonDialog(opts) {
+  var classId = opts.classId, subject = opts.subject, dateMs = opts.dateMs;
+  var dateStr = dateMs ? toLocalDateStr(dateMs) : toLocalDateStr(Date.now());
+  var existing = Object.entries(App.cache.lessons).find(function(e) {
+    var l = e[1];
+    return l.classId === classId && l.subject === subject && new Date(l.date).setHours(0,0,0,0) === parseLocalDate(dateStr);
+  });
+  var cls = App.cache.classes[classId];
+  var actions = [];
+  if (existing) {
+    actions.push({ label:'Удалить', class:'btn-danger', onClick: async function() {
+      if (await confirmDialog('Удалить урок?', 'Тема и ДЗ будут удалены.')) {
+        await db.ref('lessons/' + existing[0]).remove();
+        toast('Урок удалён', 'success');
+        await loadAll();
+        renderJournal();
+      }
+    }});
+  }
+  actions.push({ label:'Отмена' });
+  actions.push({ label:'Сохранить', class:'btn-primary', onClick: async function() {
+    var date = document.getElementById('ls-date').value;
+    var topic = document.getElementById('ls-topic').value.trim();
+    var hw = document.getElementById('ls-hw').value.trim();
+    if (!date) return toast('Укажите дату', 'error');
+    var dms = parseLocalDate(date);
+    var payload = { classId:classId, subject:subject, teacherId:App.user.uid, date:dms, topic:topic, homework:hw, updatedAt:Date.now() };
+    if (existing) {
+      await db.ref('lessons/' + existing[0]).update(payload);
+      toast('Урок обновлён', 'success');
+    } else {
+      payload.createdAt = Date.now();
+      var id = db.ref('lessons').push().key;
+      await db.ref('lessons/' + id).set(payload);
+      toast('Урок добавлен', 'success');
+    }
+    closeModal();
+    await loadAll();
+    renderJournal();
+  }});
+  showModal(ic('calendar', 20) + ' ' + (existing ? 'Редактировать' : 'Новый') + ' урок',
+    '<div class="form-group"><label>Класс / Предмет</label><input value="' + cls.name + ' / ' + subject + '" disabled></div>' +
+    '<div class="form-group"><label>Дата</label><input type="date" id="ls-date" value="' + dateStr + '"></div>' +
+    '<div class="form-group"><label>Тема урока</label><textarea id="ls-topic" placeholder="Например: Вредные привычки">' + (existing ? (existing[1].topic || '') : '') + '</textarea></div>' +
+    '<div class="form-group"><label>Домашняя работа</label><textarea id="ls-hw" placeholder="Например: параграф 5">' + (existing ? (existing[1].homework || '') : '') + '</textarea></div>',
+    actions
+  );
+}
+
+function fillYearDialog(classId, subject) {
+  var curY = new Date().getFullYear();
+  var curM = new Date().getMonth();
+  var startYear = curM >= 7 ? curY : curY - 1;
+  var start = startYear + '-09-01';
+  var end = (startYear + 1) + '-05-31';
+  var wd = ['Пн','Вт','Ср','Чт','Пт','Сб'];
+  var wdHtml = wd.map(function(w, i) {
+    return '<label data-wd="' + (i + 1) + '"><input type="checkbox" value="' + (i + 1) + '">' + w + '</label>';
+  }).join('');
+  showModal(ic('zap', 20) + ' Заполнить уроки на год',
+    '<div class="form-group"><label>Класс / Предмет</label><input value="' + App.cache.classes[classId].name + ' / ' + subject + '" disabled></div>' +
+    '<div class="form-group"><label>Дата начала</label><input type="date" id="fy-start" value="' + start + '"></div>' +
+    '<div class="form-group"><label>Дата окончания</label><input type="date" id="fy-end" value="' + end + '"></div>' +
+    '<div class="form-group"><label>Дни недели уроков</label><div class="weekday-picker" id="fy-wd">' + wdHtml + '</div><div class="hint">' + ic('info', 14) + ' Отметьте дни, когда проходят уроки.</div></div>',
+    [
+      { label:'Отмена' },
+      { label:'Создать уроки', class:'btn-primary', onClick: async function() {
+        var s = document.getElementById('fy-start').value;
+        var e = document.getElementById('fy-end').value;
+        var checked = [];
+        document.querySelectorAll('#fy-wd label.on').forEach(function(l) { checked.push(+l.dataset.wd); });
+        if (!s || !e || !checked.length) return toast('Заполните даты и выберите дни', 'error');
+        var u = {};
+        var cur = new Date(parseLocalDate(s));
+        var endD = new Date(parseLocalDate(e));
+        var cnt = 0;
+        while (cur <= endD) {
+          var wdNum = cur.getDay();
+          if (checked.indexOf(wdNum) !== -1) {
+            var dms = new Date(cur.getFullYear(), cur.getMonth(), cur.getDate()).getTime();
+            var exists = Object.values(App.cache.lessons).some(function(l) {
+              return l.classId === classId && l.subject === subject && new Date(l.date).setHours(0,0,0,0) === dms;
+            });
+            if (!exists) {
+              var id = db.ref('lessons').push().key;
+              u['lessons/' + id] = { classId:classId, subject:subject, teacherId:App.user.uid, date:dms, topic:'', homework:'', createdAt:Date.now() };
+              cnt++;
+            }
+          }
+          cur.setDate(cur.getDate() + 1);
+        }
+        if (!cnt) { closeModal(); return toast('Все уроки уже есть', 'warning'); }
+        var keys = Object.keys(u);
+        var chunks = [];
+        for (var i = 0; i < keys.length; i += 200) {
+          var ch = {};
+          keys.slice(i, i + 200).forEach(function(k) { ch[k] = u[k]; });
+          chunks.push(ch);
+        }
+        try {
+          for (var j = 0; j < chunks.length; j++) await db.ref().update(chunks[j]);
+          closeModal();
+          toast('Создано уроков: <b>' + cnt + '</b>', 'success');
+          await loadAll();
+          renderJournal();
+        } catch (err) { toast('Ошибка: ' + err.message, 'error'); }
+      }}
+    ], { wide:true });
+  setTimeout(function() {
+    document.querySelectorAll('#fy-wd label').forEach(function(l) {
+      l.onclick = function(e) {
+        e.preventDefault();
+        var cb = l.querySelector('input');
+        cb.checked = !cb.checked;
+        l.classList.toggle('on', cb.checked);
+      };
+    });
+  }, 50);
+}
+
+function openGradeCellDialog(classId, subject, studentId, dateMs, existingGradeId) {
+  var student = App.cache.students[studentId];
+  var cls = App.cache.classes[classId];
+  var existing = existingGradeId ? App.cache.grades[existingGradeId] : null;
+  var dateStr = toLocalDateStr(dateMs);
+  var existingAtt = null, existingAttId = null;
+  Object.entries(App.cache.attendance).forEach(function(e) {
+    var a = e[1];
+    if (a.classId === classId && a.subject === subject && a.studentId === studentId && new Date(a.date).setHours(0,0,0,0) === dateMs) {
+      existingAtt = a;
+      existingAttId = e[0];
+    }
+  });
+  var wt = Object.entries(App.cache.workTypes).sort(function(a, b) { return (a[1].weight || 0) - (b[1].weight || 0); });
+  var selectedValue = existing ? existing.value : null;
+  var selectedAtt = existingAtt ? (existingAtt.mark || '') : '';
+  var wtOpts = wt.map(function(e) {
+    return '<option value="' + e[0] + '"' + (existing && existing.typeId === e[0] ? ' selected' : '') + '>' + e[1].name + ' (вес ' + e[1].weight + ')</option>';
+  }).join('');
+  var btns = [5,4,3,2,1].map(function(v) {
+    var a = (existing ? existing.value : null) === v ? 'active' : '';
+    return '<button type="button" class="grade-btn gb-' + v + ' ' + a + '" data-value="' + v + '">' + v + '</button>';
+  }).join('');
+  var attBtns = [{ v:'', lbl:'Был' },{ v:'н', lbl:'Н' },{ v:'у', lbl:'У' },{ v:'о', lbl:'О' }].map(function(o) {
+    var cls2 = o.v === 'н' ? 'ab-n' : (o.v === 'у' ? 'ab-u' : (o.v === 'о' ? 'ab-o' : 'ab-ok'));
+    var active = selectedAtt === o.v ? 'active' : '';
+    return '<button type="button" class="att-btn ' + cls2 + ' ' + active + '" data-att="' + o.v + '">' + o.lbl + '</button>';
+  }).join('');
+  var actions = [];
+  if (existing) {
+    actions.push({ label:'Удалить оценку', class:'btn-danger', onClick: async function() {
+      if (await confirmDialog('Удалить оценку?', 'Необратимо.')) {
+        await db.ref('grades/' + existingGradeId).remove();
+        toast('Оценка удалена', 'success');
+        closeModal();
+        await loadAll();
+        renderJournal();
+      }
+    }});
+  }
+  actions.push({ label:'Отмена' });
+  actions.push({ label:'Сохранить', class:'btn-primary', onClick: async function() {
+    var date = document.getElementById('gd-date').value;
+    var typeId = document.getElementById('gd-type').value;
+    var notes = document.getElementById('gd-notes').value.trim();
+    var gd = parseLocalDate(date);
+    if (selectedAtt !== '') {
+      if (existingAtt) {
+        await db.ref('attendance/' + existingAttId).update({ mark:selectedAtt, date:gd });
+      } else {
+        var aid = db.ref('attendance').push().key;
+        await db.ref('attendance/' + aid).set({ studentId:studentId, classId:classId, subject:subject, date:gd, mark:selectedAtt, teacherId:App.user.uid });
+      }
+    } else {
+      if (existingAtt) await db.ref('attendance/' + existingAttId).remove();
+    }
+    if (selectedValue) {
+      var w = App.cache.workTypes[typeId];
+      if (existing) {
+        var hist = (existing.history || []).slice();
+        if (existing.value !== selectedValue) {
+          hist.push({ changedBy:App.user.uid, changedAt:Date.now(), oldValue:existing.value, newValue:selectedValue });
+        }
+        await db.ref('grades/' + existingGradeId).update({ value:selectedValue, date:gd, typeId:typeId, weight:w.weight, notes:notes, history:hist });
+        toast('Сохранено', 'success');
+      } else {
+        var gid = db.ref('grades').push().key;
+        await db.ref('grades/' + gid).set({ studentId:studentId, classId:classId, subject:subject, teacherId:App.user.uid, date:gd, typeId:typeId, weight:w.weight, value:selectedValue, notes:notes, history:[] });
+        toast('Оценка выставлена', 'success');
+      }
+    } else {
+      if (existing) await db.ref('grades/' + existingGradeId).remove();
+      toast('Сохранено', 'success');
+    }
+    closeModal();
+    await loadAll();
+    renderJournal();
+  }});
+  showModal(ic('pencil', 20) + ' Оценка и посещаемость',
+    '<div class="form-group"><label>Класс / Предмет</label><input value="' + cls.name + ' / ' + subject + '" disabled></div>' +
+    '<div class="form-group"><label>Ученик</label><input value="' + student.name + '" disabled></div>' +
+    '<div class="form-group"><label>Дата</label><input type="date" id="gd-date" value="' + dateStr + '"></div>' +
+    '<div class="form-group"><label>Посещаемость</label><div class="att-picker" id="gd-att-picker">' + attBtns + '</div><div class="hint" style="margin-top:6px;"><b>Н</b> — не был, <b>У</b> — уважительная, <b>О</b> — опоздал</div></div>' +
+    '<div class="form-group"><label>Тип работы</label><select id="gd-type">' + wtOpts + '</select></div>' +
+    '<div class="form-group"><label>Оценка</label><div class="grade-picker" id="gd-picker">' + btns + '</div><div class="hint" style="margin-top:6px;">Нажмите на оценку ещё раз, чтобы снять</div></div>' +
+    '<div class="form-group"><label>Замечания</label><textarea id="gd-notes" placeholder="Комментарий…">' + (existing && existing.notes ? existing.notes : '') + '</textarea></div>',
+    actions
+  );
+  setTimeout(function() {
+    var p = document.getElementById('gd-picker');
+    p.querySelectorAll('.grade-btn').forEach(function(b) {
+      b.onclick = function() {
+        var cur = +b.dataset.value;
+        if (selectedValue === cur) {
+          selectedValue = null;
+          p.querySelectorAll('.grade-btn').forEach(function(x) { x.classList.remove('active'); });
+        } else {
+          p.querySelectorAll('.grade-btn').forEach(function(x) { x.classList.remove('active'); });
+          b.classList.add('active');
+          selectedValue = cur;
+        }
+      };
+    });
+    var ap = document.getElementById('gd-att-picker');
+    ap.querySelectorAll('.att-btn').forEach(function(b) {
+      b.onclick = function() {
+        ap.querySelectorAll('.att-btn').forEach(function(x) { x.classList.remove('active'); });
+        b.classList.add('active');
+        selectedAtt = b.dataset.att;
+      };
+    });
+  }, 50);
+}
+
+function exportJournalXLS(classId, subject, quarterId) {
+  var cls = App.cache.classes[classId];
+  var students = Object.entries(App.cache.students).filter(function(e) { return e[1].classId === classId; }).sort(function(a, b) { return a[1].name.localeCompare(b[1].name); });
+  var grades = Object.entries(App.cache.grades).filter(function(e) { return e[1].classId === classId && e[1].subject === subject; }).map(function(e) { return Object.assign({}, e[1], { id:e[0], dms:new Date(e[1].date).setHours(0,0,0,0) }); }).filter(function(g) { return inQuarter(g.dms, quarterId); });
+  var atts = Object.entries(App.cache.attendance).filter(function(e) { return e[1].classId === classId && e[1].subject === subject; }).map(function(e) { return Object.assign({}, e[1], { id:e[0], dms:new Date(e[1].date).setHours(0,0,0,0) }); }).filter(function(a) { return inQuarter(a.dms, quarterId); });
+  var dateSet = {};
+  grades.forEach(function(g) { dateSet[g.dms] = true; });
+  atts.forEach(function(a) { dateSet[a.dms] = true; });
+  var ds = Object.keys(dateSet).map(Number).sort(function(a, b) { return a - b; });
+  var html = '<html><head><meta charset="UTF-8"><style>table{border-collapse:collapse;font-family:Arial,sans-serif;font-size:11px}th,td{border:1px solid #999;padding:3px 5px;text-align:center}th{background:#0EA5E9;color:#fff;font-weight:bold}td.name{text-align:left;font-weight:bold}td.g5{background:#10B981;color:#fff;font-weight:bold}td.g4{background:#84CC16;color:#fff;font-weight:bold}td.g3{background:#F59E0B;color:#fff;font-weight:bold}td.g2{background:#EF4444;color:#fff;font-weight:bold}td.g1{background:#991B1B;color:#fff;font-weight:bold}td.avg{background:#E0F2FE;font-weight:bold}td.att{background:#FEF3C7;font-weight:bold}</style></head><body>';
+  html += '<h2>Журнал: ' + cls.name + ' / ' + subject + (quarterId !== 'all' ? ' (' + quarterName(quarterId) + ')' : '') + '</h2>';
+  html += '<table><tr><th>№</th><th>Ученик</th>';
+  ds.forEach(function(d) { html += '<th>' + new Date(d).toLocaleDateString('ru-RU') + '</th>'; });
+  html += '<th>Средний</th><th>Итог</th></tr>';
+  students.forEach(function(entry, i) {
+    var sid = entry[0], s = entry[1];
+    html += '<tr><td>' + (i + 1) + '</td><td class="name">' + s.name + '</td>';
+    ds.forEach(function(d) {
+      var g = grades.find(function(x) { return x.studentId === sid && x.dms === d; });
+      var a = atts.find(function(x) { return x.studentId === sid && x.dms === d; });
+      var att = a ? (a.mark === 'н' ? 'Н' : (a.mark === 'у' ? 'У' : 'О')) : '';
+      if (g) {
+        var v = String(g.value);
+        if (att) html += '<td class="g' + Math.round(g.value) + '">' + v + ' (' + att + ')</td>';
+        else html += '<td class="g' + Math.round(g.value) + '">' + v + '</td>';
+      } else if (att) {
+        html += '<td class="att">' + att + '</td>';
+      } else {
+        html += '<td></td>';
+      }
+    });
+    var sg = grades.filter(function(x) { return x.studentId === sid; });
+    var avg = weightedAvg(sg);
+    html += '<td class="avg">' + (avg || '—') + '</td><td class="avg">' + (avg ? Math.round(avg) : '—') + '</td></tr>';
+  });
+  html += '</table></body></html>';
+  var blob = new Blob(['\uFEFF' + html], { type:'application/vnd.ms-excel;charset=utf-8' });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = 'journal_' + cls.name + '_' + subject + (quarterId !== 'all' ? '_' + quarterId : '') + '.xls';
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('Excel скачан', 'success');
+}
+
+function exportJournalCSV(classId, subject, quarterId) {
+  var cls = App.cache.classes[classId];
+  var st = Object.entries(App.cache.students).filter(function(e) { return e[1].classId === classId; }).sort(function(a, b) { return a[1].name.localeCompare(b[1].name); });
+  var g = Object.entries(App.cache.grades).filter(function(e) { return e[1].classId === classId && e[1].subject === subject; }).map(function(e) { return Object.assign({}, e[1], { id:e[0], dms:new Date(e[1].date).setHours(0,0,0,0) }); }).filter(function(x) { return inQuarter(x.dms, quarterId); });
+  var dateSet = {};
+  g.forEach(function(x) { dateSet[x.dms] = true; });
+  var ds = Object.keys(dateSet).map(Number).sort(function(a, b) { return a - b; });
+  var csv = 'Журнал ' + cls.name + ' / ' + subject + (quarterId !== 'all' ? ' — ' + quarterName(quarterId) : '') + '\n';
+  csv += '№;Ученик;' + ds.map(function(d) { return new Date(d).toLocaleDateString('ru-RU'); }).join(';') + ';Средний\n';
+  st.forEach(function(entry, i) {
+    var sid = entry[0], s = entry[1];
+    var row = [i + 1, s.name];
+    ds.forEach(function(d) {
+      var x = g.find(function(y) { return y.studentId === sid && y.dms === d; });
+      row.push(x ? x.value : '');
+    });
+    var sg = g.filter(function(x) { return x.studentId === sid; });
+    row.push(weightedAvg(sg) || '');
+    csv += row.join(';') + '\n';
+  });
+  var b = new Blob(['\uFEFF' + csv], { type:'text/csv;charset=utf-8' });
+  var u = URL.createObjectURL(b);
+  var a = document.createElement('a');
+  a.href = u;
+  a.download = 'journal_' + cls.name + '_' + subject + (quarterId !== 'all' ? '_' + quarterId : '') + '.csv';
+  a.click();
+  URL.revokeObjectURL(u);
+}
+
+function importCSVDialog(classId) {
+  var input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.csv,.txt,text/csv,text/plain';
+  input.onchange = function(e) {
+    var file = e.target.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = async function(ev) {
+      try {
+        var text = (ev.target.result || '').replace(/^\uFEFF/, '');
+        var lines = text.split(/\r?\n/);
+        var names = [];
+        lines.forEach(function(line) {
+          var s = (line || '').trim();
+          if (!s) return;
+          var parts = s.split(/[;\t]|,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(function(p) { return p.trim().replace(/^"+|"+$/g, '').trim(); }).filter(Boolean);
+          if (!parts.length) return;
+          if (/^(№|no|number|фио|имя|ученик|ученики|fio|name)$/i.test(parts[0])) return;
+          var name = parts.reduce(function(a, b) { return b.length > a.length ? b : a; }, '');
+          if (name && name.length >= 3 && /[А-Яа-яЁёA-Za-z]/.test(name)) names.push(name);
+        });
+        var seen = {};
+        names = names.filter(function(n) { var key = n.toLowerCase(); if (seen[key]) return false; seen[key] = true; return true; });
+        if (!names.length) return toast('Не удалось найти имена', 'error');
+        var ok = await warnDialog('Импорт учеников', 'Найдено: <b>' + names.length + '</b><br><br>Первые 5:<br>' + names.slice(0, 5).map(function(n) { return '• ' + n; }).join('<br>') + (names.length > 5 ? '<br>…и ещё ' + (names.length - 5) : '') + '<br><br>Добавить?', 'Добавить ' + names.length);
+        if (!ok) return;
+        var u = {};
+        var now = Date.now();
+        names.forEach(function(n, i) {
+          var id = db.ref('students').push().key;
+          u['students/' + id] = { name:n, classId:classId, createdAt:now + i };
+        });
+        await db.ref().update(u);
+        toast('Импортировано: <b>' + names.length + '</b>', 'success');
+        await loadAll();
+        if (location.hash.indexOf('#class/') === 0) renderClassDetail(classId);
+        else router();
+      } catch (err) { toast('Ошибка чтения файла: ' + err.message, 'error'); }
+    };
+    reader.readAsText(file, 'UTF-8');
+  };
+  input.click();
+}
+
+async function renderStudents() {
+  $('#page-title').textContent = 'Ученики';
+  var c = $('#content');
+  c.innerHTML = '';
+  var cls = myClasses();
+  var has = Object.keys(cls).length > 0;
+  var card = el('div', { class:'card' });
+  card.appendChild(el('div', { class:'card-header' },
+    el('div', { class:'card-title' }, 'Все мои ученики'),
+    has ? el('div', { style:'display:flex;gap:6px;flex-wrap:wrap;' },
+      el('button', { class:'btn btn-success btn-sm', html: ic('upload', 14) + ' Импорт CSV', onclick: function() { importCSVWithClassDialog(); } }),
+      el('button', { class:'btn btn-primary btn-sm', html: ic('userPlus', 14) + ' Добавить', onclick: addStudentsDialog })
+    ) : el('span', { class:'hint' }, 'Сначала создайте класс')
+  ));
+  var ids = Object.keys(cls);
+  var st = Object.entries(App.cache.students).filter(function(e) { return ids.indexOf(e[1].classId) !== -1; }).sort(function(a, b) { return a[1].name.localeCompare(b[1].name); });
+  if (!st.length) {
+    card.appendChild(el('div', { class:'empty' }, 'Учеников пока нет'));
+  } else {
+    var t = el('table');
+    t.innerHTML = '<thead><tr><th>#</th><th>ФИО</th><th>Класс</th><th>Средний</th></tr></thead>';
+    var tb = el('tbody');
+    st.forEach(function(entry, i) {
+      var sid = entry[0], s = entry[1];
+      var cl = App.cache.classes[s.classId];
+      var a = avgForStudent(sid, s.classId);
+      var tr = el('tr');
+      tr.innerHTML = '<td>' + (i + 1) + '</td><td>' + s.name + '</td><td>' + (cl ? cl.name : '—') + '</td><td><span class="grade ' + gradeClass(a) + '">' + (a || '—') + '</span></td>';
+      tb.appendChild(tr);
+    });
+    t.appendChild(tb);
+    card.appendChild(t);
+  }
+  c.appendChild(card);
+}
+
+function importCSVWithClassDialog() {
+  var cls = myClasses();
+  if (!Object.keys(cls).length) return toast('Сначала создайте класс', 'warning');
+  var opts = Object.entries(cls).sort(function(a, b) { return a[1].name.localeCompare(b[1].name); }).map(function(e) { return '<option value="' + e[0] + '">' + e[1].name + '</option>'; }).join('');
+  showModal(ic('upload', 20) + ' Импорт из CSV',
+    '<div class="form-group"><label>Класс</label><select id="imp-csv-class">' + opts + '</select></div>' +
+    '<div class="form-group"><label>Как это работает</label><div class="hint" style="flex-direction:column;align-items:flex-start;line-height:1.7;"><span>• Файл .csv или .txt, UTF-8</span><span>• Одна фамилия в строке</span><span>• Или через запятую</span><span>• Первая строка с заголовками пропускается</span></div></div>',
+    [{ label:'Отмена' }, { label:'Выбрать файл', class:'btn-primary', onclick: function() { var cid = document.getElementById('imp-csv-class').value; closeModal(); setTimeout(function() { importCSVDialog(cid); }, 100); } }]);
+}
+
+async function renderWorkTypes() {
+  $('#page-title').textContent = 'Типы работ';
+  var c = $('#content');
+  c.innerHTML = '';
+  var card = el('div', { class:'card' });
+  card.appendChild(el('div', { class:'card-header' },
+    el('div', { class:'card-title' }, 'Типы работ и веса'),
+    el('button', { class:'btn btn-primary', html: ic('plus', 16) + ' Добавить тип', onclick: addWorkTypeDialog })
+  ));
+  var it = Object.entries(App.cache.workTypes).sort(function(a, b) { return (a[1].weight || 0) - (b[1].weight || 0); });
+  if (!it.length) {
+    card.appendChild(el('div', { class:'empty' }, 'Типов пока нет'));
+  } else {
+    var t = el('table');
+    t.innerHTML = '<thead><tr><th>Название</th><th>Код</th><th>Вес</th><th></th></tr></thead>';
+    var tb = el('tbody');
+    it.forEach(function(entry) {
+      var id = entry[0], w = entry[1];
+      var tr = el('tr');
+      tr.innerHTML = '<td>' + w.name + '</td><td><b>' + (w.code || '—') + '</b></td><td>' + w.weight + '</td>';
+      var a = el('td');
+      a.appendChild(el('button', { class:'btn btn-sm btn-ghost', html: ic('trash', 14), onclick: async function() {
+        if (await confirmDialog('Удалить тип?', 'Тип "' + w.name + '" будет удалён.')) {
+          await db.ref('workTypes/' + id).remove();
+          await loadAll();
+          renderWorkTypes();
+        }
+      }}));
+      tr.appendChild(a);
+      tb.appendChild(tr);
+    });
+    t.appendChild(tb);
+    card.appendChild(t);
+  }
+  c.appendChild(card);
+}
+
+async function renderProfile() {
+  $('#page-title').textContent = 'Профиль';
+  var c = $('#content');
+  c.innerHTML = '';
+  var p = App.profile;
+  var card = el('div', { class:'card' });
+  card.innerHTML =
+    '<div class="card-header"><div class="card-title">Мой профиль</div></div>' +
+    '<p style="margin-bottom:8px;display:flex;align-items:center;gap:8px;"><span style="color:var(--text-muted);">' + ic('user', 16) + '</span><b>ФИО:</b> ' + (p.name || '—') + '</p>' +
+    '<p style="margin-bottom:8px;display:flex;align-items:center;gap:8px;"><span style="color:var(--text-muted);">' + ic('key', 16) + '</span><b>Логин:</b> ' + (p.login || '—') + '</p>' +
+    '<p style="margin-bottom:8px;display:flex;align-items:center;gap:8px;"><span style="color:var(--text-muted);">' + ic('mail', 16) + '</span><b>Email:</b> ' + (p.email || '—') + '</p>' +
+    '<p style="margin-bottom:8px;display:flex;align-items:center;gap:8px;"><span style="color:var(--text-muted);">' + ic('tag', 16) + '</span><b>Роль:</b> <span class="badge">' + roleLabel(p.role) + '</span></p>' +
+    '<p style="margin-bottom:8px;display:flex;align-items:center;gap:8px;"><span style="color:var(--text-muted);">' + ic('school', 16) + '</span><b>Школа:</b> ' + (App.cache.schools[p.schoolId] ? App.cache.schools[p.schoolId].name : '—') + '</p>' +
+    '<p style="margin-bottom:8px;display:flex;align-items:center;gap:8px;"><span style="color:var(--text-muted);">' + ic('city', 16) + '</span><b>Город:</b> ' + (App.cache.cities[p.cityId] ? App.cache.cities[p.cityId].name : '—') + '</p>' +
+    '<hr style="border:none;border-top:1px solid var(--border);margin:18px 0;">' +
+    '<div style="font-size:14px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:8px;">' + ic('monitor', 16) + ' Настройки отображения</div>' +
+    '<div class="form-group" style="max-width:340px;"><label>Размер журнала</label><select id="device-select"><option value="auto">🔄 Авто</option><option value="phone">📱 Телефон</option><option value="tablet">💻 Планшет</option><option value="desktop">🖥️ Компьютер</option></select></div>' +
+    '<hr style="border:none;border-top:1px solid var(--border);margin:18px 0;">' +
+    '<div style="font-size:14px;font-weight:700;margin-bottom:10px;">Четверти</div>' +
+    '<div style="font-size:12px;color:var(--text-muted);line-height:1.7;">' +
+      QUARTERS.map(function(q) {
+        var m1 = ['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек'][q.sm];
+        var m2 = ['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек'][q.em];
+        return '<div><b>' + q.name + ':</b> ' + q.sd + ' ' + m1 + ' — ' + q.ed + ' ' + m2 + '</div>';
+      }).join('') +
+    '</div>';
+  c.appendChild(card);
+  var devSel = $('#device-select');
+  if (devSel) {
+    devSel.value = localStorage.getItem('device') || 'auto';
+    devSel.onchange = function() {
+      var v = devSel.value;
+      localStorage.setItem('device', v);
+      applyDevice(v);
+      toast('Размер журнала обновлён', 'success');
+    };
+  }
+}
+
+function addCityDialog() {
+  showModal(ic('city', 20) + ' Новый город',
+    '<div class="form-group"><label>Название</label><input id="m-city-name" placeholder="Москва"></div>',
+    [{ label:'Отмена' }, { label:'Создать', class:'btn-primary', onClick: async function() {
+      var n = document.getElementById('m-city-name').value.trim();
+      if (!n) return;
+      var id = db.ref('cities').push().key;
+      await db.ref('cities/' + id).set({ name:n, creatorId:App.user.uid, createdAt:Date.now() });
+      closeModal();
+      toast('Город создан', 'success');
+      await loadAll();
+      renderCities();
+    } }]);
+}
+
+function addSchoolDialog() {
+  var opts = Object.entries(App.cache.cities).filter(function(e) { return App.profile.role !== 'city_creator' || e[0] === App.profile.cityId; }).map(function(e) { return '<option value="' + e[0] + '">' + e[1].name + '</option>'; }).join('');
+  if (!opts) return toast('Сначала создайте город', 'warning');
+  showModal(ic('school', 20) + ' Новая школа',
+    '<div class="form-group"><label>Название</label><input id="m-school-name" placeholder="Школа №1"></div><div class="form-group"><label>Город</label><select id="m-school-city">' + opts + '</select></div>',
+    [{ label:'Отмена' }, { label:'Создать', class:'btn-primary', onClick: async function() {
+      var n = document.getElementById('m-school-name').value.trim();
+      var cid = document.getElementById('m-school-city').value;
+      if (!n || !cid) return;
+      var id = db.ref('schools').push().key;
+      await db.ref('schools/' + id).set({ name:n, cityId:cid, creatorId:App.user.uid, createdAt:Date.now() });
+      closeModal();
+      toast('Школа создана', 'success');
+      await loadAll();
+      renderSchools();
+    } }]);
+}
+
+function createCityCreatorDialog(cityId) {
+  showModal(ic('userPlus', 20) + ' Создатель города',
+    '<div class="form-group"><label>ФИО</label><input id="cc-name"></div><div class="form-group"><label>Логин</label><input id="cc-login"></div><div class="form-group"><label>Email</label><input id="cc-email" type="email"></div><div class="form-group"><label>Пароль</label><input id="cc-pass" type="password" minlength="6"></div>',
+    [{ label:'Отмена' }, { label:'Создать', class:'btn-primary', onClick: async function() {
+      var n = document.getElementById('cc-name').value.trim();
+      var l = document.getElementById('cc-login').value.trim();
+      var e = document.getElementById('cc-email').value.trim();
+      var p = document.getElementById('cc-pass').value;
+      if (!n || !l || !e || p.length < 6) return toast('Заполните всё (пароль ≥6)', 'error');
+      try {
+        var cred = await secondaryAuth.createUserWithEmailAndPassword(e, p);
+        var uid = cred.user.uid;
+        await secondaryAuth.signOut();
+        await db.ref('users/' + uid).set({ role:'city_creator', login:l, name:n, email:e, cityId:cityId, createdAt:Date.now() });
+        closeModal();
+        toast('Создано', 'success');
+        await loadAll();
+        renderCities();
+      } catch (err) { toast(translateError(err), 'error'); }
+    } }]);
+}
+
+function createSchoolCreatorDialog(schoolId, cityId) {
+  showModal(ic('userPlus', 20) + ' Создатель школы',
+    '<div class="form-group"><label>ФИО</label><input id="sc-name"></div><div class="form-group"><label>Логин</label><input id="sc-login"></div><div class="form-group"><label>Email</label><input id="sc-email" type="email"></div><div class="form-group"><label>Пароль</label><input id="sc-pass" type="password" minlength="6"></div>',
+    [{ label:'Отмена' }, { label:'Создать', class:'btn-primary', onClick: async function() {
+      var n = document.getElementById('sc-name').value.trim();
+      var l = document.getElementById('sc-login').value.trim();
+      var e = document.getElementById('sc-email').value.trim();
+      var p = document.getElementById('sc-pass').value;
+      if (!n || !l || !e || p.length < 6) return toast('Заполните всё (пароль ≥6)', 'error');
+      try {
+        var cred = await secondaryAuth.createUserWithEmailAndPassword(e, p);
+        var uid = cred.user.uid;
+        await secondaryAuth.signOut();
+        await db.ref('users/' + uid).set({ role:'school_creator', login:l, name:n, email:e, schoolId:schoolId, cityId:cityId, createdAt:Date.now() });
+        closeModal();
+        toast('Создано', 'success');
+        await loadAll();
+        renderSchools();
+      } catch (err) { toast(translateError(err), 'error'); }
+    } }]);
+}
+
+function createInvite() {
+  var code = Math.random().toString(36).substring(2, 8).toUpperCase();
+  var exp = Date.now() + 7 * 24 * 60 * 60 * 1000;
+  db.ref('invites/' + code).set({ role:'teacher', schoolId:App.profile.schoolId || null, cityId:App.profile.cityId || null, createdBy:App.user.uid, used:false, createdAt:Date.now(), expiresAt:exp }).then(async function() {
+    toast('Код создан: <b>' + code + '</b>', 'success');
+    await loadAll();
+    renderInvites();
+  });
+}
+
+function addClassDialog() {
+  var gh = POPULAR_SUBJECTS.map(function(g, gi) {
+    var items = g.items.map(function(n) {
+      return '<label class="subject-item" data-name="' + n + '"><input type="checkbox" value="' + n + '"><span>' + n + '</span></label>';
+    }).join('');
+    return '<div class="subject-group" data-group="' + gi + '"><div class="subject-group-title">' + ic('list', 12) + ' ' + g.group + '</div>' + items + '</div>';
+  }).join('');
+  var d = showModal(ic('cap', 20) + ' Новый класс',
+    '<div class="form-group"><label>Название</label><input id="m-cl-name" placeholder="1А"></div><div class="form-group"><label>Год</label><input id="m-cl-year" type="number" value="' + new Date().getFullYear() + '"></div>' +
+    '<div class="form-group"><label>Предметы</label><div class="subjects-toolbar"><input type="text" id="m-cl-search" placeholder="Поиск..."><button type="button" class="btn btn-sm btn-ghost" id="m-cl-all">Все</button><button type="button" class="btn btn-sm btn-ghost" id="m-cl-clr">Снять</button></div><div class="subjects-box" id="m-cl-box">' + gh + '</div><div class="subject-counter">Выбрано: <b id="m-cl-counter">0</b></div></div>',
+    [{ label:'Отмена' }, { label:'Создать', class:'btn-primary', onClick: async function() {
+      var n = document.getElementById('m-cl-name').value.trim();
+      var y = +document.getElementById('m-cl-year').value;
+      var subs = [];
+      d.querySelectorAll('.subject-item input:checked').forEach(function(c) { subs.push(c.value); });
+      if (!n) return toast('Введите название', 'error');
+      if (!subs.length) return toast('Выберите предметы', 'error');
+      var id = db.ref('classes').push().key;
+      await db.ref('classes/' + id).set({ name:n, year:y, subjects:subs, teacherId:App.user.uid, schoolId:App.profile.schoolId || null, createdAt:Date.now() });
+      closeModal();
+      toast('Класс создан, предметов: <b>' + subs.length + '</b>', 'success');
+      await loadAll();
+      renderClasses();
+    } }], { wide:true });
+  setTimeout(function() {
+    var search = d.querySelector('#m-cl-search');
+    var counter = d.querySelector('#m-cl-counter');
+    var items = d.querySelectorAll('.subject-item');
+    var upd = function() { counter.textContent = d.querySelectorAll('.subject-item input:checked').length; };
+    items.forEach(function(it) {
+      var cb = it.querySelector('input');
+      it.addEventListener('click', function(e) {
+        if (e.target !== cb) cb.checked = !cb.checked;
+        it.classList.toggle('checked', cb.checked);
+        upd();
+      });
+      cb.addEventListener('change', function() {
+        it.classList.toggle('checked', cb.checked);
+        upd();
+      });
+    });
+    search.oninput = function() {
+      var q = search.value.toLowerCase().trim();
+      items.forEach(function(it) {
+        var m = !q || it.dataset.name.toLowerCase().indexOf(q) !== -1;
+        it.style.display = m ? '' : 'none';
+      });
+      d.querySelectorAll('.subject-group').forEach(function(g) {
+        var vis = false;
+        g.querySelectorAll('.subject-item').forEach(function(i) { if (i.style.display !== 'none') vis = true; });
+        g.style.display = vis ? '' : 'none';
+      });
+    };
+    d.querySelector('#m-cl-all').onclick = function() {
+      items.forEach(function(i) { if (i.style.display !== 'none') { i.querySelector('input').checked = true; i.classList.add('checked'); } });
+      upd();
+    };
+    d.querySelector('#m-cl-clr').onclick = function() {
+      items.forEach(function(i) { i.querySelector('input').checked = false; i.classList.remove('checked'); });
+      upd();
+    };
+    if (d.querySelector('#m-cl-name')) d.querySelector('#m-cl-name').focus();
+    upd();
+  }, 50);
+}
+
+function addStudentDialog(classId) {
+  showModal(ic('userPlus', 20) + ' Новые ученики',
+    '<div class="form-group"><label>ФИО учеников</label><textarea id="m-st-names" placeholder="Иванов Иван, Петров Пётр, Сидорова Анна"></textarea><div class="hint">' + ic('info', 14) + ' Через запятую или с новой строки.</div></div>',
+    [{ label:'Отмена' }, { label:'Добавить', class:'btn-primary', onClick: async function() {
+      var raw = document.getElementById('m-st-names').value;
+      var ns = raw.split(/[,\n]+/).map(function(s) { return s.trim(); }).filter(Boolean);
+      if (!ns.length) return toast('Введите ФИО', 'error');
+      var u = {};
+      var now = Date.now();
+      ns.forEach(function(n, i) {
+        var id = db.ref('students').push().key;
+        u['students/' + id] = { name:n, classId:classId, createdAt:now + i };
+      });
+      await db.ref().update(u);
+      closeModal();
+      toast('Добавлено: <b>' + ns.length + '</b>', 'success');
+      await loadAll();
+      renderClassDetail(classId);
+    } }]);
+  setTimeout(function() { if (document.getElementById('m-st-names')) document.getElementById('m-st-names').focus(); }, 100);
+}
+
+function addStudentsDialog() {
+  var cls = myClasses();
+  if (!Object.keys(cls).length) return toast('Сначала создайте класс', 'warning');
+  var opts = Object.entries(cls).sort(function(a, b) { return a[1].name.localeCompare(b[1].name); }).map(function(e) { return '<option value="' + e[0] + '">' + e[1].name + '</option>'; }).join('');
+  showModal(ic('userPlus', 20) + ' Добавить учеников',
+    '<div class="form-group"><label>Класс</label><select id="m-as-class">' + opts + '</select></div><div class="form-group"><label>ФИО учеников</label><textarea id="m-as-names" placeholder="Иванов Иван, Петров Пётр"></textarea></div>',
+    [{ label:'Отмена' }, { label:'Добавить', class:'btn-primary', onClick: async function() {
+      var cid = document.getElementById('m-as-class').value;
+      var raw = document.getElementById('m-as-names').value;
+      var ns = raw.split(/[,\n]+/).map(function(s) { return s.trim(); }).filter(Boolean);
+      if (!ns.length) return toast('Введите ФИО', 'error');
+      var u = {};
+      var now = Date.now();
+      ns.forEach(function(n, i) {
+        var id = db.ref('students').push().key;
+        u['students/' + id] = { name:n, classId:cid, createdAt:now + i };
+      });
+      await db.ref().update(u);
+      closeModal();
+      toast('Добавлено: <b>' + ns.length + '</b>', 'success');
+      await loadAll();
+      renderStudents();
+    } }]);
+}
+
+async function deleteStudent(sid, name) {
+  if (await confirmDialog('Удалить ученика?', '"' + name + '" будет удалён вместе с оценками.')) {
+    var u = {};
+    u['students/' + sid] = null;
+    Object.entries(App.cache.grades).forEach(function(e) { if (e[1].studentId === sid) u['grades/' + e[0]] = null; });
+    Object.entries(App.cache.attendance).forEach(function(e) { if (e[1].studentId === sid) u['attendance/' + e[0]] = null; });
+    await db.ref().update(u);
+    toast('Ученик удалён', 'success');
+    await loadAll();
+    router();
+  }
+}
+
+function addWorkTypeDialog() {
+  showModal(ic('tag', 20) + ' Новый тип работы',
+    '<div class="form-group"><label>Название</label><input id="m-wt-name" placeholder="Контрольная работа"></div><div class="form-group"><label>Код</label><input id="m-wt-code" placeholder="К/Р" maxlength="5"></div><div class="form-group"><label>Вес (1–10)</label><input id="m-wt-weight" type="number" min="1" max="10" value="1"></div>',
+    [{ label:'Отмена' }, { label:'Создать', class:'btn-primary', onClick: async function() {
+      var n = document.getElementById('m-wt-name').value.trim();
+      var c = document.getElementById('m-wt-code').value.trim().toUpperCase();
+      var w = +document.getElementById('m-wt-weight').value;
+      if (!n || w < 1) return;
+      var id = db.ref('workTypes').push().key;
+      await db.ref('workTypes/' + id).set({ name:n, code:c, weight:w, schoolId:App.profile.schoolId || null, createdBy:App.user.uid });
+      closeModal();
+      toast('Тип добавлен', 'success');
+      await loadAll();
+      renderWorkTypes();
+    } }]);
+}
+
+function resetPasswordDialog(email) {
+  if (!email) return toast('Нет email', 'error');
+  showModal(ic('key', 20) + ' Сброс пароля', '<p>Отправить письмо на <b>' + email + '</b>?</p>',
+    [{ label:'Отмена' }, { label:'Отправить', class:'btn-primary', onClick: async function() {
+      try { await auth.sendPasswordResetEmail(email); toast('Письмо отправлено', 'success'); }
+      catch (e) { toast(e.message, 'error'); }
+      closeModal();
+    } }]);
+}
+
+function weightedAvg(list) {
+  var s = list.reduce(function(a, g) { return a + g.value * g.weight; }, 0);
+  var w = list.reduce(function(a, g) { return a + g.weight; }, 0);
+  return w ? Math.round(s / w * 100) / 100 : 0;
+}
+function avgForStudent(sid, cid) {
+  return weightedAvg(Object.values(App.cache.grades).filter(function(g) { return g.studentId === sid && (!cid || g.classId === cid); }));
+}
+function countStudentsBySchool() {
+  var ids = Object.entries(App.cache.classes).filter(function(e) { return e[1].schoolId === App.profile.schoolId; }).map(function(e) { return e[0]; });
+  return Object.values(App.cache.students).filter(function(s) { return ids.indexOf(s.classId) !== -1; }).length;
+}
+function countStudentsInMyClasses() {
+  var ids = Object.keys(myClasses());
+  return Object.values(App.cache.students).filter(function(s) { return ids.indexOf(s.classId) !== -1; }).length;
+}
+function countMyGrades() {
+  return Object.values(App.cache.grades).filter(function(g) { return g.teacherId === App.user.uid; }).length;
+}
+function showLoader(text) {
+  $('#loader-text').textContent = text || 'Загрузка…';
+  $('#loader-screen').style.display = 'flex';
+  $('#auth-screen').style.display = 'none';
+  $('#app-screen').style.display = 'none';
+}
+function showAuth() {
+  $('#loader-screen').style.display = 'none';
+  $('#auth-screen').style.display = 'flex';
+  $('#app-screen').style.display = 'none';
+}
+function showApp() {
+  $('#loader-screen').style.display = 'none';
+  $('#auth-screen').style.display = 'none';
+  $('#app-screen').style.display = 'flex';
+}
+
+async function startApp(user, profile) {
+  App.user = user;
+  App.profile = profile;
+  showLoader('Загрузка данных…');
+  $('#user-name').textContent = profile.name || profile.login || '';
+  $('#user-role').textContent = roleLabel(profile.role);
+  try {
+    await loadAll();
+    await bootstrapDefaultWorkTypes();
+    buildMenu();
+    showApp();
+    if (!location.hash) location.hash = '#dashboard';
+    router();
+  } catch (err) {
+    console.error(err);
+    toast('Ошибка: ' + err.message, 'error');
+    showApp();
+  }
+}
+
+$('#logout-btn').onclick = async function() {
+  var b = $('#logout-btn');
+  b.disabled = true;
+  b.innerHTML = ic('logout', 16) + ' Выход…';
+  clearSession();
+  App.user = null;
+  App.profile = null;
+  try { await auth.signOut(); } catch (e) {}
+  location.reload();
+};
+
+$('#menu-toggle').onclick = function() { $('#sidebar').classList.toggle('open'); };
+
+(async function() {
+  showLoader('Загрузка…');
+  var s = getSession();
+  if (s && s.user && s.profile) {
+    await startApp(s.user, s.profile);
+    return;
+  }
+  auth.onAuthStateChanged(async function(fbUser) {
+    if (!fbUser) { showAuth(); return; }
+    showLoader('Загрузка профиля…');
+    try {
+      var snap = await db.ref('users/' + fbUser.uid).once('value');
+      if (!snap.exists()) {
+        toast('Профиль не найден', 'error');
+        await auth.signOut();
+        showAuth();
+        return;
+      }
+      var p = snap.val();
+      setSession({ uid: fbUser.uid, email: fbUser.email }, p);
+      await startApp({ uid: fbUser.uid, email: fbUser.email }, p);
+    } catch (err) {
+      console.error(err);
+      toast('Ошибка: ' + err.message, 'error');
+      showAuth();
+    }
+  });
+})();
+</script>
+</body>
+</html>
