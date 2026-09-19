@@ -82,6 +82,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--primary)
 .grid{display:grid;gap:14px}
 .grid-3{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
 .grid-4{grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}
+.grid-2{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
 .stat-card{background:var(--bg-elev);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);transition:var(--transition);border:1px solid var(--border);position:relative;overflow:hidden}
 .stat-label{font-size:11px;color:var(--text-muted);text-transform:uppercase;margin-bottom:8px;font-weight:700}
 .stat-value{font-size:26px;font-weight:800}
@@ -171,6 +172,35 @@ th{background:var(--bg);font-weight:700;font-size:11px;text-transform:uppercase;
 .lesson-tip{position:fixed;z-index:1000;background:var(--bg-elev);border:1px solid var(--border);border-radius:8px;padding:8px 10px;box-shadow:var(--shadow-lg);max-width:240px;font-size:11px;line-height:1.4;pointer-events:none}
 .lesson-tip .tip-title{font-size:9px;text-transform:uppercase;color:var(--text-muted);font-weight:700;letter-spacing:.05em;margin-bottom:2px}
 .lesson-tip .tip-body{color:var(--text);margin-bottom:6px}
+/* --- Новые стили для расширенного дашборда --- */
+.mini-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border)}
+.mini-row:last-child{border-bottom:none}
+.mini-row .mr-icon{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-weight:800;font-size:13px}
+.mini-row .mr-body{flex:1;min-width:0}
+.mini-row .mr-title{font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mini-row .mr-sub{font-size:11px;color:var(--text-muted);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mini-row .mr-time{font-size:11px;color:var(--text-muted);white-space:nowrap;flex-shrink:0}
+.subject-bar{margin-bottom:12px}
+.subject-bar:last-child{margin-bottom:0}
+.subject-bar-head{display:flex;justify-content:space-between;align-items:center;font-size:12px;margin-bottom:5px}
+.subject-bar-name{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:8px}
+.subject-bar-val{font-weight:800;flex-shrink:0}
+.subject-bar-track{height:8px;background:var(--bg);border-radius:4px;overflow:hidden;position:relative}
+.subject-bar-fill{height:100%;border-radius:4px;transition:width .6s cubic-bezier(.16,1,.3,1)}
+.progress-ring{display:inline-block;position:relative}
+.dash-hero-grid{display:grid;grid-template-columns:1fr;gap:14px;margin-bottom:14px}
+@media(min-width:900px){.dash-hero-grid{grid-template-columns:2fr 1fr}}
+.today-lesson{display:flex;gap:12px;padding:11px 0;border-bottom:1px solid var(--border)}
+.today-lesson:last-child{border-bottom:none}
+.today-lesson .tl-time{font-weight:800;color:var(--primary);font-size:13px;min-width:52px;flex-shrink:0}
+.today-lesson .tl-body{flex:1;min-width:0}
+.today-lesson .tl-title{font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.today-lesson .tl-sub{font-size:11px;color:var(--text-muted);margin-top:2px}
+.pill-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.pill{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:10px;font-weight:700;background:var(--bg);color:var(--text-muted)}
+.pill.ok{background:rgba(16,185,129,.12);color:#10B981}
+.pill.warn{background:rgba(245,158,11,.12);color:#D97706}
+.pill.err{background:rgba(239,68,68,.12);color:#DC2626}
 </style>
 </head>
 <body>
@@ -269,14 +299,10 @@ th{background:var(--bg);font-weight:700;font-size:11px;text-transform:uppercase;
 
 <script>
 /* ============================================================
-   НИКАКИХ КЛЮЧЕЙ FIREBASE ЗДЕСЬ БОЛЬШЕ НЕТ
-   Только адрес Worker'а
+   API-КЛИЕНТ
 ============================================================ */
 var WORKER_URL = 'https://klassjur-api.c6fpjs5ryf.workers.dev';
 
-/* ============================================================
-   API-КЛИЕНТ (работает только через Worker)
-============================================================ */
 var API = {
   idToken: localStorage.getItem('idToken') || null,
   refreshToken: localStorage.getItem('refreshToken') || null,
@@ -328,8 +354,7 @@ var API = {
 };
 
 /* ============================================================
-   МИМИКРИЯ FIREBASE DB — через Worker
-   Клиент думает, что работает с базой, но на самом деле — с API
+   МИМИКРИЯ FIREBASE — через Worker
 ============================================================ */
 var _writeQueue = [];
 var _writeTimer = null;
@@ -367,7 +392,6 @@ CacheRef.prototype.set = async function(v) {
 };
 CacheRef.prototype.update = async function(v) {
   await queueWrite(this._path, 'PATCH', v);
-  // оптимистичное обновление кеша
   var cur = getCache(this._path) || {};
   Object.keys(v).forEach(function(k) {
     var parts = k.split('/');
@@ -421,7 +445,7 @@ var db = {
 };
 
 /* ============================================================
-   Дальше — код журнала, как был
+   Константы
 ============================================================ */
 var QUARTERS = [
   { id:'q1', name:'I четверть',  sm:8,  sd:1, em:9,  ed:27 },
@@ -478,7 +502,12 @@ var ICON_PATHS = {
   monitor:'<rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>',
   file:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>',
   award:'<circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/>',
-  wrench:'<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>'
+  wrench:'<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>',
+  trendUp:'<polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/>',
+  star:'<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>',
+  activity:'<polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>',
+  layers:'<polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/>',
+  target:'<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>'
 };
 function ic(n, s) { if (s === undefined) s = 18; return '<svg xmlns="http://www.w3.org/2000/svg" width="' + s + '" height="' + s + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + (ICON_PATHS[n] || '') + '</svg>'; }
 
@@ -545,6 +574,19 @@ function warnDialog(t, m, c) { return new Promise(function(r) { showModal(ic('al
 function toLocalDateStr(dms) { var d = new Date(dms); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
 function parseLocalDate(str) { if (!str) return NaN; var p = str.split('-').map(Number); return new Date(p[0], p[1] - 1, p[2]).getTime(); }
 var fmt = { date: function(ts) { return ts ? new Date(ts).toLocaleDateString('ru-RU') : '—'; } };
+
+/* ============================================================
+   ★ БЕЗОПАСНОСТЬ: экранирование HTML для защиты от XSS
+============================================================ */
+function esc(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 function gradeClass(v) { var n = Math.round(v); if (n >= 5) return 'g5'; if (n === 4) return 'g4'; if (n === 3) return 'g3'; if (n === 2) return 'g2'; return 'g1'; }
 function avgClass(v) { if (v >= 4.5) return 'g-avg-5'; if (v >= 3.5) return 'g-avg-4'; if (v >= 2.5) return 'g-avg-3'; if (v >= 1.5) return 'g-avg-2'; return 'g-avg-1'; }
 function initTheme() {
@@ -638,7 +680,7 @@ var MENU = {
     { id:'profile', icon:'user', label:'Профиль' }
   ]
 };
-function buildMenu() { var nav = $('#sidebar-nav'); nav.innerHTML = ''; (MENU[App.profile.role] || []).forEach(function(it) { nav.appendChild(el('div', { class:'nav-item' + (location.hash === '#' + it.id ? ' active' : ''), html: ic(it.icon, 18) + '<span>' + it.label + '</span>', onclick: function() { navigate(it.id); } })); }); }
+function buildMenu() { var nav = $('#sidebar-nav'); nav.innerHTML = ''; (MENU[App.profile.role] || []).forEach(function(it) { nav.appendChild(el('div', { class:'nav-item' + (location.hash === '#' + it.id ? ' active' : ''), html: ic(it.icon, 18) + '<span>' + esc(it.label) + '</span>', onclick: function() { navigate(it.id); } })); }); }
 function navigate(v, p) { if (!p) p = {}; location.hash = '#' + v + (p.id ? '/' + p.id : ''); router(); }
 async function router() {
   var hash = location.hash.slice(1) || 'dashboard';
@@ -673,33 +715,55 @@ function mySchools() {
 function myClasses() { return Object.fromEntries(Object.entries(App.cache.classes).filter(function(e) { return e[1].teacherId === App.profile.uid; })); }
 function greetingByTime() { var h = new Date().getHours(); if (h < 5) return 'Доброй ночи'; if (h < 12) return 'Доброе утро'; if (h < 18) return 'Добрый день'; return 'Добрый вечер'; }
 function todayLabel() { var d = new Date(); var days = ['воскресенье','понедельник','вторник','среда','четверг','пятница','суббота']; var months = ['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря']; return d.getDate() + ' ' + months[d.getMonth()] + ', ' + days[d.getDay()]; }
+function timeAgo(ts) {
+  if (!ts) return '';
+  var d = Date.now() - ts;
+  var sec = Math.floor(d / 1000);
+  if (sec < 60) return 'только что';
+  var min = Math.floor(sec / 60);
+  if (min < 60) return min + ' мин назад';
+  var h = Math.floor(min / 60);
+  if (h < 24) return h + ' ч назад';
+  var dd = Math.floor(h / 24);
+  if (dd < 7) return dd + ' дн назад';
+  return new Date(ts).toLocaleDateString('ru-RU');
+}
 
+/* ============================================================
+   ★ ОБНОВЛЁННЫЙ ДАШБОРД — расширенные виджеты
+============================================================ */
 async function renderDashboard() {
   $('#page-title').textContent = 'Дашборд';
   var c = $('#content'); c.innerHTML = '';
   var role = App.profile.role;
   var userName = (App.profile.name || App.profile.login || '').split(' ')[0] || 'друг';
   var greet = el('div', { class:'dash-greet dash-anim' });
-  greet.innerHTML = '<h2>' + greetingByTime() + ', ' + userName + '! 👋</h2><p>' + (role === 'teacher' ? 'Вот обзор вашей работы' : 'Панель управления') + '</p><div style="display:inline-flex;align-items:center;gap:8px;margin-top:14px;padding:6px 14px;background:rgba(255,255,255,.18);border-radius:20px;font-size:12px;font-weight:600;">' + ic('calendar', 14) + ' ' + todayLabel() + '</div>';
+  greet.innerHTML = '<h2>' + esc(greetingByTime()) + ', ' + esc(userName) + '! 👋</h2><p>' + (role === 'teacher' ? 'Вот обзор вашей работы' : 'Панель управления') + '</p><div style="display:inline-flex;align-items:center;gap:8px;margin-top:14px;padding:6px 14px;background:rgba(255,255,255,.18);border-radius:20px;font-size:12px;font-weight:600;">' + ic('calendar', 14) + ' ' + esc(todayLabel()) + '</div>';
   c.appendChild(greet);
+
+  /* ---------- Статистика ---------- */
   var stats = [];
   if (role === 'super_admin') {
     stats = [
       { label:'Городов', value:Object.keys(App.cache.cities).length, icon:'city', color:'#0EA5E9' },
       { label:'Школ', value:Object.keys(App.cache.schools).length, icon:'school', color:'#A855F7' },
-      { label:'Пользователей', value:Object.keys(App.cache.users).length, icon:'users', color:'#10B981' }
+      { label:'Пользователей', value:Object.keys(App.cache.users).length, icon:'users', color:'#10B981' },
+      { label:'Классов', value:Object.keys(App.cache.classes).length, icon:'cap', color:'#F59E0B' }
     ];
   } else if (role === 'city_creator') {
     stats = [
       { label:'Школ в городе', value:Object.keys(mySchools()).length, icon:'school', color:'#0EA5E9' },
-      { label:'Пользователей', value:Object.values(App.cache.users).filter(function(u) { return u.cityId === App.profile.cityId; }).length, icon:'users', color:'#A855F7' }
+      { label:'Пользователей', value:Object.values(App.cache.users).filter(function(u) { return u.cityId === App.profile.cityId; }).length, icon:'users', color:'#A855F7' },
+      { label:'Классов', value:Object.values(App.cache.classes).filter(function(cl) { return mySchools()[cl.schoolId]; }).length, icon:'cap', color:'#10B981' },
+      { label:'Учеников', value:Object.values(App.cache.students).filter(function(s) { var cl = App.cache.classes[s.classId]; return cl && mySchools()[cl.schoolId]; }).length, icon:'student', color:'#F59E0B' }
     ];
   } else if (role === 'school_creator') {
     var su = Object.values(App.cache.users).filter(function(u) { return u.schoolId === App.profile.schoolId; });
     stats = [
       { label:'Учителей', value:su.filter(function(u) { return u.role === 'teacher'; }).length, icon:'users', color:'#0EA5E9' },
       { label:'Классов', value:Object.values(App.cache.classes).filter(function(cl) { return cl.schoolId === App.profile.schoolId; }).length, icon:'cap', color:'#A855F7' },
-      { label:'Учеников', value:countStudentsBySchool(), icon:'student', color:'#10B981' }
+      { label:'Учеников', value:countStudentsBySchool(), icon:'student', color:'#10B981' },
+      { label:'Оценок', value:Object.keys(App.cache.grades).length, icon:'check', color:'#F59E0B' }
     ];
   } else if (role === 'teacher') {
     var avg = avgAllMyStudents();
@@ -714,16 +778,275 @@ async function renderDashboard() {
   stats.forEach(function(s, i) {
     var card = el('div', { class:'stat-card dash-anim' });
     card.style.animationDelay = (100 + i * 80) + 'ms';
-    card.innerHTML = '<div style="display:flex;justify-content:space-between;margin-bottom:14px;"><div class="stat-label">' + s.label + '</div><div style="width:38px;height:38px;border-radius:12px;background:' + s.color + '22;color:' + s.color + ';display:flex;align-items:center;justify-content:center;">' + ic(s.icon, 20) + '</div></div><div class="stat-value' + (s.isAvg ? ' ' + avgClass(parseFloat(s.value)) : '') + '">' + String(s.value) + '</div>';
+    card.innerHTML = '<div style="display:flex;justify-content:space-between;margin-bottom:14px;"><div class="stat-label">' + esc(s.label) + '</div><div style="width:38px;height:38px;border-radius:12px;background:' + s.color + '22;color:' + s.color + ';display:flex;align-items:center;justify-content:center;">' + ic(s.icon, 20) + '</div></div><div class="stat-value' + (s.isAvg ? ' ' + avgClass(parseFloat(s.value)) : '') + '">' + esc(String(s.value)) + '</div>';
     grid.appendChild(card);
   });
   c.appendChild(grid);
+
+  /* ---------- Расширенные виджеты по ролям ---------- */
+  if (role === 'teacher') {
+    await renderTeacherWidgets(c);
+  } else if (role === 'school_creator') {
+    await renderSchoolCreatorWidgets(c);
+  } else if (role === 'city_creator') {
+    await renderCityCreatorWidgets(c);
+  } else if (role === 'super_admin') {
+    await renderSuperAdminWidgets(c);
+  }
+
+  /* ---------- Telegram-баннер ---------- */
   var tg = el('a', { class:'tg-banner dash-anim', href:'https://t.me/klassjur', target:'_blank', rel:'noopener' });
-  tg.style.animationDelay = '500ms';
+  tg.style.animationDelay = '600ms';
   tg.innerHTML = '<div style="width:52px;height:52px;border-radius:14px;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;"><svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg></div><div style="flex:1;"><div style="font-size:16px;font-weight:800;">Мы в Telegram</div><div style="font-size:13px;opacity:.92;">Новости и обновления журнала</div></div>';
   c.appendChild(tg);
 }
 
+/* ---------- Виджеты для учителя ---------- */
+async function renderTeacherWidgets(c) {
+  var myG = Object.values(App.cache.grades).filter(function(g) { return g.teacherId === App.profile.uid; });
+  var myClasses = myClasses();
+  var myClassIds = Object.keys(myClasses);
+
+  /* — Последние оценки — */
+  var recentGrades = Object.entries(App.cache.grades)
+    .filter(function(e) { return e[1].teacherId === App.profile.uid; })
+    .map(function(e) { return Object.assign({}, e[1], { id:e[0] }); })
+    .sort(function(a, b) { return (b.date || 0) - (a.date || 0); })
+    .slice(0, 6);
+
+  /* — Средние по предметам — */
+  var bySubject = {};
+  myG.forEach(function(g) {
+    if (!bySubject[g.subject]) bySubject[g.subject] = [];
+    bySubject[g.subject].push(g);
+  });
+  var subjectAvgs = Object.entries(bySubject).map(function(e) {
+    return { subject: e[0], avg: weightedAvg(e[1]), count: e[1].length };
+  }).sort(function(a, b) { return b.avg - a.avg; });
+
+  /* — Топ учеников — */
+  var studentAvgs = {};
+  Object.values(App.cache.students).filter(function(s) { return myClassIds.indexOf(s.classId) !== -1; }).forEach(function(s) {
+    var g = myG.filter(function(x) { return x.studentId === Object.keys(App.cache.students).find(function(k) { return App.cache.students[k] === s; }); });
+  });
+  // Проще — через ключи
+  var studentList = Object.entries(App.cache.students).filter(function(e) { return myClassIds.indexOf(e[1].classId) !== -1; });
+  var studentStats = studentList.map(function(e) {
+    var sid = e[0], s = e[1];
+    var sg = myG.filter(function(g) { return g.studentId === sid; });
+    return { id: sid, name: s.name, avg: weightedAvg(sg), count: sg.length, classId: s.classId };
+  }).filter(function(x) { return x.count > 0; })
+    .sort(function(a, b) { return b.avg - a.avg; })
+    .slice(0, 5);
+
+  /* — Расписание на сегодня — */
+  var todayDms = new Date().setHours(0, 0, 0, 0);
+  var todayLessons = Object.values(App.cache.lessons)
+    .filter(function(l) { return l.teacherId === App.profile.uid && new Date(l.date).setHours(0,0,0,0) === todayDms; });
+
+  var heroGrid = el('div', { class:'dash-hero-grid' });
+
+  /* ЛЕВАЯ КОЛОНКА */
+  var leftCol = el('div');
+
+  /* Средние по предметам */
+  if (subjectAvgs.length) {
+    var card1 = el('div', { class:'card dash-anim' });
+    card1.style.animationDelay = '400ms';
+    card1.appendChild(el('div', { class:'card-header' }, el('div', { class:'card-title', html: ic('trendUp', 16) + ' Средний балл по предметам' })));
+    subjectAvgs.slice(0, 6).forEach(function(x) {
+      var pct = Math.min(100, (x.avg / 5) * 100);
+      var bar = el('div', { class:'subject-bar' });
+      var color = x.avg >= 4.5 ? '#10B981' : x.avg >= 3.5 ? '#84CC16' : x.avg >= 2.5 ? '#F59E0B' : '#EF4444';
+      bar.innerHTML = '<div class="subject-bar-head"><span class="subject-bar-name">' + esc(x.subject) + '</span><span class="subject-bar-val ' + avgClass(x.avg) + '">' + esc(String(x.avg)) + '</span></div><div class="subject-bar-track"><div class="subject-bar-fill" style="width:' + pct + '%;background:' + color + ';"></div></div><div class="hint" style="margin-top:3px;">' + x.count + ' оценок</div>';
+      card1.appendChild(bar);
+    });
+    leftCol.appendChild(card1);
+  }
+
+  /* Топ учеников */
+  if (studentStats.length) {
+    var card2 = el('div', { class:'card dash-anim' });
+    card2.style.animationDelay = '480ms';
+    card2.appendChild(el('div', { class:'card-header' }, el('div', { class:'card-title', html: ic('star', 16) + ' Лучшие ученики' })));
+    studentStats.forEach(function(s, i) {
+      var medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '';
+      var cl = App.cache.classes[s.classId];
+      var row = el('div', { class:'mini-row' });
+      row.innerHTML = '<div class="mr-icon" style="background:' + (i === 0 ? '#FEF3C7' : i === 1 ? '#F1F5F9' : i === 2 ? '#FED7AA' : 'var(--bg)') + ';color:var(--text-muted);font-weight:800;">' + (medal || (i + 1)) + '</div><div class="mr-body"><div class="mr-title">' + esc(s.name) + '</div><div class="mr-sub">' + esc(cl ? cl.name : '—') + ' • ' + s.count + ' оценок</div></div><div class="mr-time ' + avgClass(s.avg) + '" style="font-weight:800;font-size:14px;">' + esc(String(s.avg)) + '</div>';
+      card2.appendChild(row);
+    });
+    leftCol.appendChild(card2);
+  }
+
+  /* ПРАВАЯ КОЛОНКА */
+  var rightCol = el('div');
+
+  /* Расписание на сегодня */
+  var card3 = el('div', { class:'card dash-anim' });
+  card3.style.animationDelay = '440ms';
+  card3.appendChild(el('div', { class:'card-header' }, el('div', { class:'card-title', html: ic('clock', 16) + ' Сегодня' })));
+  if (!todayLessons.length) {
+    card3.appendChild(el('div', { class:'empty', style:'padding:20px;font-size:12px;' }, 'На сегодня уроков нет'));
+  } else {
+    todayLessons.forEach(function(l) {
+      var cl = App.cache.classes[l.classId];
+      var lesson = el('div', { class:'today-lesson' });
+      lesson.innerHTML = '<div class="tl-time">' + ic('book', 12) + '</div><div class="tl-body"><div class="tl-title">' + esc(cl ? cl.name : '—') + '</div><div class="tl-sub">' + esc(l.subject || '—') + (l.topic ? ' • ' + esc(l.topic) : '') + '</div></div>';
+      lesson.style.cursor = 'pointer';
+      lesson.onclick = function() { navigate('journal'); };
+      card3.appendChild(lesson);
+    });
+  }
+  rightCol.appendChild(card3);
+
+  /* Последние оценки */
+  var card4 = el('div', { class:'card dash-anim' });
+  card4.style.animationDelay = '520ms';
+  card4.appendChild(el('div', { class:'card-header' }, el('div', { class:'card-title', html: ic('activity', 16) + ' Последние оценки' })));
+  if (!recentGrades.length) {
+    card4.appendChild(el('div', { class:'empty', style:'padding:20px;font-size:12px;' }, 'Оценок пока нет'));
+  } else {
+    recentGrades.forEach(function(g) {
+      var s = App.cache.students[g.studentId];
+      var row = el('div', { class:'mini-row' });
+      row.innerHTML = '<div class="mr-icon ' + gradeClass(g.value) + '" style="color:#fff;">' + g.value + '</div><div class="mr-body"><div class="mr-title">' + esc(s ? s.name : '—') + '</div><div class="mr-sub">' + esc(g.subject || '—') + '</div></div><div class="mr-time">' + esc(timeAgo(g.date)) + '</div>';
+      card4.appendChild(row);
+    });
+  }
+  rightCol.appendChild(card4);
+
+  heroGrid.appendChild(leftCol);
+  heroGrid.appendChild(rightCol);
+  c.appendChild(heroGrid);
+}
+
+/* ---------- Виджеты для создателя школы ---------- */
+async function renderSchoolCreatorWidgets(c) {
+  var grid = el('div', { class:'grid grid-2' });
+
+  var card1 = el('div', { class:'card dash-anim' });
+  card1.style.animationDelay = '400ms';
+  card1.appendChild(el('div', { class:'card-header' }, el('div', { class:'card-title', html: ic('users', 16) + ' Учителя школы' })));
+  var teachers = Object.entries(App.cache.users).filter(function(e) { return e[1].schoolId === App.profile.schoolId && e[1].role === 'teacher'; });
+  if (!teachers.length) {
+    card1.appendChild(el('div', { class:'empty', style:'padding:20px;font-size:12px;' }, 'Учителей пока нет'));
+  } else {
+    teachers.slice(0, 6).forEach(function(e) {
+      var u = e[1];
+      var initials = (u.name || '?').split(' ').map(function(s) { return s[0] || ''; }).slice(0, 2).join('').toUpperCase();
+      var row = el('div', { class:'mini-row' });
+      row.innerHTML = '<div class="mr-icon" style="background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff;">' + esc(initials) + '</div><div class="mr-body"><div class="mr-title">' + esc(u.name || '—') + '</div><div class="mr-sub">' + esc(u.login || '—') + '</div></div>';
+      card1.appendChild(row);
+    });
+  }
+  grid.appendChild(card1);
+
+  var card2 = el('div', { class:'card dash-anim' });
+  card2.style.animationDelay = '480ms';
+  card2.appendChild(el('div', { class:'card-header' }, el('div', { class:'card-title', html: ic('cap', 16) + ' Классы школы' })));
+  var classes = Object.entries(App.cache.classes).filter(function(e) { return e[1].schoolId === App.profile.schoolId; });
+  if (!classes.length) {
+    card2.appendChild(el('div', { class:'empty', style:'padding:20px;font-size:12px;' }, 'Классов пока нет'));
+  } else {
+    classes.slice(0, 6).forEach(function(e) {
+      var cl = e[1];
+      var n = Object.values(App.cache.students).filter(function(s) { return s.classId === e[0]; }).length;
+      var row = el('div', { class:'mini-row' });
+      row.innerHTML = '<div class="mr-icon" style="background:rgba(168,85,247,.15);color:#A855F7;">' + ic('cap', 16) + '</div><div class="mr-body"><div class="mr-title">' + esc(cl.name) + '</div><div class="mr-sub">' + (cl.year || '—') + ' год • ' + n + ' уч.</div></div>';
+      card2.appendChild(row);
+    });
+  }
+  grid.appendChild(card2);
+
+  c.appendChild(grid);
+}
+
+/* ---------- Виджеты для создателя города ---------- */
+async function renderCityCreatorWidgets(c) {
+  var grid = el('div', { class:'grid grid-2' });
+
+  var card1 = el('div', { class:'card dash-anim' });
+  card1.style.animationDelay = '400ms';
+  card1.appendChild(el('div', { class:'card-header' }, el('div', { class:'card-title', html: ic('school', 16) + ' Школы города' })));
+  var schools = Object.entries(mySchools());
+  if (!schools.length) {
+    card1.appendChild(el('div', { class:'empty', style:'padding:20px;font-size:12px;' }, 'Школ пока нет'));
+  } else {
+    schools.slice(0, 8).forEach(function(e) {
+      var s = e[1];
+      var cnt = Object.values(App.cache.classes).filter(function(c2) { return c2.schoolId === e[0]; }).length;
+      var row = el('div', { class:'mini-row' });
+      row.innerHTML = '<div class="mr-icon" style="background:rgba(14,165,233,.15);color:#0EA5E9;">' + ic('school', 16) + '</div><div class="mr-body"><div class="mr-title">' + esc(s.name) + '</div><div class="mr-sub">' + cnt + ' классов</div></div><div class="mr-time">' + esc(fmt.date(s.createdAt)) + '</div>';
+      card1.appendChild(row);
+    });
+  }
+  grid.appendChild(card1);
+
+  var card2 = el('div', { class:'card dash-anim' });
+  card2.style.animationDelay = '480ms';
+  card2.appendChild(el('div', { class:'card-header' }, el('div', { class:'card-title', html: ic('users', 16) + ' Пользователи города' })));
+  var users = Object.entries(App.cache.users).filter(function(e) { return e[1].cityId === App.profile.cityId; });
+  if (!users.length) {
+    card2.appendChild(el('div', { class:'empty', style:'padding:20px;font-size:12px;' }, 'Пользователей пока нет'));
+  } else {
+    users.slice(0, 6).forEach(function(e) {
+      var u = e[1];
+      var initials = (u.name || '?').split(' ').map(function(s) { return s[0] || ''; }).slice(0, 2).join('').toUpperCase();
+      var row = el('div', { class:'mini-row' });
+      row.innerHTML = '<div class="mr-icon" style="background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff;">' + esc(initials) + '</div><div class="mr-body"><div class="mr-title">' + esc(u.name || '—') + '</div><div class="mr-sub">' + esc(roleLabel(u.role)) + '</div></div>';
+      card2.appendChild(row);
+    });
+  }
+  grid.appendChild(card2);
+
+  c.appendChild(grid);
+}
+
+/* ---------- Виджеты для super_admin ---------- */
+async function renderSuperAdminWidgets(c) {
+  var grid = el('div', { class:'grid grid-2' });
+
+  var card1 = el('div', { class:'card dash-anim' });
+  card1.style.animationDelay = '400ms';
+  card1.appendChild(el('div', { class:'card-header' }, el('div', { class:'card-title', html: ic('school', 16) + ' Последние школы' })));
+  var schools = Object.entries(App.cache.schools).sort(function(a, b) { return (b[1].createdAt || 0) - (a[1].createdAt || 0); });
+  if (!schools.length) {
+    card1.appendChild(el('div', { class:'empty', style:'padding:20px;font-size:12px;' }, 'Школ пока нет'));
+  } else {
+    schools.slice(0, 6).forEach(function(e) {
+      var s = e[1];
+      var city = App.cache.cities[s.cityId];
+      var row = el('div', { class:'mini-row' });
+      row.innerHTML = '<div class="mr-icon" style="background:rgba(168,85,247,.15);color:#A855F7;">' + ic('school', 16) + '</div><div class="mr-body"><div class="mr-title">' + esc(s.name) + '</div><div class="mr-sub">' + esc(city ? city.name : '—') + '</div></div><div class="mr-time">' + esc(timeAgo(s.createdAt)) + '</div>';
+      card1.appendChild(row);
+    });
+  }
+  grid.appendChild(card1);
+
+  var card2 = el('div', { class:'card dash-anim' });
+  card2.style.animationDelay = '480ms';
+  card2.appendChild(el('div', { class:'card-header' }, el('div', { class:'card-title', html: ic('users', 16) + ' Последние пользователи' })));
+  var users = Object.entries(App.cache.users).sort(function(a, b) { return (b[1].createdAt || 0) - (a[1].createdAt || 0); });
+  if (!users.length) {
+    card2.appendChild(el('div', { class:'empty', style:'padding:20px;font-size:12px;' }, 'Пользователей пока нет'));
+  } else {
+    users.slice(0, 6).forEach(function(e) {
+      var u = e[1];
+      var initials = (u.name || '?').split(' ').map(function(s) { return s[0] || ''; }).slice(0, 2).join('').toUpperCase();
+      var row = el('div', { class:'mini-row' });
+      row.innerHTML = '<div class="mr-icon" style="background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff;">' + esc(initials) + '</div><div class="mr-body"><div class="mr-title">' + esc(u.name || '—') + '</div><div class="mr-sub">' + esc(roleLabel(u.role)) + '</div></div><div class="mr-time">' + esc(timeAgo(u.createdAt)) + '</div>';
+      card2.appendChild(row);
+    });
+  }
+  grid.appendChild(card2);
+
+  c.appendChild(grid);
+}
+
+/* ============================================================
+   Остальные страницы (все с esc())
+============================================================ */
 async function renderCities() {
   $('#page-title').textContent = 'Города';
   var c = $('#content'); c.innerHTML = '';
@@ -738,10 +1061,10 @@ async function renderCities() {
     cities.forEach(function(e) {
       var id = e[0], city = e[1];
       var tr = el('tr');
-      tr.innerHTML = '<td>' + city.name + '</td><td>' + fmt.date(city.createdAt) + '</td>';
+      tr.innerHTML = '<td>' + esc(city.name) + '</td><td>' + fmt.date(city.createdAt) + '</td>';
       var a = el('td', { style:'display:flex;gap:6px;' });
       a.appendChild(el('button', { class:'btn btn-sm btn-ghost', html:ic('userPlus', 14) + ' Создателя', onclick:function() { createCityCreatorDialog(id); } }));
-      a.appendChild(el('button', { class:'btn btn-sm btn-ghost', html:ic('trash', 14), onclick:async function() { if (await confirmDialog('Удалить город?', 'Город "' + city.name + '" будет удалён.')) { await db.ref('cities/' + id).remove(); toast('Удалён','success'); await loadAll(); renderCities(); } } }));
+      a.appendChild(el('button', { class:'btn btn-sm btn-ghost', html:ic('trash', 14), onclick:async function() { if (await confirmDialog('Удалить город?', 'Город "' + esc(city.name) + '" будет удалён.')) { await db.ref('cities/' + id).remove(); toast('Удалён','success'); await loadAll(); renderCities(); } } }));
       tr.appendChild(a); tb.appendChild(tr);
     });
     t.appendChild(tb); card.appendChild(t);
@@ -764,10 +1087,10 @@ async function renderSchools() {
       var id = e[0], s = e[1];
       var city = App.cache.cities[s.cityId];
       var tr = el('tr');
-      tr.innerHTML = '<td>' + s.name + '</td><td>' + (city ? city.name : '—') + '</td><td>' + fmt.date(s.createdAt) + '</td>';
+      tr.innerHTML = '<td>' + esc(s.name) + '</td><td>' + esc(city ? city.name : '—') + '</td><td>' + fmt.date(s.createdAt) + '</td>';
       var a = el('td', { style:'display:flex;gap:6px;' });
       a.appendChild(el('button', { class:'btn btn-sm btn-ghost', html:ic('userPlus', 14) + ' Создателя', onclick:function() { createSchoolCreatorDialog(id, s.cityId); } }));
-      a.appendChild(el('button', { class:'btn btn-sm btn-ghost', html:ic('trash', 14), onclick:async function() { if (await confirmDialog('Удалить школу?', 'Школа "' + s.name + '" будет удалена.')) { await db.ref('schools/' + id).remove(); toast('Удалена','success'); await loadAll(); renderSchools(); } } }));
+      a.appendChild(el('button', { class:'btn btn-sm btn-ghost', html:ic('trash', 14), onclick:async function() { if (await confirmDialog('Удалить школу?', 'Школа "' + esc(s.name) + '" будет удалена.')) { await db.ref('schools/' + id).remove(); toast('Удалена','success'); await loadAll(); renderSchools(); } } }));
       tr.appendChild(a); tb.appendChild(tr);
     });
     t.appendChild(tb); card.appendChild(t);
@@ -790,7 +1113,7 @@ async function renderUsers() {
     users.forEach(function(e) {
       var u = e[1];
       var tr = el('tr');
-      tr.innerHTML = '<td>' + (u.name || '—') + '</td><td>' + (u.login || '—') + '</td><td>' + (u.email || '—') + '</td><td><span class="badge">' + roleLabel(u.role) + '</span></td>';
+      tr.innerHTML = '<td>' + esc(u.name || '—') + '</td><td>' + esc(u.login || '—') + '</td><td>' + esc(u.email || '—') + '</td><td><span class="badge">' + esc(roleLabel(u.role)) + '</span></td>';
       var a = el('td');
       a.appendChild(el('button', { class:'btn btn-sm btn-ghost', html:ic('key', 14) + ' Пароль', onclick:function() { resetPasswordDialog(u.email); } }));
       tr.appendChild(a); tb.appendChild(tr);
@@ -817,7 +1140,7 @@ async function renderInvites() {
       else if (i.expiresAt < Date.now()) st = '⌛ Истёк';
       else st = '🟢 Активен';
       var tr = el('tr');
-      tr.innerHTML = '<td><span class="invite-code ' + (i.used ? 'used' : '') + '">' + code + '</span></td><td>' + st + '</td><td>' + fmt.date(i.createdAt) + '</td><td>' + fmt.date(i.expiresAt) + '</td>';
+      tr.innerHTML = '<td><span class="invite-code">' + esc(code) + '</span></td><td>' + st + '</td><td>' + fmt.date(i.createdAt) + '</td><td>' + fmt.date(i.expiresAt) + '</td>';
       tb.appendChild(tr);
     });
     t.appendChild(tb); card.appendChild(t);
@@ -838,10 +1161,10 @@ async function renderClasses() {
       var n = Object.values(App.cache.students).filter(function(s) { return s.classId === id; }).length;
       var cc = el('div', { class:'stat-card dash-anim' });
       cc.style.animationDelay = (i * 60) + 'ms';
-      cc.innerHTML = '<div class="stat-label">' + (cl.year || '—') + ' год</div><div class="stat-value" style="font-size:20px;">' + cl.name + '</div><div style="display:flex;gap:14px;margin-top:10px;font-size:12px;color:var(--text-muted);"><span>👨‍🎓 ' + n + ' учеников</span><span>📚 ' + ((cl.subjects || []).length) + ' предметов</span></div>';
+      cc.innerHTML = '<div class="stat-label">' + esc(cl.year || '—') + ' год</div><div class="stat-value" style="font-size:20px;">' + esc(cl.name) + '</div><div style="display:flex;gap:14px;margin-top:10px;font-size:12px;color:var(--text-muted);"><span>👨‍🎓 ' + n + ' учеников</span><span>📚 ' + ((cl.subjects || []).length) + ' предметов</span></div>';
       var a = el('div', { style:'margin-top:14px;display:flex;gap:6px;' });
       a.appendChild(el('button', { class:'btn btn-sm btn-primary', html:ic('arrowLeft', 14) + ' Открыть', style:'flex:1;', onclick:function() { navigate('class', { id:id }); } }));
-      a.appendChild(el('button', { class:'btn btn-sm btn-ghost', html:ic('trash', 14), onclick:async function() { if (await confirmDialog('Удалить класс?', 'Класс "' + cl.name + '" и его ученики будут удалены.')) { var u = {}; u['classes/' + id] = null; Object.entries(App.cache.students).forEach(function(e2) { if (e2[1].classId === id) u['students/' + e2[0]] = null; }); Object.entries(App.cache.grades).forEach(function(e2) { if (e2[1].classId === id) u['grades/' + e2[0]] = null; }); Object.entries(App.cache.lessons).forEach(function(e2) { if (e2[1].classId === id) u['lessons/' + e2[0]] = null; }); Object.entries(App.cache.attendance).forEach(function(e2) { if (e2[1].classId === id) u['attendance/' + e2[0]] = null; }); await db.ref().update(u); toast('Класс удалён','success'); await loadAll(); renderClasses(); } } }));
+      a.appendChild(el('button', { class:'btn btn-sm btn-ghost', html:ic('trash', 14), onclick:async function() { if (await confirmDialog('Удалить класс?', 'Класс "' + esc(cl.name) + '" и его ученики будут удалены.')) { var u = {}; u['classes/' + id] = null; Object.entries(App.cache.students).forEach(function(e2) { if (e2[1].classId === id) u['students/' + e2[0]] = null; }); Object.entries(App.cache.grades).forEach(function(e2) { if (e2[1].classId === id) u['grades/' + e2[0]] = null; }); Object.entries(App.cache.lessons).forEach(function(e2) { if (e2[1].classId === id) u['lessons/' + e2[0]] = null; }); Object.entries(App.cache.attendance).forEach(function(e2) { if (e2[1].classId === id) u['attendance/' + e2[0]] = null; }); await db.ref().update(u); toast('Класс удалён','success'); await loadAll(); renderClasses(); } } }));
       cc.appendChild(a); g.appendChild(cc);
     });
     card.appendChild(g);
@@ -854,7 +1177,7 @@ async function renderClassDetail(classId) {
   $('#page-title').textContent = 'Класс ' + cl.name;
   var c = $('#content'); c.innerHTML = '';
   var info = el('div', { class:'card' });
-  info.innerHTML = '<div class="card-header"><div class="card-title">' + cl.name + ' • ' + (cl.year || '') + ' год</div></div><div style="font-size:13px;color:var(--text-muted);">📚 Предметы: ' + ((cl.subjects || []).join(', ') || '—') + '</div>';
+  info.innerHTML = '<div class="card-header"><div class="card-title">' + esc(cl.name) + ' • ' + esc(cl.year || '') + ' год</div></div><div style="font-size:13px;color:var(--text-muted);">📚 Предметы: ' + esc((cl.subjects || []).join(', ') || '—') + '</div>';
   c.appendChild(info);
   var card = el('div', { class:'card' });
   card.appendChild(el('div', { class:'card-header' }, el('div', { class:'card-title' }, 'Ученики класса'), el('div', { style:'display:flex;gap:6px;' }, el('button', { class:'btn btn-success btn-sm', html:ic('upload', 14) + ' Импорт CSV', onclick:function() { importCSVDialog(classId); } }), el('button', { class:'btn btn-primary btn-sm', html:ic('userPlus', 14) + ' Добавить', onclick:function() { addStudentDialog(classId); } }))));
@@ -867,7 +1190,7 @@ async function renderClassDetail(classId) {
     st.sort(function(a, b) { return a[1].name.localeCompare(b[1].name); }).forEach(function(e, i) {
       var sid = e[0], s = e[1];
       var tr = el('tr');
-      tr.innerHTML = '<td>' + (i + 1) + '</td><td>' + s.name + '</td>';
+      tr.innerHTML = '<td>' + (i + 1) + '</td><td>' + esc(s.name) + '</td>';
       var a = el('td');
       a.appendChild(el('button', { class:'btn btn-sm btn-ghost', html:ic('trash', 14), onclick:function() { deleteStudent(sid, s.name); } }));
       tr.appendChild(a); tb.appendChild(tr);
@@ -906,7 +1229,7 @@ async function renderJournal() {
   top.appendChild(el('button', { class:'btn btn-warn', html:ic('trash', 14) + ' Сбросить', onclick:function() { resetSubjectDialog(state.classId, state.subject); } }));
   shell.appendChild(top);
   var sub = el('div', { class:'journal-sub' });
-  sub.innerHTML = '<span><b>Класс:</b> ' + curCls.name + '</span><span><b>Предмет:</b> ' + (state.subject || '—') + '</span><span><b>Период:</b> ' + quarterName(state.quarterId) + '</span>';
+  sub.innerHTML = '<span><b>Класс:</b> ' + esc(curCls.name) + '</span><span><b>Предмет:</b> ' + esc(state.subject || '—') + '</span><span><b>Период:</b> ' + esc(quarterName(state.quarterId)) + '</span>';
   shell.appendChild(sub);
   var scroll = el('div', { class:'journal-scroll' });
   var table = buildJournalTable(state.classId, state.subject, state.quarterId);
@@ -922,7 +1245,7 @@ async function resetSubjectDialog(classId, subject) {
   Object.values(App.cache.lessons).forEach(function(l) { if (l.classId === classId && l.subject === subject) lc++; });
   Object.values(App.cache.grades).forEach(function(g) { if (g.classId === classId && g.subject === subject) gc++; });
   Object.values(App.cache.attendance).forEach(function(a) { if (a.classId === classId && a.subject === subject) ac++; });
-  var ok1 = await warnDialog('Сбросить предмет?', 'Сброс <b>«' + subject + '»</b> в классе <b>' + cls.name + '</b>.<br><br>Уроков: <b>' + lc + '</b><br>Оценок: <b>' + gc + '</b><br>Отметок: <b>' + ac + '</b><br><br>Продолжить?', 'Да, продолжить');
+  var ok1 = await warnDialog('Сбросить предмет?', 'Сброс <b>«' + esc(subject) + '»</b> в классе <b>' + esc(cls.name) + '</b>.<br><br>Уроков: <b>' + lc + '</b><br>Оценок: <b>' + gc + '</b><br>Отметок: <b>' + ac + '</b><br><br>Продолжить?', 'Да, продолжить');
   if (!ok1) return;
   var ok2 = await warnDialog('Точно?', 'Это необратимо. Продолжить?', 'Да, я уверен');
   if (!ok2) return;
@@ -985,7 +1308,7 @@ function buildJournalTable(classId, subject, quarterId) {
     var dayG = grades.filter(function(g) { return g.dms === dms; });
     var code = '—';
     if (dayG.length) { var wt = App.cache.workTypes[dayG[0].typeId]; code = (wt && wt.code) || (wt && wt.name ? wt.name.substring(0, 3).toUpperCase() : '—'); }
-    tr3.appendChild(el('th', {}, code));
+    tr3.appendChild(el('th', {}, esc(code)));
   });
   thead.appendChild(tr3);
   table.appendChild(thead);
@@ -1026,7 +1349,7 @@ function showLessonTip(target, lesson) {
   hideLessonTip();
   var r = target.getBoundingClientRect();
   var tip = el('div', { class:'lesson-tip' });
-  tip.innerHTML = '<div class="tip-title">Тема урока</div><div class="tip-body">' + (lesson.topic || 'не задана') + '</div><div class="tip-title">Домашняя работа</div><div class="tip-body">' + (lesson.homework || 'без задания') + '</div>';
+  tip.innerHTML = '<div class="tip-title">Тема урока</div><div class="tip-body">' + esc(lesson.topic || 'не задана') + '</div><div class="tip-title">Домашняя работа</div><div class="tip-body">' + esc(lesson.homework || 'без задания') + '</div>';
   document.body.appendChild(tip);
   tip.style.left = (r.left + r.width / 2 - 120) + 'px';
   tip.style.top = (r.bottom + 6) + 'px';
@@ -1053,10 +1376,10 @@ function openLessonDialog(opts) {
     closeModal(); await loadAll(); renderJournal();
   }});
   showModal(ic('calendar', 20) + ' ' + (existing ? 'Редактировать' : 'Новый') + ' урок',
-    '<div class="form-group"><label>Класс / Предмет</label><input value="' + cls.name + ' / ' + subject + '" disabled></div>' +
-    '<div class="form-group"><label>Дата</label><input type="date" id="ls-date" value="' + dateStr + '"></div>' +
-    '<div class="form-group"><label>Тема урока</label><textarea id="ls-topic">' + (existing ? (existing[1].topic || '') : '') + '</textarea></div>' +
-    '<div class="form-group"><label>Домашняя работа</label><textarea id="ls-hw">' + (existing ? (existing[1].homework || '') : '') + '</textarea></div>',
+    '<div class="form-group"><label>Класс / Предмет</label><input value="' + esc(cls.name) + ' / ' + esc(subject) + '" disabled></div>' +
+    '<div class="form-group"><label>Дата</label><input type="date" id="ls-date" value="' + esc(dateStr) + '"></div>' +
+    '<div class="form-group"><label>Тема урока</label><textarea id="ls-topic">' + esc(existing ? (existing[1].topic || '') : '') + '</textarea></div>' +
+    '<div class="form-group"><label>Домашняя работа</label><textarea id="ls-hw">' + esc(existing ? (existing[1].homework || '') : '') + '</textarea></div>',
     actions);
 }
 async function fillYearDialog(classId, subject) {
@@ -1067,7 +1390,7 @@ async function fillYearDialog(classId, subject) {
   var wd = ['Пн','Вт','Ср','Чт','Пт','Сб'];
   var wdHtml = wd.map(function(w, i) { return '<label data-wd="' + (i + 1) + '"><input type="checkbox" value="' + (i + 1) + '">' + w + '</label>'; }).join('');
   showModal(ic('zap', 20) + ' Заполнить уроки на год',
-    '<div class="form-group"><label>Класс / Предмет</label><input value="' + App.cache.classes[classId].name + ' / ' + subject + '" disabled></div>' +
+    '<div class="form-group"><label>Класс / Предмет</label><input value="' + esc(App.cache.classes[classId].name) + ' / ' + esc(subject) + '" disabled></div>' +
     '<div class="form-group"><label>Дата начала</label><input type="date" id="fy-start" value="' + start + '"></div>' +
     '<div class="form-group"><label>Дата окончания</label><input type="date" id="fy-end" value="' + end + '"></div>' +
     '<div class="form-group"><label>Дни недели уроков</label><div class="weekday-picker" id="fy-wd">' + wdHtml + '</div><div class="hint">' + ic('info', 14) + ' Отметьте дни, когда проходят уроки.</div></div>',
@@ -1103,7 +1426,7 @@ function openGradeCellDialog(classId, subject, studentId, dateMs, existingGradeI
   var wt = Object.entries(App.cache.workTypes).sort(function(a, b) { return (a[1].weight || 0) - (b[1].weight || 0); });
   var selectedValue = existing ? existing.value : null;
   var selectedAtt = existingAtt ? (existingAtt.mark || '') : '';
-  var wtOpts = wt.map(function(e) { return '<option value="' + e[0] + '"' + (existing && existing.typeId === e[0] ? ' selected' : '') + '>' + e[1].name + ' (вес ' + e[1].weight + ')</option>'; }).join('');
+  var wtOpts = wt.map(function(e) { return '<option value="' + esc(e[0]) + '"' + (existing && existing.typeId === e[0] ? ' selected' : '') + '>' + esc(e[1].name) + ' (вес ' + e[1].weight + ')</option>'; }).join('');
   var btns = [5,4,3,2,1].map(function(v) { var a = (existing ? existing.value : null) === v ? 'active' : ''; return '<button type="button" class="grade-btn gb-' + v + ' ' + a + '" data-value="' + v + '">' + v + '</button>'; }).join('');
   var attBtns = [{ v:'', lbl:'Был' },{ v:'н', lbl:'Н' },{ v:'у', lbl:'У' },{ v:'о', lbl:'О' }].map(function(o) {
     var cls2 = o.v === 'н' ? 'ab-n' : (o.v === 'у' ? 'ab-u' : (o.v === 'о' ? 'ab-o' : 'ab-ok'));
@@ -1138,13 +1461,13 @@ function openGradeCellDialog(classId, subject, studentId, dateMs, existingGradeI
     closeModal(); await loadAll(); renderJournal();
   }});
   showModal(ic('pencil', 20) + ' Оценка и посещаемость',
-    '<div class="form-group"><label>Класс / Предмет</label><input value="' + cls.name + ' / ' + subject + '" disabled></div>' +
-    '<div class="form-group"><label>Ученик</label><input value="' + student.name + '" disabled></div>' +
-    '<div class="form-group"><label>Дата</label><input type="date" id="gd-date" value="' + dateStr + '"></div>' +
+    '<div class="form-group"><label>Класс / Предмет</label><input value="' + esc(cls.name) + ' / ' + esc(subject) + '" disabled></div>' +
+    '<div class="form-group"><label>Ученик</label><input value="' + esc(student.name) + '" disabled></div>' +
+    '<div class="form-group"><label>Дата</label><input type="date" id="gd-date" value="' + esc(dateStr) + '"></div>' +
     '<div class="form-group"><label>Посещаемость</label><div class="att-picker" id="gd-att-picker">' + attBtns + '</div></div>' +
     '<div class="form-group"><label>Тип работы</label><select id="gd-type">' + wtOpts + '</select></div>' +
     '<div class="form-group"><label>Оценка</label><div class="grade-picker" id="gd-picker">' + btns + '</div></div>' +
-    '<div class="form-group"><label>Замечания</label><textarea id="gd-notes">' + (existing && existing.notes ? existing.notes : '') + '</textarea></div>',
+    '<div class="form-group"><label>Замечания</label><textarea id="gd-notes">' + esc(existing && existing.notes ? existing.notes : '') + '</textarea></div>',
     actions);
   setTimeout(function() {
     var p = document.getElementById('gd-picker');
@@ -1163,13 +1486,13 @@ function exportJournalXLS(classId, subject, quarterId) {
   atts.forEach(function(a) { dateSet[a.dms] = true; });
   var ds = Object.keys(dateSet).map(Number).sort(function(a, b) { return a - b; });
   var html = '<html><head><meta charset="UTF-8"><style>table{border-collapse:collapse;font-family:Arial,sans-serif;font-size:11px}th,td{border:1px solid #999;padding:3px 5px;text-align:center}th{background:#0EA5E9;color:#fff;font-weight:bold}td.name{text-align:left;font-weight:bold}td.g5{background:#10B981;color:#fff;font-weight:bold}td.g4{background:#84CC16;color:#fff;font-weight:bold}td.g3{background:#F59E0B;color:#fff;font-weight:bold}td.g2{background:#EF4444;color:#fff;font-weight:bold}td.g1{background:#991B1B;color:#fff;font-weight:bold}td.avg{background:#E0F2FE;font-weight:bold}td.att{background:#FEF3C7;font-weight:bold}</style></head><body>';
-  html += '<h2>Журнал: ' + cls.name + ' / ' + subject + (quarterId !== 'all' ? ' (' + quarterName(quarterId) + ')' : '') + '</h2>';
+  html += '<h2>Журнал: ' + esc(cls.name) + ' / ' + esc(subject) + (quarterId !== 'all' ? ' (' + esc(quarterName(quarterId)) + ')' : '') + '</h2>';
   html += '<table><tr><th>№</th><th>Ученик</th>';
   ds.forEach(function(d) { html += '<th>' + new Date(d).toLocaleDateString('ru-RU') + '</th>'; });
   html += '<th>Средний</th><th>Итог</th></tr>';
   students.forEach(function(entry, i) {
     var sid = entry[0], s = entry[1];
-    html += '<tr><td>' + (i + 1) + '</td><td class="name">' + s.name + '</td>';
+    html += '<tr><td>' + (i + 1) + '</td><td class="name">' + esc(s.name) + '</td>';
     ds.forEach(function(d) {
       var g = grades.find(function(x) { return x.studentId === sid && x.dms === d; });
       var a = atts.find(function(x) { return x.studentId === sid && x.dms === d; });
@@ -1267,7 +1590,7 @@ async function renderStudents() {
       var cl = App.cache.classes[s.classId];
       var a = avgForStudent(sid, s.classId);
       var tr = el('tr');
-      tr.innerHTML = '<td>' + (i + 1) + '</td><td>' + s.name + '</td><td>' + (cl ? cl.name : '—') + '</td><td><span class="grade ' + gradeClass(a) + '">' + (a || '—') + '</span></td>';
+      tr.innerHTML = '<td>' + (i + 1) + '</td><td>' + esc(s.name) + '</td><td>' + esc(cl ? cl.name : '—') + '</td><td><span class="grade ' + gradeClass(a) + '">' + (a || '—') + '</span></td>';
       tb.appendChild(tr);
     });
     t.appendChild(tb); card.appendChild(t);
@@ -1277,7 +1600,7 @@ async function renderStudents() {
 function importCSVWithClassDialog() {
   var cls = myClasses();
   if (!Object.keys(cls).length) return toast('Сначала создайте класс', 'warning');
-  var opts = Object.entries(cls).sort(function(a, b) { return a[1].name.localeCompare(b[1].name); }).map(function(e) { return '<option value="' + e[0] + '">' + e[1].name + '</option>'; }).join('');
+  var opts = Object.entries(cls).sort(function(a, b) { return a[1].name.localeCompare(b[1].name); }).map(function(e) { return '<option value="' + esc(e[0]) + '">' + esc(e[1].name) + '</option>'; }).join('');
   showModal(ic('upload', 20) + ' Импорт из CSV',
     '<div class="form-group"><label>Класс</label><select id="imp-csv-class">' + opts + '</select></div>' +
     '<div class="form-group"><label>Как это работает</label><div class="hint">• Файл .csv или .txt, UTF-8<br>• Одна фамилия в строке<br>• Или через запятую</div></div>',
@@ -1297,9 +1620,9 @@ async function renderWorkTypes() {
     it.forEach(function(entry) {
       var id = entry[0], w = entry[1];
       var tr = el('tr');
-      tr.innerHTML = '<td>' + w.name + '</td><td><b>' + (w.code || '—') + '</b></td><td>' + w.weight + '</td>';
+      tr.innerHTML = '<td>' + esc(w.name) + '</td><td><b>' + esc(w.code || '—') + '</b></td><td>' + w.weight + '</td>';
       var a = el('td');
-      a.appendChild(el('button', { class:'btn btn-sm btn-ghost', html:ic('trash', 14), onclick:async function() { if (await confirmDialog('Удалить тип?', 'Тип "' + w.name + '" будет удалён.')) { await db.ref('workTypes/' + id).remove(); await loadAll(); renderWorkTypes(); } } }));
+      a.appendChild(el('button', { class:'btn btn-sm btn-ghost', html:ic('trash', 14), onclick:async function() { if (await confirmDialog('Удалить тип?', 'Тип "' + esc(w.name) + '" будет удалён.')) { await db.ref('workTypes/' + id).remove(); await loadAll(); renderWorkTypes(); } } }));
       tr.appendChild(a); tb.appendChild(tr);
     });
     t.appendChild(tb); card.appendChild(t);
@@ -1313,10 +1636,10 @@ async function renderProfile() {
   var card = el('div', { class:'card' });
   card.innerHTML =
     '<div class="card-header"><div class="card-title">Мой профиль</div></div>' +
-    '<p style="margin-bottom:8px;display:flex;align-items:center;gap:8px;"><span style="color:var(--text-muted);">' + ic('user', 16) + '</span><b>ФИО:</b> ' + (p.name || '—') + '</p>' +
-    '<p style="margin-bottom:8px;display:flex;align-items:center;gap:8px;"><span style="color:var(--text-muted);">' + ic('key', 16) + '</span><b>Логин:</b> ' + (p.login || '—') + '</p>' +
-    '<p style="margin-bottom:8px;display:flex;align-items:center;gap:8px;"><span style="color:var(--text-muted);">' + ic('mail', 16) + '</span><b>Email:</b> ' + (p.email || '—') + '</p>' +
-    '<p style="margin-bottom:8px;display:flex;align-items:center;gap:8px;"><span style="color:var(--text-muted);">' + ic('tag', 16) + '</span><b>Роль:</b> <span class="badge">' + roleLabel(p.role) + '</span></p>' +
+    '<p style="margin-bottom:8px;display:flex;align-items:center;gap:8px;"><span style="color:var(--text-muted);">' + ic('user', 16) + '</span><b>ФИО:</b> ' + esc(p.name || '—') + '</p>' +
+    '<p style="margin-bottom:8px;display:flex;align-items:center;gap:8px;"><span style="color:var(--text-muted);">' + ic('key', 16) + '</span><b>Логин:</b> ' + esc(p.login || '—') + '</p>' +
+    '<p style="margin-bottom:8px;display:flex;align-items:center;gap:8px;"><span style="color:var(--text-muted);">' + ic('mail', 16) + '</span><b>Email:</b> ' + esc(p.email || '—') + '</p>' +
+    '<p style="margin-bottom:8px;display:flex;align-items:center;gap:8px;"><span style="color:var(--text-muted);">' + ic('tag', 16) + '</span><b>Роль:</b> <span class="badge">' + esc(roleLabel(p.role)) + '</span></p>' +
     '<hr style="border:none;border-top:1px solid var(--border);margin:18px 0;">' +
     '<div style="font-size:14px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:8px;">' + ic('monitor', 16) + ' Настройки отображения</div>' +
     '<div class="form-group" style="max-width:340px;"><label>Размер журнала</label><select id="device-select"><option value="auto">🔄 Авто</option><option value="phone">📱 Телефон</option><option value="tablet">💻 Планшет</option><option value="desktop">🖥️ Компьютер</option></select></div>' +
@@ -1350,7 +1673,7 @@ function addCityDialog() {
     [{ label:'Отмена' }, { label:'Создать', class:'btn-primary', onClick: async function() { var n = document.getElementById('m-city-name').value.trim(); if (!n) return; var id = db.ref('cities').push().key; await db.ref('cities/' + id).set({ name:n, creatorId:App.profile.uid, createdAt:Date.now() }); closeModal(); toast('Город создан', 'success'); await loadAll(); renderCities(); } }]);
 }
 function addSchoolDialog() {
-  var opts = Object.entries(App.cache.cities).filter(function(e) { return App.profile.role !== 'city_creator' || e[0] === App.profile.cityId; }).map(function(e) { return '<option value="' + e[0] + '">' + e[1].name + '</option>'; }).join('');
+  var opts = Object.entries(App.cache.cities).filter(function(e) { return App.profile.role !== 'city_creator' || e[0] === App.profile.cityId; }).map(function(e) { return '<option value="' + esc(e[0]) + '">' + esc(e[1].name) + '</option>'; }).join('');
   if (!opts) return toast('Сначала создайте город', 'warning');
   showModal(ic('school', 20) + ' Новая школа',
     '<div class="form-group"><label>Название</label><input id="m-school-name" placeholder="Школа №1"></div><div class="form-group"><label>Город</label><select id="m-school-city">' + opts + '</select></div>',
@@ -1360,22 +1683,11 @@ function createCityCreatorDialog(cityId) {
   showModal(ic('userPlus', 20) + ' Создатель города',
     '<div class="form-group"><label>ФИО</label><input id="cc-name"></div><div class="form-group"><label>Логин</label><input id="cc-login"></div><div class="form-group"><label>Email</label><input id="cc-email" type="email"></div><div class="form-group"><label>Пароль</label><input id="cc-pass" type="password" minlength="6"></div>',
     [{ label:'Отмена' }, { label:'Создать', class:'btn-primary', onClick: async function() {
-      var n = document.getElementById('cc-name').value.trim(); var l = document.getElementById('cc-login').value.trim();
-      var e = document.getElementById('cc-email').value.trim(); var p = document.getElementById('cc-pass').value;
-      if (!n || !l || !e || p.length < 6) return toast('Заполните всё (пароль ≥6)', 'error');
-      try {
-        var d = await API.request('/api/auth/register', 'POST', { code:'ADMIN_CREATE', name:n, login:l, email:e, password:p, role:'city_creator', cityId:cityId });
-        // fallback — если через register не получается, создаём через двойной auth не выйдет, поэтому делаем на клиенте
-      } catch (err) { /* используем способ ниже */ }
-      // Создаём напрямую через Worker write
-      try {
-        // ... (нужен доп. эндпоинт в Worker, но пока просто заглушка)
-        toast('Функция создания пользователя пока не поддерживается, обратитесь к разработчику', 'warning');
-      } catch (err) { toast(err.message, 'error'); }
+      toast('Функция создания пользователя пока не поддерживается', 'warning');
     } }]);
 }
 function createSchoolCreatorDialog(schoolId, cityId) {
-  toast('Функция создания пользователя скоро появится. Пока используйте Firebase Console.', 'warning');
+  toast('Функция создания пользователя пока не поддерживается', 'warning');
 }
 function createInvite() {
   var code = Math.random().toString(36).substring(2, 8).toUpperCase();
@@ -1384,8 +1696,8 @@ function createInvite() {
 }
 function addClassDialog() {
   var gh = POPULAR_SUBJECTS.map(function(g, gi) {
-    var items = g.items.map(function(n) { return '<label class="subject-item" data-name="' + n + '"><input type="checkbox" value="' + n + '"><span>' + n + '</span></label>'; }).join('');
-    return '<div class="subject-group" data-group="' + gi + '"><div class="subject-group-title">' + ic('list', 12) + ' ' + g.group + '</div>' + items + '</div>';
+    var items = g.items.map(function(n) { return '<label class="subject-item" data-name="' + esc(n) + '"><input type="checkbox" value="' + esc(n) + '"><span>' + esc(n) + '</span></label>'; }).join('');
+    return '<div class="subject-group" data-group="' + gi + '"><div class="subject-group-title">' + ic('list', 12) + ' ' + esc(g.group) + '</div>' + items + '</div>';
   }).join('');
   var d = showModal(ic('cap', 20) + ' Новый класс',
     '<div class="form-group"><label>Название</label><input id="m-cl-name" placeholder="1А"></div>' +
@@ -1425,7 +1737,7 @@ function addStudentDialog(classId) {
 function addStudentsDialog() {
   var cls = myClasses();
   if (!Object.keys(cls).length) return toast('Сначала создайте класс', 'warning');
-  var opts = Object.entries(cls).sort(function(a, b) { return a[1].name.localeCompare(b[1].name); }).map(function(e) { return '<option value="' + e[0] + '">' + e[1].name + '</option>'; }).join('');
+  var opts = Object.entries(cls).sort(function(a, b) { return a[1].name.localeCompare(b[1].name); }).map(function(e) { return '<option value="' + esc(e[0]) + '">' + esc(e[1].name) + '</option>'; }).join('');
   showModal(ic('userPlus', 20) + ' Добавить учеников',
     '<div class="form-group"><label>Класс</label><select id="m-as-class">' + opts + '</select></div><div class="form-group"><label>ФИО учеников</label><textarea id="m-as-names" placeholder="Иванов Иван, Петров Пётр"></textarea></div>',
     [{ label:'Отмена' }, { label:'Добавить', class:'btn-primary', onClick: async function() {
@@ -1439,7 +1751,7 @@ function addStudentsDialog() {
     } }]);
 }
 async function deleteStudent(sid, name) {
-  if (await confirmDialog('Удалить ученика?', '"' + name + '" будет удалён вместе с оценками.')) {
+  if (await confirmDialog('Удалить ученика?', '"' + esc(name) + '" будет удалён вместе с оценками.')) {
     var u = {}; u['students/' + sid] = null;
     Object.entries(App.cache.grades).forEach(function(e) { if (e[1].studentId === sid) u['grades/' + e[0]] = null; });
     Object.entries(App.cache.attendance).forEach(function(e) { if (e[1].studentId === sid) u['attendance/' + e[0]] = null; });
@@ -1461,7 +1773,7 @@ function addWorkTypeDialog() {
 }
 function resetPasswordDialog(email) {
   if (!email) return toast('Нет email', 'error');
-  showModal(ic('key', 20) + ' Сброс пароля', '<p>Отправить письмо на <b>' + email + '</b>?</p>',
+  showModal(ic('key', 20) + ' Сброс пароля', '<p>Отправить письмо на <b>' + esc(email) + '</b>?</p>',
     [{ label:'Отмена' }, { label:'Отправить', class:'btn-primary', onClick: async function() { try { await API.request('/api/auth/reset', 'POST', { email: email }); toast('Письмо отправлено', 'success'); } catch (e) { toast(e.message, 'error'); } closeModal(); } }]);
 }
 function showLoader(text) { $('#loader-text').textContent = text || 'Загрузка…'; $('#loader-screen').style.display = 'flex'; $('#auth-screen').style.display = 'none'; $('#app-screen').style.display = 'none'; }
